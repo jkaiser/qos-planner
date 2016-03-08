@@ -1,18 +1,20 @@
+syntax = "proto3";
+
 package rpc;
 
 message Request {
     message DeleteRequest {     // delete an exiting reservation for a given ID
         repeated string ID = 1; // list of IDs
-        optional bool all = 2;   // signals to delete every single resource reservation.
+        bool all = 2;   // signals to delete every single resource reservation.
     }
     message ResourceRequest {   // reserve resources for a given ID
         message ResourceDefinition {
-            required string file = 1;
-            required int32 throughputMB = 2;
-            required int64 tstart = 3;
-            required int64 tstop = 4;
+            string file = 1;
+            int32 throughputMB = 2;
+            int64 tstart = 3;
+            int64 tstop = 4;
         }
-        required string ID = 1;
+        string ID = 1;
         repeated ResourceDefinition requestedResources = 2;
 
     }
@@ -22,7 +24,7 @@ message Request {
         DELETE = 1;
     }
 
-    required Type type = 1;
+    Type type = 1;
     oneof rt {
         ResourceRequest resourceRequest = 2;
         DeleteRequest deleteRequest = 3;
@@ -36,14 +38,14 @@ message Error {
         EARGS = 0;      // invalid arguments (e.g. unknown JOBID given in a delete request)
         EUNKNOWN = 1;   // unknown/unspecified error
     }
-    required errorType error = 1;
-    optional string msg = 2;
+    errorType error = 1;
+    string msg = 2;
 }
 
 
 message Reply {
-    required int32 rc = 1;
-    optional Error error = 2;
+    int32 rc = 1;
+    Error error = 2;
 }
 
 // The main message body.
@@ -53,7 +55,7 @@ message Message {
         REPLY = 1;
     }
 
-    required Type type = 1;
+    Type type = 1;
     oneof rq {
         Request request = 2;
         Reply   reply = 3;
