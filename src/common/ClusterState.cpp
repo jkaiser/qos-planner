@@ -4,8 +4,7 @@
 
 #include "ClusterState.h"
 
-
-//MemoryClusterState::MemoryClusterState() {}
+namespace common {
 
 const NodeState *MemoryClusterState::getState(std::string id) {
     auto it = this->nodeMap.find(id);
@@ -82,4 +81,10 @@ void MemoryClusterState::updateRepeatedly() {
 
 bool MemoryClusterState::Update() {
     return false;
+}
+
+void MemoryClusterState::UpdateNode(std::string name, const NodeState &node_state) {
+    nodeMap[name] = node_state;
+}
+
 }
