@@ -7,6 +7,7 @@
 
 #include <ClusterState.h>
 
+
 TEST(MemClusterState, InitTeardown) {
     common::MemoryClusterState mcs;
     EXPECT_TRUE(mcs.Init());
@@ -31,4 +32,5 @@ TEST(MemClusterState, GetState) {
 
     EXPECT_TRUE(mcs.TearDown());
 };
+
 
