@@ -80,6 +80,7 @@ void MemoryClusterState::updateRepeatedly() {
 }
 
 bool MemoryClusterState::Update() {
+    //TODO: Implement update mechanism -> Needs an Lustre implementation!!!
     return false;
 }
 

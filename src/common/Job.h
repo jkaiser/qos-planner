@@ -14,6 +14,11 @@ class Job {
 
 private:
 public:
+    enum JobEvent {
+        JOBSTART = 1,
+        JOBSTOP
+    };
+
     enum JobState {
         INITIALIZED = 0,
         SCHEDULED,
@@ -21,8 +26,10 @@ public:
         DONE
     };
 
-    Job(const std::string &jobid, std::chrono::time_point<std::chrono::system_clock> tstart,
-            std::chrono::time_point<std::chrono::system_clock> tend, uint32_t min_read_throughput_MB)
+    Job(const std::string &jobid,
+        std::chrono::time_point<std::chrono::system_clock> tstart,
+        std::chrono::time_point<std::chrono::system_clock> tend,
+        uint32_t min_read_throughput_MB)
             : jobid(jobid), tstart(tstart), tend(tend), min_read_throughput_MB(min_read_throughput_MB) { }
 
     Job(const std::string &jobid) : jobid(jobid){
