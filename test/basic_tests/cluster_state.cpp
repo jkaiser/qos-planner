@@ -22,11 +22,11 @@ TEST(MemClusterState, GetState) {
 
     EXPECT_TRUE(mcs.getNodes()->empty());
     common::NodeState ns = {"n1", 42, 17};
-    mcs.UpdateNode("foo", ns);
+    mcs.UpdateNode("n1", ns);
 
-    auto rt = mcs.getState("foo");
+    auto rt = mcs.getState("n1");
     EXPECT_NE(rt, nullptr);
-    EXPECT_STREQ(rt->name.c_str(), "foo");
+    EXPECT_STREQ(rt->name.c_str(), "n1");
     EXPECT_EQ(ns.rpcSec, rt->rpcSec);
     EXPECT_EQ(ns.maxRpcSec, rt->maxRpcSec);
 
