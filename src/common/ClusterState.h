@@ -14,6 +14,9 @@
 
 namespace common {
 
+/**
+ * Simple representation of a node's current workload (the actual measured one)
+ */
 struct NodeState {
     std::string name;
     uint32_t rpcSec;
