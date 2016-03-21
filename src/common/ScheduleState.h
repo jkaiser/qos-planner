@@ -49,6 +49,15 @@ public:
     virtual bool AddJob(const std::string &jobid, const Job &job, const std::vector<std::string> &osts) = 0;
 
     virtual bool UpdateJob(std::string jobid, Job::JobState new_state) = 0;
+
+    virtual bool GetJobThroughput(const std::string jobid, uint32_t *throughput) = 0;
+
+    virtual bool GetJobStatus(const std::string jobid, Job::JobState *state) = 0;
+    virtual bool GetJobEnd(const std::string jobid, std::chrono::system_clock::time_point *tend) = 0;
+
+    /**
+     * Returns a copy of all current jobs. NOTE: This is an expensive operation. Use it with care!
+     */
     virtual std::map<std::string, Job*> *GetAllJobs() = 0;
 };
 
@@ -70,6 +79,9 @@ public:
     virtual void Reset() override;
     virtual bool AddJob(const std::string &jobid, const Job &job, const std::vector<std::string> &osts) override;
     virtual bool UpdateJob(std::string jobid, Job::JobState new_state) override;
+    virtual bool GetJobThroughput(const std::string jobid, uint32_t *throughput) override;
+    virtual bool GetJobStatus(const std::string jobid, Job::JobState *state) override;
+    virtual bool GetJobEnd(const std::string jobid, std::chrono::system_clock::time_point *tend) override;
     virtual std::map<std::string, Job*> *GetAllJobs() override;
 };
 }

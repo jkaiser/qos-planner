@@ -99,4 +99,39 @@ std::map<std::string, Job *> *MemoryScheduleState::GetAllJobs() {
 
     return new_map;
 }
+
+bool MemoryScheduleState::GetJobThroughput(std::string jobid, uint32_t *throughput) {
+    std::unique_lock<std::mutex> lck(schedule_mut);
+    auto it = jobs.find(jobid);
+    if (it == jobs.end()) {
+        return false;
+    }
+
+    *throughput = it->second->getMin_read_throughput_MB();
+    return true;
+}
+
+bool MemoryScheduleState::GetJobStatus(const std::string jobid, Job::JobState *state) {
+    std::unique_lock<std::mutex> lck(schedule_mut);
+    auto it = jobs.find(jobid);
+    if (it == jobs.end()) {
+        return false;
+    }
+
+    *state = it->second->getState();
+    return true;
+}
+
+bool MemoryScheduleState::GetJobEnd(const std::string jobid, std::chrono::system_clock::time_point *tend) {
+    std::unique_lock<std::mutex> lck(schedule_mut);
+    auto it = jobs.find(jobid);
+    if (it == jobs.end()) {
+        return false;
+    }
+
+    *tend = it->second->getTend();
+    return true;
+}
+
+
 }

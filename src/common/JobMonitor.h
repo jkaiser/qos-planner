@@ -13,6 +13,7 @@
 #include "Job.h"
 #include "ScheduleState.h"
 #include "JobPriorityQueue.h"
+#include "Lustre.h"
 
 namespace common {
 
@@ -24,7 +25,10 @@ class JobMonitor {
 
 
 private:
-    bool monitor_thread_started;
+    // The internal thread sleeps for this amount of seconds before checking for a Teardown call
+    uint32_t waiting_time_sec = 5;
+
+    bool monitor_thread_started = false;
     std::thread monitor_thread;
     bool monitor_thread_exit_flag = false;
 
@@ -41,6 +45,8 @@ private:
     std::condition_variable in_flight_jobs_cv;
     std::set<std::string> in_flight_jobs;
 
+    const std::string lustre_tbf_rule_postfix = "_qos_sched_io_rule";
+    Lustre *lustre;
 
     // function the monitor thread executes
     void Monitor();
@@ -50,7 +56,8 @@ private:
     bool StopJob(const std::string &jobid);
 
 public:
-    JobMonitor(ScheduleState *st);
+    JobMonitor(common::ScheduleState *st, Lustre *lustre);
+    JobMonitor(common::ScheduleState *st, Lustre *lustre, uint32_t waiting_time_sec);
     bool Init();
     bool TearDown();
     bool RegisterJob(const Job &job);
