@@ -54,6 +54,10 @@ void JobMonitor::Handle(const std::string &jobid, Job::JobEvent event) {
 }
 
 bool JobMonitor::Init() {
+    if ((scheduleState == nullptr) || (lustre == nullptr)) {
+        return false;
+    }
+
     // fill the monitor with existing jobs. We only consider jobs that werde touched by the monitor
     // itself -> state == SCHEDULED or state == ACTIVE
     std::map<std::string, Job*> *existing_jobs = scheduleState->GetAllJobs();
@@ -254,6 +258,9 @@ bool JobMonitor::UnregisterJob(const Job &job) {
 
     return ret_val;
 }
+
+JobMonitor::JobMonitor() {}
+
 
 }
 

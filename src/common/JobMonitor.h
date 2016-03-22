@@ -32,7 +32,7 @@ private:
     std::thread monitor_thread;
     bool monitor_thread_exit_flag = false;
 
-    ScheduleState *scheduleState;
+    ScheduleState *scheduleState = nullptr;
 
     std::mutex job_priority_queue_mutex;
     JobPriorityQueue job_priority_queue;
@@ -46,7 +46,7 @@ private:
     std::set<std::string> in_flight_jobs;
 
     const std::string lustre_tbf_rule_postfix = "_qos_sched_io_rule";
-    Lustre *lustre;
+    Lustre *lustre = nullptr;
 
     // function the monitor thread executes
     void Monitor();
@@ -56,6 +56,7 @@ private:
     bool StopJob(const std::string &jobid);
 
 public:
+    JobMonitor();
     JobMonitor(common::ScheduleState *st, Lustre *lustre);
     JobMonitor(common::ScheduleState *st, Lustre *lustre, uint32_t waiting_time_sec);
     bool Init();
