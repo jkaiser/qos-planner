@@ -6,7 +6,7 @@
 
 namespace common {
 
-const NodeState *MemoryClusterState::getState(std::string id) {
+const NodeState *MemoryClusterState::getState(const std::string &id) {
     auto it = this->nodeMap.find(id);
     if (it == this->nodeMap.end()) {
         return nullptr;
@@ -84,7 +84,7 @@ bool MemoryClusterState::Update() {
     return false;
 }
 
-void MemoryClusterState::UpdateNode(std::string name, const NodeState &node_state) {
+void MemoryClusterState::UpdateNode(const std::string &name, const NodeState &node_state) {
     nodeMap[name] = node_state;
 }
 

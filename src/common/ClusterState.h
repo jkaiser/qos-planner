@@ -33,15 +33,13 @@ public:
 
     virtual bool Init() = 0;
     virtual bool TearDown() = 0;
-    virtual const NodeState * getState(std::string id) = 0;
+    virtual const NodeState *getState(const std::string &id) = 0;
     virtual std::vector<std::string> *getNodes() = 0;
 
-    virtual void UpdateNode(std::string name, const NodeState &node_state) = 0;
+    virtual void UpdateNode(const std::string &name, const NodeState &node_state) = 0;
 };
 
 class MemoryClusterState : public ClusterState {
-
-
 
 private:
     std::map<std::string, NodeState> nodeMap;
@@ -60,8 +58,8 @@ public:
     virtual bool Init() override;
     virtual bool TearDown() override;
     virtual std::vector<std::string> *getNodes() override;
-    virtual const NodeState *getState(std::string id) override;
-    virtual void UpdateNode(std::string name, const NodeState &node_state) override;
+    virtual const NodeState *getState(const std::string &id) override;
+    virtual void UpdateNode(const std::string &name, const NodeState &node_state) override;
 };
 }
 #endif //QOS_PLANNER_CLUSTERSTATE_H
