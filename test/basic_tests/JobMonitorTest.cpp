@@ -5,29 +5,14 @@
 
 #include "gmock/gmock.h"
 
-#include <Lustre.h>
+
+#include "MockScheduleState.h"
+#include "MockLustre.h"
 #include <JobMonitor.h>
 
 using ::testing::_;
 
 namespace common {
-
-class MockScheduleState : public MemoryScheduleState {
-public:
-    MOCK_METHOD2(GetJobEnd, bool(std::string, std::chrono::system_clock::time_point*));
-    MOCK_METHOD2(GetJobStatus, bool(std::string, Job::JobState*));
-    MOCK_METHOD2(UpdateJob, bool(std::string, Job::JobState));
-    MOCK_METHOD2(GetJobThroughput, bool(std::string, uint32_t*));
-    MOCK_METHOD0(GetAllJobs, std::map<std::string, Job*> *());
-};
-
-class MockLustre : public LocalLustre {
-public:
-    MOCK_METHOD3(StartJobTbfRule, bool(std::string, std::string, uint32_t));
-    MOCK_METHOD2(StopJobTbfRule, bool(std::string, std::string));
-};
-}
-
 
 TEST(JobMonitor, InitGetJobs) {
     common::MockScheduleState scheduleState;
