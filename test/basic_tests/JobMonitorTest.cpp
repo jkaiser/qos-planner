@@ -4,7 +4,6 @@
 
 
 #include "gmock/gmock.h"
-#include "gtest/gtest.h"
 
 #include <Lustre.h>
 #include <JobMonitor.h>
@@ -19,6 +18,7 @@ public:
     MOCK_METHOD2(GetJobStatus, bool(std::string, Job::JobState*));
     MOCK_METHOD2(UpdateJob, bool(std::string, Job::JobState));
     MOCK_METHOD2(GetJobThroughput, bool(std::string, uint32_t*));
+    MOCK_METHOD0(GetAllJobs, std::map<std::string, Job*> *());
 };
 
 class MockLustre : public LocalLustre {
@@ -26,6 +26,25 @@ public:
     MOCK_METHOD3(StartJobTbfRule, bool(std::string, std::string, uint32_t));
     MOCK_METHOD2(StopJobTbfRule, bool(std::string, std::string));
 };
+}
+
+
+TEST(JobMonitor, InitGetJobs) {
+    common::MockScheduleState scheduleState;
+    common::LocalLustre lustre;
+    common::JobMonitor jobMonitor(&scheduleState, &lustre, 3);
+
+    std::map<std::string, common::Job*> *jobmap = new std::map<std::string, common::Job*>();
+    (*jobmap)["job1"] = new common::Job("job1",
+                                std::chrono::system_clock::now(),
+                                std::chrono::system_clock::now() + std::chrono::milliseconds(1),
+                                42);
+    (*jobmap)["job1"]->setState(common::Job::SCHEDULED);
+
+    EXPECT_CALL(scheduleState, GetAllJobs()).WillOnce(testing::Return(jobmap));
+
+    EXPECT_TRUE(jobMonitor.Init());
+    EXPECT_TRUE(jobMonitor.TearDown());
 }
 
 TEST(JobMonitor, InitTeardown) {

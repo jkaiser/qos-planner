@@ -54,11 +54,34 @@ void JobMonitor::Handle(const std::string &jobid, Job::JobEvent event) {
 }
 
 bool JobMonitor::Init() {
-    /**
-     * TODO: retrieve all existing jobs from the Schedule
-     *      1) fill priority queue based on that
-     *      2) only consider jobs that should be active NOW or in the future
-     */
+    // fill the monitor with existing jobs. We only consider jobs that werde touched by the monitor
+    // itself -> state == SCHEDULED or state == ACTIVE
+    std::map<std::string, Job*> *existing_jobs = scheduleState->GetAllJobs();
+
+    std::unique_lock<std::mutex> lock(job_priority_queue_mutex);
+    for (auto job : *existing_jobs) {
+        JobPriorityQueue::WaitingItem *wt;
+        switch (job.second->getState()) {
+
+            case Job::SCHEDULED:
+                wt = new JobPriorityQueue::WaitingItem(job.second->getJobid(), job.second->getTstart(), Job::JobEvent::JOBSTART);
+                job_priority_queue.Push(wt);
+                break;
+
+            case Job::ACTIVE:
+                wt = new JobPriorityQueue::WaitingItem(job.second->getJobid(), job.second->getTend(), Job::JobEvent::JOBSTOP);
+                job_priority_queue.Push(wt);
+                break;
+
+            case Job::INITIALIZED:break;    // job is there, but never was scheduled -> to do
+            case Job::DONE:break;           // job is finished -> nothing to do
+        }
+        delete job.second;
+    }
+    existing_jobs->clear();
+    delete existing_jobs;
+    lock.unlock();
+
 
     if (not monitor_thread_started) {
         monitor_thread = std::thread(&JobMonitor::Monitor, this);
@@ -66,7 +89,6 @@ bool JobMonitor::Init() {
     } else { // something's wrong. Was it initialized before?
         return false;
     }
-
 
     return true;
 }
