@@ -15,6 +15,7 @@ namespace common {
 
 class MockScheduleState : public MemoryScheduleState {
 public:
+    MOCK_METHOD2(GetJobEnd, bool(std::string, std::chrono::system_clock::time_point*));
     MOCK_METHOD2(GetJobStatus, bool(std::string, Job::JobState*));
     MOCK_METHOD2(UpdateJob, bool(std::string, Job::JobState));
     MOCK_METHOD2(GetJobThroughput, bool(std::string, uint32_t*));
@@ -37,7 +38,57 @@ TEST(JobMonitor, InitTeardown) {
     EXPECT_TRUE(jobMonitor.TearDown());
 }
 
+TEST(JobMonitor, StartStopJob) {
+    // The Start & Stop call are private, so I trigger them by small start-stop times
+    common::MockScheduleState scheduleState;
+    common::MockLustre lustre;
+    lustre.Init();
+    common::JobMonitor jobMonitor(&scheduleState, &lustre, 1);
 
+    EXPECT_TRUE(jobMonitor.Init());
+
+    auto job1 = new common::Job("job1",
+                                std::chrono::system_clock::now(),
+                                std::chrono::system_clock::now() + std::chrono::milliseconds(1),
+                                42);
+
+    EXPECT_CALL(scheduleState, GetJobStatus(job1->getJobid(), _))
+            .WillOnce(DoAll(testing::SetArgPointee<1>(common::Job::SCHEDULED), testing::Return(true)))
+            .WillOnce(DoAll(testing::SetArgPointee<1>(common::Job::ACTIVE), testing::Return(true)));
+    EXPECT_CALL(scheduleState, UpdateJob(job1->getJobid(), _)).Times(2).WillRepeatedly(testing::Return(true));
+    EXPECT_CALL(scheduleState, GetJobEnd(job1->getJobid(), _)).WillOnce(testing::DoAll(testing::SetArgPointee<1>(job1->getTend()), testing::Return(true)));
+    ON_CALL(scheduleState, GetJobThroughput(job1->getJobid(), _)).WillByDefault(testing::Return(true));
+    EXPECT_CALL(lustre, StartJobTbfRule(job1->getJobid(), _, _)).WillOnce(testing::Return(true));
+    EXPECT_CALL(lustre, StopJobTbfRule(job1->getJobid(), _)).WillOnce(testing::Return(true));
+
+    EXPECT_TRUE(jobMonitor.RegisterJob(*job1));
+    std::this_thread::sleep_for(std::chrono::seconds(2));
+    EXPECT_TRUE(jobMonitor.TearDown());
+}
+
+TEST(JobMonitor, RegisterJob) {
+    common::MockScheduleState scheduleState;
+    common::MockLustre lustre;
+    lustre.Init();
+    common::JobMonitor jobMonitor(&scheduleState, &lustre, 1);
+
+    EXPECT_TRUE(jobMonitor.Init());
+
+    auto job1 = new common::Job("job1",
+                                std::chrono::system_clock::now(),
+                                std::chrono::system_clock::now() + std::chrono::hours(1),
+                                42);
+
+    EXPECT_CALL(scheduleState, GetJobStatus(job1->getJobid(), _))
+            .WillOnce(DoAll(testing::SetArgPointee<1>(common::Job::SCHEDULED), testing::Return(true)));
+    EXPECT_CALL(scheduleState, UpdateJob(job1->getJobid(), _)).Times(1).WillRepeatedly(testing::Return(true));
+    EXPECT_CALL(scheduleState, GetJobThroughput(job1->getJobid(), _)).WillOnce(testing::Return(true));
+    EXPECT_CALL(lustre, StartJobTbfRule(job1->getJobid(), _, _)).WillOnce(testing::Return(true));
+
+    EXPECT_TRUE(jobMonitor.RegisterJob(*job1));
+    std::this_thread::sleep_for(std::chrono::seconds(2));
+    EXPECT_TRUE(jobMonitor.TearDown());
+}
 
 TEST(JobMonitor, RegisterUnregisterJob) {
     common::MockScheduleState scheduleState;
