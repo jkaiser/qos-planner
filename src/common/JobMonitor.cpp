@@ -164,6 +164,13 @@ bool JobMonitor::StartJob(const std::string &jobid) {
 
 bool JobMonitor::StopJob(const std::string &jobid) {
 
+    Job::JobState job_state;
+    if (!scheduleState->GetJobStatus(jobid, &job_state)) {   // job was removed in the meantime
+        return false;
+    } else if (job_state != Job::ACTIVE) {   // job was unregistered/removed in the meantime
+        return false;
+    }
+
     // set the NRS settings
     if(!lustre->StopJobTbfRule(jobid, jobid + lustre_tbf_rule_postfix)) {
         //TODO: give a warning here. This can lead to open permanent open NRS settings in Lustre!
