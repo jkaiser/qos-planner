@@ -56,7 +56,7 @@ public:
     virtual bool GetJobEnd(const std::string jobid, std::chrono::system_clock::time_point *tend) = 0;
 
     /**
-     * Returns a copy of all current jobs. NOTE: This is an expensive operation. Use it with care!
+     * Returns a (deep) copy of all current jobs. NOTE: This is an expensive operation. Use it with care!
      */
     virtual std::map<std::string, Job*> *GetAllJobs() = 0;
 };
