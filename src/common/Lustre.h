@@ -14,6 +14,7 @@ public:
     virtual bool Init() = 0;
 
     virtual uint32_t MBsToRPCs(const uint32_t mb_per_sec) const = 0;
+    virtual uint32_t RPCsToMBs(const uint32_t rpc_per_sec) const = 0;
 
     virtual bool StartJobTbfRule(std::string jobid, std::string rule_name, uint32_t rpc_rate_limit) = 0;
 
@@ -33,6 +34,7 @@ public:
     LocalLustre() : max_rpc_size(1) { }
 
     virtual uint32_t MBsToRPCs(const uint32_t mb_per_sec) const override;
+    virtual uint32_t RPCsToMBs(const uint32_t rpc_per_sec) const override;
 
     virtual bool StartJobTbfRule(std::string jobid, std::string rule_name, uint32_t rpc_rate_limit) override;
 

@@ -59,10 +59,10 @@ public:
     JobMonitor();
     JobMonitor(common::ScheduleState *st, Lustre *lustre);
     JobMonitor(common::ScheduleState *st, Lustre *lustre, uint32_t waiting_time_sec);
-    bool Init();
-    bool TearDown();
-    bool RegisterJob(const Job &job);
-    bool UnregisterJob(const Job &job);
+    virtual bool Init();
+    virtual bool TearDown();
+    virtual bool RegisterJob(const Job &job);
+    virtual bool UnregisterJob(const Job &job);
 };
 }
 

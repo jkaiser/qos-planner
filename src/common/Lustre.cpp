@@ -23,6 +23,10 @@ uint32_t LocalLustre::MBsToRPCs(const uint32_t mb_per_sec) const {
     return mb_per_sec/max_rpc_size;   // TODO:
 }
 
+uint32_t LocalLustre::RPCsToMBs(const uint32_t rpc_per_sec) const {
+    return rpc_per_sec * max_rpc_size;   // TODO:
+}
+
 bool LocalLustre::Init() {
     /**
      * TODO: implement logic to convert MB/sec -> RPC/sec
@@ -31,6 +35,7 @@ bool LocalLustre::Init() {
 
     return true;
 }
+
 
 
 }

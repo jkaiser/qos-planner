@@ -76,6 +76,33 @@ bool MemoryScheduleState::AddJob(const std::string &jobid, const Job &job, const
     return true;
 }
 
+
+bool MemoryScheduleState::RemoveJob(const std::string &jobid) {
+    std::unique_lock<std::mutex> lck(schedule_mut);
+
+    if (jobs.find(jobid) == jobs.end()) {
+        return false;
+    }
+
+    Job *job = jobs[jobid];
+    jobs.erase(jobid);
+
+
+    for (auto ost : job->getOsts()) {
+
+        std::list<Job*> ost_job_list = schedule[ost];
+        for (std::list<Job*>::iterator it = ost_job_list.begin(); it !=  ost_job_list.end(); it++) {
+
+            if ((*it)->getJobid().compare(jobid) == 0) {
+                ost_job_list.erase(it);
+                break;
+            }
+        }
+    }
+
+    return true;
+}
+
 bool MemoryScheduleState::UpdateJob(std::string jobid, Job::JobState new_state) {
     std::unique_lock<std::mutex> lck(schedule_mut);
 
@@ -132,6 +159,7 @@ bool MemoryScheduleState::GetJobEnd(const std::string jobid, std::chrono::system
     *tend = it->second->getTend();
     return true;
 }
+
 
 
 }

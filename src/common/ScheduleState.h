@@ -47,6 +47,7 @@ public:
      * Tries to add a job to the given OSTs.
      */
     virtual bool AddJob(const std::string &jobid, const Job &job, const std::vector<std::string> &osts) = 0;
+    virtual bool RemoveJob(const std::string &jobid) = 0;
 
     virtual bool UpdateJob(std::string jobid, Job::JobState new_state) = 0;
 
@@ -65,7 +66,12 @@ public:
 class MemoryScheduleState : public ScheduleState {
 
 private:
-    // ost -> [jobs] mappings
+    /**
+     * Mappings from each ost to the sorted list of of jobs for that ost (ost -> [jobs] mappings).
+     * TODO: This data structure mainly is used for checking for available resources in a given time interval. The
+     * operation is O(n) for the std::list version. Switch to a skiplist if this turns out to be a bottleneck.
+     */
+    //
     std::map<std::string, std::list<Job*>> schedule;
 
     std::map<std::string, Job*> jobs;
@@ -78,6 +84,7 @@ public:
     virtual const std::list<Job*> *GetOSTState(const std::string &ost) override;
     virtual void Reset() override;
     virtual bool AddJob(const std::string &jobid, const Job &job, const std::vector<std::string> &osts) override;
+    virtual bool RemoveJob(const std::string &jobid) override;
     virtual bool UpdateJob(std::string jobid, Job::JobState new_state) override;
     virtual bool GetJobThroughput(const std::string jobid, uint32_t *throughput) override;
     virtual bool GetJobStatus(const std::string jobid, Job::JobState *state) override;
@@ -85,9 +92,5 @@ public:
     virtual std::map<std::string, Job*> *GetAllJobs() override;
 };
 }
-
-
-
-
 
 #endif //QOS_PLANNER_SCHEDULESTATE_H

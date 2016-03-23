@@ -7,6 +7,7 @@
 
 
 #include <chrono>
+#include <vector>
 
 namespace common {
 
@@ -41,6 +42,7 @@ private:
     std::string jobid;
     std::chrono::time_point<std::chrono::system_clock> tstart;
     std::chrono::time_point<std::chrono::system_clock> tend;
+    std::vector<std::string> osts;  // relevant osts for this. An OST is relevant if one (part) of the input files reside on it.
     uint32_t min_read_throughput_MB;
 
 public:
@@ -64,6 +66,15 @@ public:
     const std::chrono::time_point<std::chrono::system_clock> &getTend() const {
         return tend;
     }
+
+    const std::vector<std::string> &getOsts() const {
+        return osts;
+    }
+
+    void setOsts(const std::vector<std::string> &osts) {
+        Job::osts = osts;
+    }
+
 
     uint32_t getMin_read_throughput_MB() const {
         return min_read_throughput_MB;
