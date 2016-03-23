@@ -6,13 +6,13 @@
 
 namespace common {
 
-const NodeState *MemoryClusterState::getState(const std::string &id) {
+bool MemoryClusterState::getState(const std::string &id, NodeState *state) const {
     auto it = this->nodeMap.find(id);
     if (it == this->nodeMap.end()) {
-        return nullptr;
+        return false;
     }
-    return &it->second;
-
+    *state = it->second;
+    return true;
 }
 
 std::vector<std::string> *MemoryClusterState::getNodes() {

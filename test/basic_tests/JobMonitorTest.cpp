@@ -12,7 +12,6 @@
 
 using ::testing::_;
 
-namespace common {
 
 TEST(JobMonitor, InitGetJobs) {
     common::MockScheduleState scheduleState;
@@ -49,6 +48,9 @@ TEST(JobMonitor, StartStopJob) {
     lustre.Init();
     common::JobMonitor jobMonitor(&scheduleState, &lustre, 1);
 
+    auto job_map = new std::map<std::string, common::Job *>();
+    ON_CALL(scheduleState, GetAllJobs()).WillByDefault(testing::Return(job_map));
+
     EXPECT_TRUE(jobMonitor.Init());
 
     auto job1 = new common::Job("job1",
@@ -76,6 +78,8 @@ TEST(JobMonitor, RegisterJob) {
     lustre.Init();
     common::JobMonitor jobMonitor(&scheduleState, &lustre, 1);
 
+    auto job_map = new std::map<std::string, common::Job *>();
+    ON_CALL(scheduleState, GetAllJobs()).WillByDefault(testing::Return(job_map));
     EXPECT_TRUE(jobMonitor.Init());
 
     auto job1 = new common::Job("job1",
@@ -100,6 +104,9 @@ TEST(JobMonitor, RegisterUnregisterJob) {
     lustre.Init();
     common::JobMonitor jobMonitor(&scheduleState, &lustre, 1);
 
+    auto job_map = new std::map<std::string, common::Job *>();
+    ON_CALL(scheduleState, GetAllJobs()).WillByDefault(testing::Return(job_map));
+
     EXPECT_TRUE(jobMonitor.Init());
 
     auto job1 = new common::Job("job1",
@@ -107,9 +114,13 @@ TEST(JobMonitor, RegisterUnregisterJob) {
                                 std::chrono::system_clock::now() + std::chrono::hours(1),
                                 42);
 
+    ON_CALL(scheduleState, GetJobEnd(_, _)).WillByDefault(DoAll(testing::SetArgPointee<1>(job1->getTend()),testing::Return(true)));
+
+
     EXPECT_CALL(scheduleState, GetJobStatus(job1->getJobid(), _))
             .WillOnce(DoAll(testing::SetArgPointee<1>(common::Job::SCHEDULED), testing::Return(true)))
-            .WillOnce(DoAll(testing::SetArgPointee<1>(common::Job::ACTIVE), testing::Return(true)));
+            .WillOnce(DoAll(testing::SetArgPointee<1>(common::Job::ACTIVE), testing::Return(true))) // unregister
+            .WillOnce(DoAll(testing::SetArgPointee<1>(common::Job::ACTIVE), testing::Return(true))); // call StopJob in unregister
     EXPECT_CALL(scheduleState, UpdateJob(job1->getJobid(), _)).Times(2).WillRepeatedly(testing::Return(true));
     EXPECT_CALL(scheduleState, GetJobThroughput(job1->getJobid(), _)).WillOnce(testing::Return(true));
     EXPECT_CALL(lustre, StartJobTbfRule(job1->getJobid(), _, _)).WillOnce(testing::Return(true));

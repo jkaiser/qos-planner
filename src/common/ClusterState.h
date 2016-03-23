@@ -23,6 +23,10 @@ struct NodeState {
     uint32_t maxRpcSec;
 };
 
+
+/**
+ * The ClusterState holds the current performance metrics of each Lustre node.
+ */
 class ClusterState {
 
 protected:
@@ -33,7 +37,7 @@ public:
 
     virtual bool Init() = 0;
     virtual bool TearDown() = 0;
-    virtual const NodeState *getState(const std::string &id) = 0;
+    virtual bool getState(const std::string &id, NodeState *state) const = 0;
     virtual std::vector<std::string> *getNodes() = 0;
 
     virtual void UpdateNode(const std::string &name, const NodeState &node_state) = 0;
@@ -58,7 +62,7 @@ public:
     virtual bool Init() override;
     virtual bool TearDown() override;
     virtual std::vector<std::string> *getNodes() override;
-    virtual const NodeState *getState(const std::string &id) override;
+    virtual bool getState(const std::string &id, NodeState *state) const override;
     virtual void UpdateNode(const std::string &name, const NodeState &node_state) override;
 };
 }

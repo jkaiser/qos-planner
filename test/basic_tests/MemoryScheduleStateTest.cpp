@@ -41,6 +41,18 @@ TEST(MemClusterState, AddJob) {
     EXPECT_TRUE(mss.TearDown());
 };
 
+TEST(MemClusterState, RemoveJob) {
+    common::MemoryScheduleState mss;
+    EXPECT_TRUE(mss.Init());
+
+    common::Job *j = new common::Job("foo", std::chrono::system_clock::now(), std::chrono::system_clock::now(), 42);
+    std::vector<std::string> osts = {"OST_a", "OST_b", "OST_c"};
+    EXPECT_TRUE(mss.AddJob(j->getJobid(), *j, osts));
+
+    EXPECT_TRUE(mss.RemoveJob(j->getJobid())) << "Remove of existing job must succeed";
+    EXPECT_FALSE(mss.RemoveJob(j->getJobid()))<< "Remove of nonexisting job must fail";
+}
+
 TEST(MemClusterState, AddJobTwice) {
     common::MemoryScheduleState mss;
     EXPECT_TRUE(mss.Init());

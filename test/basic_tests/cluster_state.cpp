@@ -24,11 +24,11 @@ TEST(MemClusterState, GetState) {
     common::NodeState ns = {"n1", 42, 17};
     mcs.UpdateNode("n1", ns);
 
-    auto rt = mcs.getState("n1");
-    EXPECT_NE(rt, nullptr);
-    EXPECT_STREQ(rt->name.c_str(), "n1");
-    EXPECT_EQ(ns.rpcSec, rt->rpcSec);
-    EXPECT_EQ(ns.maxRpcSec, rt->maxRpcSec);
+    common::NodeState rt;
+    EXPECT_TRUE(mcs.getState("n1", &rt));
+    EXPECT_STREQ(rt.name.c_str(), "n1");
+    EXPECT_EQ(ns.rpcSec, rt.rpcSec);
+    EXPECT_EQ(ns.maxRpcSec, rt.maxRpcSec);
 
     EXPECT_TRUE(mcs.TearDown());
 };
