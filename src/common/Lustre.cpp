@@ -36,6 +36,9 @@ bool LocalLustre::Init() {
     return true;
 }
 
+bool LocalLustre::GetOstsForFile(const std::string &file, std::shared_ptr<std::vector<std::string>> osts) {
+    return false;
+}
 
 
 }

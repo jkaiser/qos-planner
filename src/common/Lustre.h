@@ -6,6 +6,7 @@
 #define QOS_PLANNER_LUSTRE_H
 
 #include <string>
+#include <vector>
 
 namespace common {
 
@@ -23,10 +24,17 @@ public:
     virtual bool StartJobTbfRule(std::string jobid, std::string rule_name, uint32_t rpc_rate_limit) = 0;
 
     virtual bool StopJobTbfRule(std::string jobid, std::string rule_name) = 0;
+
+    /**
+     * Determines the osts for the given file and appends them to the given vector.
+     */
+    virtual bool GetOstsForFile(const std::string &file, std::shared_ptr<std::vector<std::string>> osts) = 0;
 };
 
 
-
+/**
+ * Class for Lustre interactions where there are local (and already configured) cmd-line tools for Lustre.
+ */
 class LocalLustre : public Lustre {
 
 private:
@@ -43,6 +51,7 @@ public:
     virtual bool StartJobTbfRule(std::string jobid, std::string rule_name, uint32_t rpc_rate_limit) override;
 
     virtual bool StopJobTbfRule(std::string jobid, std::string rule_name) override;
+    virtual bool GetOstsForFile(const std::string &file, std::shared_ptr<std::vector<std::string>> osts) override;
 };
 
 }
