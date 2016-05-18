@@ -43,6 +43,9 @@ public:
     virtual void UpdateNode(const std::string &name, const NodeState &node_state) = 0;
 };
 
+/**
+ * ClusterState implementation which stores everything in main memory.
+ */
 class MemoryClusterState : public ClusterState {
 
 private:

@@ -17,6 +17,9 @@
 
 namespace common {
 
+// TODO: this is for the long run: when a job is removed, some resources are freed on the OST. These won't be used
+//       until the remaining NRS settings are adjusted (since the other ones limit the throughput of
+//        the running applications)
 /**
  * The JobMonitor tracks the time points when NRS settings for a given job should be set or unset. The Monitor
  * then performs the actions at the defined times.

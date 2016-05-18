@@ -20,6 +20,9 @@ struct Workload {
     uint32_t max_rpc_per_sec;
 };
 
+/**
+ * Abstract class. The ScheduleState holds and manages the schedule. The schedule is the set of accepted jobs.
+ */
 class ScheduleState {
 
 protected:
@@ -62,7 +65,9 @@ public:
     virtual std::map<std::string, Job*> *GetAllJobs() = 0;
 };
 
-
+/**
+ * Main memory based implementation of the ScheduleState.
+ */
 class MemoryScheduleState : public ScheduleState {
 
 private:

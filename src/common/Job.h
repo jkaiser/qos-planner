@@ -11,6 +11,9 @@
 
 namespace common {
 
+/**
+ * A given resource request for a given time is represented as Job.
+ */
 class Job {
 
 private:

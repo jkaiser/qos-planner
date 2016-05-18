@@ -8,6 +8,10 @@
 #include <string>
 
 namespace common {
+
+/**
+ * Abstract class for Lustre interactions
+ */
 class Lustre {
 
 public:
