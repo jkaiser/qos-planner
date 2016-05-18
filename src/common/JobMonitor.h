@@ -10,6 +10,8 @@
 #include <chrono>
 #include <thread>
 #include <set>
+#include <memory>
+#include <condition_variable>
 #include "Job.h"
 #include "ScheduleState.h"
 #include "JobPriorityQueue.h"

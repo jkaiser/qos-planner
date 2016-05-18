@@ -5,6 +5,7 @@
 #ifndef QOS_PLANNER_SCHEDULER_H
 #define QOS_PLANNER_SCHEDULER_H
 
+#include <memory>
 #include "ScheduleState.h"
 #include "JobMonitor.h"
 #include "ClusterState.h"
