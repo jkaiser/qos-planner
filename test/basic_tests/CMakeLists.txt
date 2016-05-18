@@ -3,6 +3,8 @@ include_directories(../../src/common)
 file(GLOB SRCS *.cpp)
 
 add_executable(runBasicTests ${SRCS})
+target_link_libraries(runBasicTests gtest gmock common)
 
-target_link_libraries(runBasicTests ${GTEST_LIBRARIES} ${GMOCK_LIBRARIES} libgtest libgmock common)
-install(TARGETS runBasicTests DESTINATION bin)
+# small helper to run the test within the CLion IDE...
+add_executable(runBasicTests_direct ${SRCS})
+target_link_libraries(runBasicTests_direct gtest_main gmock common)
