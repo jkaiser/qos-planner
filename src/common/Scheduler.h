@@ -28,10 +28,10 @@ class Scheduler {
 private:
     std::mutex scheduler_mut;
 
-    ClusterState *cluster_state;
-    ScheduleState *schedule;
-    JobMonitor *job_monitor;
-    Lustre *lustre;
+    std::shared_ptr<ClusterState> cluster_state;
+    std::shared_ptr<ScheduleState> schedule;
+    std::shared_ptr<JobMonitor> job_monitor;
+    std::shared_ptr<Lustre> lustre;
 
 
     bool GetMaxLoadInTimeInterval(std::string ost,
@@ -43,9 +43,9 @@ public:
     /**
      * Constructor. It is assumed that the given instances already are initialized and ready to be used.
      */
-    Scheduler(ScheduleState *schedule, JobMonitor *job_monitor, ClusterState *cluster_state, Lustre *lustre)
+    Scheduler(std::shared_ptr<ScheduleState> schedule, std::shared_ptr<JobMonitor> job_monitor,
+              std::shared_ptr<ClusterState> cluster_state, std::shared_ptr<Lustre> lustre)
             : schedule(schedule), job_monitor(job_monitor), cluster_state(cluster_state), lustre(lustre) {
-        int foo = 4;
         this->job_monitor = job_monitor;
     }
 

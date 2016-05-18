@@ -6,14 +6,14 @@
 
 namespace common {
 
-JobMonitor::JobMonitor(common::ScheduleState *st, Lustre *lustre) :
+JobMonitor::JobMonitor(std::shared_ptr<common::ScheduleState> st, std::shared_ptr<Lustre> lustre) :
         monitor_thread_started(false),
         scheduleState(st),
         lustre(lustre) {
     JobMonitor(st, lustre, 5);
 }
 
-JobMonitor::JobMonitor(common::ScheduleState *st, Lustre *lustre, uint32_t waiting_time_sec) :
+JobMonitor::JobMonitor(std::shared_ptr<ScheduleState> st, std::shared_ptr<Lustre> lustre, uint32_t waiting_time_sec) :
         monitor_thread_started(false),
         scheduleState(st),
         lustre(lustre),

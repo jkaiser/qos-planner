@@ -45,7 +45,7 @@ private:
     std::string jobid;
     std::chrono::time_point<std::chrono::system_clock> tstart;
     std::chrono::time_point<std::chrono::system_clock> tend;
-    std::vector<std::string> osts;  // relevant osts for this. An OST is relevant if one (part) of the input files reside on it.
+    std::vector<std::string> osts;  // relevant osts for this. A OST becomes relevant if one (part) of the input files reside on it.
     uint32_t min_read_throughput_MB;
 
 public:

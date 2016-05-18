@@ -35,7 +35,8 @@ private:
     std::thread monitor_thread;
     bool monitor_thread_exit_flag = false;
 
-    ScheduleState *scheduleState = nullptr;
+    std::shared_ptr<ScheduleState> scheduleState;
+//    ScheduleState *scheduleState = nullptr;
 
     std::mutex job_priority_queue_mutex;
     JobPriorityQueue job_priority_queue;
@@ -49,7 +50,7 @@ private:
     std::set<std::string> in_flight_jobs;
 
     const std::string lustre_tbf_rule_postfix = "_qos_sched_io_rule";
-    Lustre *lustre = nullptr;
+    std::shared_ptr<Lustre> lustre:
 
     // function the monitor thread executes
     void Monitor();
@@ -60,8 +61,13 @@ private:
 
 public:
     JobMonitor();
-    JobMonitor(common::ScheduleState *st, Lustre *lustre);
-    JobMonitor(common::ScheduleState *st, Lustre *lustre, uint32_t waiting_time_sec);
+//    JobMonitor(common::ScheduleState *st, Lustre *lustre);
+//    JobMonitor(common::ScheduleState *st, Lustre *lustre, uint32_t waiting_time_sec);
+    JobMonitor(std::shared_ptr<ScheduleState> st, std::shared_ptr<Lustre> lustre);
+    /**
+     * waiting_time_sec: The time the internal threads sleeps before checking for an exit flag (set by a Teardown call)
+     */
+    JobMonitor(std::shared_ptr<ScheduleState> st, std::shared_ptr<Lustre> lustre, uint32_t waiting_time_sec);
     virtual bool Init();
     virtual bool TearDown();
     virtual bool RegisterJob(const Job &job);
