@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 2.8.2)
 
+# The automatic download mechanism bases on this blog entry: https://crascit.com/2015/07/25/cmake-gtest/
+
 include(CTest)
 
 if (CMAKE_VERSION VERSION_LESS 3.2)
