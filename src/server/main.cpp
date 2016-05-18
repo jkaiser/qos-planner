@@ -6,6 +6,8 @@
 
 #include <zhelpers.hpp>
 
+#include "Server.h"
+
 using namespace std;
 
 
@@ -35,10 +37,15 @@ DEFINE_string(port, "5555", "Port to use.");
 
 int main(int argc, char* argv[]) {
     gflags::ParseCommandLineFlags(&argc, &argv, true);
-    string ipPort = FLAGS_ip + ":" + FLAGS_port;
+    string ip_port = FLAGS_ip + ":" + FLAGS_port;
 
     cout << "Hello, World!" << endl;
-    executeServer(ipPort);
+
+//    executeServer(ipPort);
+
+    Server s("");
+    s.Init();
+    s.Serve(ip_port)
 
     return 0;
 }
