@@ -16,7 +16,10 @@ using ::testing::_;
 TEST(JobMonitor, InitGetJobs) {
     common::MockScheduleState scheduleState;
     common::LocalLustre lustre;
-    common::JobMonitor jobMonitor(&scheduleState, &lustre, 3);
+    std::shared_ptr<common::ScheduleState> ss (&scheduleState);
+    std::shared_ptr<common::LocalLustre> ll (&lustre);
+
+    common::JobMonitor jobMonitor(ss, ll);
 
     std::map<std::string, common::Job*> *jobmap = new std::map<std::string, common::Job*>();
     (*jobmap)["job1"] = new common::Job("job1",
@@ -34,7 +37,12 @@ TEST(JobMonitor, InitGetJobs) {
 TEST(JobMonitor, InitTeardown) {
     common::MemoryScheduleState scheduleState;
     common::LocalLustre lustre;
-    common::JobMonitor jobMonitor(&scheduleState, &lustre, 3);
+
+    std::shared_ptr<common::ScheduleState> ss (&scheduleState);
+    std::shared_ptr<common::LocalLustre> ll (&lustre);
+
+    common::JobMonitor jobMonitor(ss, ll);
+    //common::JobMonitor jobMonitor(&scheduleState, &lustre, 3);
 
     EXPECT_TRUE(jobMonitor.Init());
     std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -46,7 +54,11 @@ TEST(JobMonitor, StartStopJob) {
     common::MockScheduleState scheduleState;
     common::MockLustre lustre;
     lustre.Init();
-    common::JobMonitor jobMonitor(&scheduleState, &lustre, 1);
+
+    std::shared_ptr<common::ScheduleState> ss (&scheduleState);
+    std::shared_ptr<common::LocalLustre> ll (&lustre);
+    common::JobMonitor jobMonitor(ss, ll);
+    //common::JobMonitor jobMonitor(&scheduleState, &lustre, 1);
 
     auto job_map = new std::map<std::string, common::Job *>();
     ON_CALL(scheduleState, GetAllJobs()).WillByDefault(testing::Return(job_map));
@@ -76,7 +88,11 @@ TEST(JobMonitor, RegisterJob) {
     common::MockScheduleState scheduleState;
     common::MockLustre lustre;
     lustre.Init();
-    common::JobMonitor jobMonitor(&scheduleState, &lustre, 1);
+
+    std::shared_ptr<common::MockScheduleState> ss (&scheduleState);
+    std::shared_ptr<common::LocalLustre> ll (&lustre);
+    common::JobMonitor jobMonitor(ss, ll);
+    //common::JobMonitor jobMonitor(&scheduleState, &lustre, 1);
 
     auto job_map = new std::map<std::string, common::Job *>();
     ON_CALL(scheduleState, GetAllJobs()).WillByDefault(testing::Return(job_map));
@@ -102,7 +118,11 @@ TEST(JobMonitor, RegisterUnregisterJob) {
     common::MockScheduleState scheduleState;
     common::MockLustre lustre;
     lustre.Init();
-    common::JobMonitor jobMonitor(&scheduleState, &lustre, 1);
+
+    std::shared_ptr<common::ScheduleState> ss (&scheduleState);
+    std::shared_ptr<common::LocalLustre> ll (&lustre);
+    common::JobMonitor jobMonitor(ss, ll);
+    //common::JobMonitor jobMonitor(&scheduleState, &lustre, 1);
 
     auto job_map = new std::map<std::string, common::Job *>();
     ON_CALL(scheduleState, GetAllJobs()).WillByDefault(testing::Return(job_map));

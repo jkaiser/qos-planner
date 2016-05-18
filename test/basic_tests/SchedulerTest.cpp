@@ -21,7 +21,13 @@ TEST(Scheduler, ScheduleOnEmptyCluster) {
     common::MockJobMonitor job_monitor;
     common::MockLustre lustre;
 
-    common::Scheduler scheduler(&schedule_state, &job_monitor, &cluster_state, &lustre);
+    std::shared_ptr<common::ClusterState> cs (&cluster_state);
+    std::shared_ptr<common::ScheduleState> ss (&schedule_state);
+    std::shared_ptr<common::MockLustre> ll (&lustre);
+    std::shared_ptr<common::JobMonitor> jm (&job_monitor);
+
+    common::Scheduler scheduler(ss, jm, cs, ll);
+    //common::Scheduler scheduler(&schedule_state, &job_monitor, &cluster_state, &lustre);
 
     // we assume an empty cluster -> no job must be scheduled
     EXPECT_CALL(job_monitor, RegisterJob(_)).Times(0);
@@ -45,7 +51,13 @@ TEST(Scheduler, ScheduleSimpleJob) {
     common::MockJobMonitor job_monitor;
     common::MockLustre lustre;
 
-    common::Scheduler scheduler(&schedule_state, &job_monitor, &cluster_state, &lustre);
+    std::shared_ptr<common::ClusterState> cs (&cluster_state);
+    std::shared_ptr<common::ScheduleState> ss (&schedule_state);
+    std::shared_ptr<common::MockLustre> ll (&lustre);
+    std::shared_ptr<common::JobMonitor> jm (&job_monitor);
+
+    common::Scheduler scheduler(ss, jm, cs, ll);
+    //common::Scheduler scheduler(&schedule_state, &job_monitor, &cluster_state, &lustre);
 
 
     auto job1 = new common::Job("job1",
@@ -79,7 +91,13 @@ TEST(Scheduler, ScheduleTooBigJob) {
     common::MockJobMonitor job_monitor;
     common::MockLustre lustre;
 
-    common::Scheduler scheduler(&schedule_state, &job_monitor, &cluster_state, &lustre);
+    std::shared_ptr<common::ClusterState> cs (&cluster_state);
+    std::shared_ptr<common::ScheduleState> ss (&schedule_state);
+    std::shared_ptr<common::MockLustre> ll (&lustre);
+    std::shared_ptr<common::JobMonitor> jm (&job_monitor);
+
+    common::Scheduler scheduler(ss, jm, cs, ll);
+    //common::Scheduler scheduler(&schedule_state, &job_monitor, &cluster_state, &lustre);
 
 
     auto job1 = new common::Job("job1",
@@ -112,7 +130,13 @@ TEST(Scheduler, RemoveNonExistingJob) {
     common::MockJobMonitor job_monitor;
     common::MockLustre lustre;
 
-    common::Scheduler scheduler(&schedule_state, &job_monitor, &cluster_state, &lustre);
+    std::shared_ptr<common::ClusterState> cs (&cluster_state);
+    std::shared_ptr<common::ScheduleState> ss (&schedule_state);
+    std::shared_ptr<common::MockLustre> ll (&lustre);
+    std::shared_ptr<common::JobMonitor> jm (&job_monitor);
+
+    common::Scheduler scheduler(ss, jm, cs, ll);
+    //common::Scheduler scheduler(&schedule_state, &job_monitor, &cluster_state, &lustre);
 
 
     common::NodeState node_state = {"OST_a", 0, 100};

@@ -50,7 +50,7 @@ private:
     std::set<std::string> in_flight_jobs;
 
     const std::string lustre_tbf_rule_postfix = "_qos_sched_io_rule";
-    std::shared_ptr<Lustre> lustre:
+    std::shared_ptr<Lustre> lustre;
 
     // function the monitor thread executes
     void Monitor();
