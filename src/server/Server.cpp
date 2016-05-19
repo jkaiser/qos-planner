@@ -4,8 +4,6 @@
 
 #include "Server.h"
 
-#include "../../../../../Library/Caches/CLion12/cmake/generated/a7b7e32b/a7b7e32b/Debug/src/common/rpc/proto/message.pb.h"
-
 #include <zhelpers.hpp>
 #include <unordered_set>
 
@@ -77,7 +75,7 @@ void Server::Serve(const std::string ip_port) {
         bool success;
         switch (msg.type()) {
             case rpc::Message::REQUEST :
-                success = ServeJobSubmission(msg.request());
+                success = ServeJobSubmission(msg.request().resourcerequest());
                 break;
             default :
                 success = false;
@@ -105,7 +103,7 @@ bool Server::ServeJobSubmission(const rpc::Request_ResourceRequest &request) {
     auto tend = std::chrono::system_clock::from_time_t(request.requestedresources(0).tstop());
 
     int min_read_throughput = 0;
-    std::unordered_set osts_set;
+    std::unordered_set<std::string> osts_set;
 
     for (auto it = request.requestedresources().begin(); it != request.requestedresources().begin(); it++) {
 

@@ -13,7 +13,7 @@
 #include <ClusterState.h>
 #include <JobMonitor.h>
 #include <Lustre.h>
-#include "../../../../../Library/Caches/CLion12/cmake/generated/a7b7e32b/a7b7e32b/Debug/src/common/rpc/proto/message.pb.h"
+#include "../common/rpc/proto/message.pb.h"
 
 /**
  * Server s(...);
@@ -35,8 +35,8 @@ private:
     std::shared_ptr<common::Lustre> lustre;
 
 protected:
-    bool ServeJobSubmission(const rpc::Message &msg);
-    bool ServeJobRemove(const rpc::Message &msg);
+    bool ServeJobSubmission(const rpc::Request_ResourceRequest &msg);
+    bool ServeJobRemove(const rpc::Request_DeleteRequest &msg);
 
 public:
 
