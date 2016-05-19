@@ -2,7 +2,8 @@
 
 #include <gflags/gflags.h>
 
-#include "../../../../../Library/Caches/CLion12/cmake/generated/a7b7e32b/a7b7e32b/Debug/src/common/rpc/proto/message.pb.h"
+//#include "../../../../../Library/Caches/CLion12/cmake/generated/a7b7e32b/a7b7e32b/Debug/src/common/rpc/proto/message.pb.h"
+#include "../common/rpc/proto/message.pb.h"
 
 #include <zhelpers.hpp>
 
@@ -45,7 +46,7 @@ int main(int argc, char* argv[]) {
 
     Server s("");
     s.Init();
-    s.Serve(ip_port)
+    s.Serve(ip_port);
 
     return 0;
 }
