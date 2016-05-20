@@ -37,14 +37,22 @@ This alone can improve performance and QoS since the planner helps to prevent ar
 %
 The QoS Planner runs as a new instance in the Lustre ecosystem (see Figure \ref{subfig:global_view_lustre}).
 Logically, it resides between a job management system such as LSF or Slurm and Lustre (see Figure \ref{subfig:qos_key_comp}).
-In Figure \ref{subfig:qos_key_comp}, the \emph{lfs} utility can be used for user configuration routines and monitoring, and
-the \emph{lctl} utility is used for root control and configuration.
+%In Figure \ref{subfig:qos_key_comp}, the \emph{lfs} utility can be used for user configuration routines and monitoring, and the \emph{lctl} utility is used for root control and configuration.
 LSF/Slurm can query the QoS Planner for storage resources (by OST/MDT stats or jobstats), such as the read/write requests in bytes, the quantity of data read/written, the number of times (the OST has handled a read or write).
+The QoS Planner then evaluates the request based on 1) the set of accepted request and 2) the capabilities of the storage cluster during the requested time interval. 
+During runtime, the planner also monitors the current workload of the Lustre storage cluster and readjusts Lustre configurations if necessary to guarantee the promised workload and improve overall performance.
+For communicating with Lustre, the planner uses the Lustre cmnd-line tools \emph{ltcl} and \emph{lfs}. 
+If they are not installed on the local machine, the planner calls them via \emph{ssh}.
+
 Figure \ref{subfig:qos_comm_flow} shows the basic communication steps during a successful resource reservation.
 For simplicity, it is assumed that the computation job only reads a single file.
 At first, Slurm/LSF wants to schedule a job and reserve I/O throughput.
-It requests the resource reservation APIs (can be looked as \emph{lctl}-like APIs), which performs an RPC to the QoS Planner.
-In Figure \ref{subfig:qos_key_comp}, the two orange parts are the work done during the \emph{milestone 1}: (1) QoS Planner, and (2) QoS Planner frontend APIs in Slurm/LSF.
+It requests the resources via a modified \emph{lctl}, which performs an RPC to the QoS Planner.
+The Planner then first queries Lustre for the set of OSTS which hold parts of the file.
+If the job was accepted, the planner finally configures the NRS settings at the defined job starting time.
+
+%It requests the resource reservation APIs (can be looked as \emph{lctl}-like APIs), which performs an RPC to the QoS Planner.
+%In Figure \ref{subfig:qos_key_comp}, the two orange parts are the work done during the \emph{milestone 1}: (1) QoS Planner, and (2) QoS Planner frontend APIs in Slurm/LSF.
 
 \begin{figure}[!ht]
 \centering
@@ -87,13 +95,14 @@ Figure \ref{fig:swarc_overview} shows the overview of system software architectu
 
 (\textbf{{\romannumeral 2}})  The \emph{Planner} module is in charge of the supply-and-demand issue for the scheduling job QoS. It provides the state of the \emph{Storage cluster} and sets the NRS according the QoS requirement (if the upply-and-demand is matching).
 
-(\textbf{{\romannumeral 3}}) The \emph{Scheduler} module collects the state of both the Storage cluster (by the \emph{ClusterState} module) and the scheduling state (by the \emph{ScheduleState} module). Also, the \emph{Scheduler} module monitors the job state in the Storage cluster by the \emph{JobMonitor} module.
+(\textbf{{\romannumeral 3}}) The \emph{Scheduler} module contains the scheduling algorithm. It reads the schedule when checking a job request and updates the schedule. The Scheduler also registers accepted jobs to the JobMonitor.
+%(\textbf{{\romannumeral 3}}) The \emph{Scheduler} module collects the state of both the Storage cluster (by the \emph{ClusterState} module) and the scheduling state (by the \emph{ScheduleState} module). Also, the \emph{Scheduler} module monitors the job state in the Storage cluster by the \emph{JobMonitor} module.
 
-(\textbf{{\romannumeral 4}}) The \emph{ClusterState} module collects the Storage cluster state (including network).
+(\textbf{{\romannumeral 4}}) The \emph{ClusterState} module collects the Storage cluster state (including network). This includes the set of OSS/OSTs as well as the current workload per OSS/OST.
 
 (\textbf{{\romannumeral 5}}) The \emph{ScheduleState} module collects the Storage cluster scheduling state.
 
-(\textbf{{\romannumeral 6}}) The \emph{JobMonitor} module monitors the job state in the Storage cluster.
+(\textbf{{\romannumeral 6}}) The \emph{JobMonitor} module ensures that Lustre is configured according to the schedule. New jobs mus be registered before they are considered.
 
 \textbf{Storage cluster}: This part is a storage cluster managed by the Lustre file system.
 
@@ -102,10 +111,10 @@ Figure \ref{fig:swarc_overview} shows the overview of system software architectu
 %
 \subsubsection{ZeroMQ}
 %
-The ZeroMQ is used as a filter that collects data from some different remote publishers and sends it to local subscribers:
+The ZeroMQ is used as a filter that collects data from some different remote publishers and sends it to local subscribers. The QoS Planner uses this library for the communication between the modified \emph{lclt} and itself.
 
 \subsubsection{Protobuf}
-We uses protocol buffers (a.k.a Protobuf) to implement automatic encoding and parsing of data with a binary format.
+We uses protocol buffers (a.k.a Protobuf) to implement automatic encoding and parsing of data with a binary format. It is also used for the communication between the modified \emph{lclt} and the QoS Planner.
 
 \subsubsection{GFlags}
 GFlags is used as a library to help parse the \emph{lctl} commandline and store the flags in some data structure.
