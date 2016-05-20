@@ -2,10 +2,16 @@
 \usepackage[english]{babel}
 \usepackage[utf8]{inputenc}
 
-
 \usepackage{graphicx}
 \usepackage[font=footnotesize, caption=false]{subfig}
 
+\usepackage{xcolor}
+\usepackage{listings}
+\lstset{basicstyle=\ttfamily,
+  showstringspaces=false,
+  commentstyle=\color{red},
+  keywordstyle=\color{blue}
+}
 
 \title{Enabling QoS Planning in Lustre}
 
@@ -139,86 +145,130 @@ We are going to extend the APIs gradually as we implement new features.
 
 \subsection{HPC cluster side tool}
 On the HPC cluster side, the job scheduling system (e.g. Slurm/LSF) must communicate with the QoS Planner to implement the resource reservation function.
-It does so calling a cmdline tool by RPC, which can be a newly created tool or an extended version of \texttt{lctl}.
+It does so calling a cmdline tool by RPC, which can be a newly created tool or an extended version of \emph{lctl}.
 The HPC cluster side tool only acts as a frontend for the QoS Planner.
 It directly forwards each request to the QoS Planner.
 
 We identify the following basic operations.
 Note that names etc.\ are preliminary and are open for discussion.
 
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%% RPC calls %%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\begin{description}
 
-\item[(1) reserve\_resources(JOBID, resource\_constraints, T$_{end})$]~\\ Asks the QoS Planner to reserve the given resources at the given time.
-\begin{description}
-    \item[Parameters]~\\
-        \begin{description}
-            \item[JOBID] Same job identifier as provided by LSF/Slurm.
-            \item[resource\_constraints] list of resource constraints.
-            The constraint for each file is given in the tuple $\langle file, Tp, T_{start}, T_{end}\rangle$.
-            In the beginning, we focus on read intensive workloads, therefore this parameter should only be given for main input files for computations.
-            This excludes small files such as shared libraries, for example.
+\begin{lstlisting}[language=bash,caption={Example lctl calls}]
+#!/bin/bash
+# reserve resources for a job with the ID "job1".
+# The same identifier will be used to setup the NRS.
+lctl qosp reserve <jobid> <resource constraints>
+lctl qosp reserve -i job1  -f /foo/bar1 \
+    -tstart 2016-05-19T12:00            \
+    -tend 2016-05-19T13:00              \
+    -mbs 10240
 
-            Note that the constraints for write throughput skip the $file$ parameter because the output files usually are created during the computation.
-            %Note that the constraints also include timestamps and durations per file.
-            While it might not be necessary for read-only files, specifying an interval $[T_{start}, T_{end}]$ becomes necessary when the QoS Planner also considers write throughput.
-            It is hard to specify exact times for normal output files, but it is easy for checkpoints as they be triggered at scheduled times in some cases.
-            Therefore, the HPC job only requires a short reservation of write throughput at different times.
-            \item[$T_{end}$] The scheduled stop date of the job.
-        \end{description}
-    \item[Returns]~\\
-        \begin{description}
-            \item[0] OK
-            \item[-1] not enough resources
-            \item[-2] invalid args
-        \end{description}
-  \end{description}
+# reserve with a given job definition file. This 
+# becomes necessary if the computation job reads 
+# many files.
+lctl qosp reserve -d <job definition file>
 
+# Remove the resource reservation for the given job.
+lctl qosp free <jobid>
+lctl qosp free job1
+lctl qosp free -a
 
-\item[(2) free(JOBID)]~\\ Removes the reservation of resources for the given job.
-  \begin{description}
-    \item[Parameters]~\\
-        \begin{description}
-            \item[JOBID] Same identifier as giving when reserving resources. %LSF/Slurm
-        \end{description}
-    \item[Returns]~\\
-        \begin{description}
-            \item[0] OK
-            \item[-1] error
-        \end{description}
-  \end{description}
+# List all existing job reservations
+lctl qosp ls
+\end{lstlisting}
+
+\paragraph{Resource Constraints Definition}
+The constraint for each file is given in the tuple $\langle file, Tp, T_{start}, T_{end}\rangle$.
+In the beginning, we focus on read intensive workloads, therefore this parameter should only be given for main input files for computations.
+This excludes small files such as shared libraries, for example.
+
+Note that the constraints for write throughput skip the $file$ parameter because the output files usually are created during the computation.
+%Note that the constraints also include timestamps and durations per file.
+While it might not be necessary for read-only files, specifying an interval $[T_{start}, T_{end}]$ becomes necessary when the QoS Planner also considers write throughput.
+It is hard to specify exact times for normal output files, but it is easy for checkpoints as they be triggered at scheduled times in some cases.
+Therefore, the HPC job only requires a short reservation of write throughput at different times.
 
 
-\item[(3) ls\_jobs()]~\\ Convenience function. Lists all active resource reservations.
-  \begin{description}
-    \item[Parameters] no input necessary
-    \item[Returns] list of active resource reservations
-  \end{description}
-\end{description}
+
+%\begin{description}
+
+%\item[(1) reserve\_resources(JOBID, resource\_constraints, T$_{end})$]~\\ Asks the QoS Planner to reserve the given resources at the given time.
+%\begin{description}
+    %\item[Parameters]~\\
+        %\begin{description}
+            %\item[JOBID] Same job identifier as provided by LSF/Slurm.
+            %\item[resource\_constraints] list of resource constraints.
+            %The constraint for each file is given in the tuple $\langle file, Tp, T_{start}, T_{end}\rangle$.
+            %In the beginning, we focus on read intensive workloads, therefore this parameter should only be given for main input files for computations.
+            %This excludes small files such as shared libraries, for example.
+
+            %Note that the constraints for write throughput skip the $file$ parameter because the output files usually are created during the computation.
+            %%Note that the constraints also include timestamps and durations per file.
+            %While it might not be necessary for read-only files, specifying an interval $[T_{start}, T_{end}]$ becomes necessary when the QoS Planner also considers write throughput.
+            %It is hard to specify exact times for normal output files, but it is easy for checkpoints as they be triggered at scheduled times in some cases.
+            %Therefore, the HPC job only requires a short reservation of write throughput at different times.
+            %\item[$T_{end}$] The scheduled stop date of the job.
+        %\end{description}
+    %\item[Returns]~\\
+        %\begin{description}
+            %\item[0] OK
+            %\item[-1] not enough resources
+            %\item[-2] invalid args
+        %\end{description}
+  %\end{description}
 
 
-\subsection{QoS Planner -- relating to OSS/NRS}
-So far, users and administrators can set NRS rules only OSS-wide, i.e.\ the same NRS rules are applied to all OSTs belonging to the same OSS.
-However, the QoS Planner needs to set NRS rule per OST.
-Therefore, the existing API of NRS and \texttt{lctl} must be extended.
+%\item[(2) free(JOBID)]~\\ Removes the reservation of resources for the given job.
+  %\begin{description}
+    %\item[Parameters]~\\
+        %\begin{description}
+            %\item[JOBID] Same identifier as giving when reserving resources. %LSF/Slurm
+        %\end{description}
+    %\item[Returns]~\\
+        %\begin{description}
+            %\item[0] OK
+            %\item[-1] error
+        %\end{description}
+  %\end{description}
+
+
+%\item[(3) ls\_jobs()]~\\ Convenience function. Lists all active resource reservations.
+  %\begin{description}
+    %\item[Parameters] no input necessary
+    %\item[Returns] list of active resource reservations
+  %\end{description}
+%\end{description}
+
+
+%\subsection{QoS Planner -- relating to OSS/NRS}        
+%So far, users and administrators can set NRS rules only OSS-wide, i.e.\ the same NRS rules are applied to all OSTs belonging to the same OSS.  % CAUTION: not sure if this is true!
+%However, the QoS Planner needs to set NRS rule per OST.
+%Therefore, the existing API of NRS and \emph{lctl} must be extended.
 
 \subsection{QoS Planner -- relating to MDS}
 In the third step in Figure \ref{subfig:qos_comm_flow}, the QoS Planner requests location information for a given file of the MDS.
-So far, we have not found an existing RPC call for this task.
+This can be done by a call of \emph{lfs} and a parsing of the cmd-line output. 
 
-\begin{description}
-\item[(1) get\_file\_locations(file)]~\\ Lists the OSTs which hold objects of the given file.
-  \begin{description}
-    \item[Parameters]~\\
-        \begin{description}
-            \item[file] The file identifier.
-        \end{description}
-    \item[Returns] lists the OSTs which hold objects of the given file.
-  \end{description}
-\end{description}
+However, if the QoS Planner processes many job requests, this mechanism could state a performance bottlneck. 
+In the long run, we, therefore, plan to perform an direct rpc call to the MDS.
+
+
+%\begin{description}
+%\item[(1) get\_file\_locations(file)]~\\ Lists the OSTs which hold objects of the given file.
+  %\begin{description}
+    %\item[Parameters]~\\
+        %\begin{description}
+            %\item[file] The file identifier.
+        %\end{description}
+    %\item[Returns] lists the OSTs which hold objects of the given file.
+  %\end{description}
+%\end{description}
 
 
 
@@ -230,7 +280,7 @@ So far, we have not found an existing RPC call for this task.
 \begin{description}
  \item[Allow alternative schedules?] To reduce try-and-error cycles of LSF/Slurm, the QoS Planner could schedule requests at alternative times if wished and the original request cannot be met.
 
- \item[QoS Planner vs. normal NRS settings] QoS also can be configured via the \texttt{lctl} tool.
+ \item[QoS Planner vs. normal NRS settings] QoS also can be configured via the \emph{lctl} tool.
  This can overwrite rules set by the QoS Planner, thus destroying the schedule.
  Currently, the QoS Planner is designed with the assumption that he alone has control over the QoS configuration.
  How to solve this conflict?
