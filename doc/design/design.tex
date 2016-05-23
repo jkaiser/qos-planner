@@ -97,16 +97,18 @@ Figure \ref{fig:swarc_overview} shows the overview of system software architectu
 
 \textbf{QoS Planner}: The modules of \emph{QoS Planner} includes:
 
-(\textbf{{\romannumeral 1}}) The \emph{Server} module communicates with the \emph{QoS Planner frontend API} in the HPC cluster and gets OST information by the \emph{lctl\&lfs} utilities of the Lustre file system.
+(\textbf{{\romannumeral 1}}) The \emph{Server} module is a thin communication layer.
+%(\textbf{{\romannumeral 1}}) The \emph{Server} module communicates with the \emph{QoS Planner frontend API} in the HPC cluster and gets OST information by the \emph{lctl\&lfs} utilities of the Lustre file system.
 
-(\textbf{{\romannumeral 2}})  The \emph{Planner} module is in charge of the supply-and-demand issue for the scheduling job QoS. It provides the state of the \emph{Storage cluster} and sets the NRS according the QoS requirement (if the supply-and-demand is matching).
+%(\textbf{{\romannumeral 2}})  The \emph{Planner} module is in charge of the supply-and-demand issue for the scheduling job QoS. It provides the state of the \emph{Storage cluster} and sets the NRS according the QoS requirement (if the supply-and-demand is matching).
+(\textbf{{\romannumeral 2}})  The \emph{Planner} module is in charge of the supply-and-demand issue for the scheduling job QoS. It interpretes the requests starts the request processing depending on the request type.
 
 (\textbf{{\romannumeral 3}}) The \emph{Scheduler} module contains the scheduling algorithm. It reads the schedule when checking a job request and updates the schedule. The Scheduler also registers accepted jobs to the JobMonitor.
 %(\textbf{{\romannumeral 3}}) The \emph{Scheduler} module collects the state of both the Storage cluster (by the \emph{ClusterState} module) and the scheduling state (by the \emph{ScheduleState} module). Also, the \emph{Scheduler} module monitors the job state in the Storage cluster by the \emph{JobMonitor} module.
 
 (\textbf{{\romannumeral 4}}) The \emph{ClusterState} module collects the Storage cluster state (including network). This includes the set of OSS/OSTs as well as the current workload per OSS/OST.
 
-(\textbf{{\romannumeral 5}}) The \emph{ScheduleState} module collects the Storage cluster scheduling state.
+(\textbf{{\romannumeral 5}}) The \emph{ScheduleState} module holds the Storage cluster scheduling state.
 
 (\textbf{{\romannumeral 6}}) The \emph{JobMonitor} module ensures that Lustre is configured according to the schedule. New jobs mus be registered before they are considered.
 
@@ -288,7 +290,7 @@ In the long run, we, therefore, plan to perform an direct rpc call to the MDS.
  \item[QoS Planner as optional instance?] Is the planner an optional instance or a mandatory one?
  If the former: how can a modified lcltl discover it?
  Add an entry to the MGS and let LSF/Lustre request the MGS regularly?
- Or make the "discovery" part of the configuration?
+ Or make the ``discovery'' part of the configuration?
 % TODO: clients müssen den QoS planer auch _entdecken_
 % -> Eintrag in MGS?
 % --> das hieße ein (initialer) zusätzlicher Kommunikationsschritt mit dem MGS. Das Wissen über den QoSPlanner kann dann in den clients vorgehalten werden.
