@@ -285,9 +285,10 @@ In the long run, we, therefore, plan to perform an direct rpc call to the MDS.
  Currently, the QoS Planner is designed with the assumption that he alone has control over the QoS configuration.
  How to solve this conflict?
 
- \item[QoS Planner as optional instance?] Is the planer an optional instance or a mandatory one?
- If the former: how to discover it?
+ \item[QoS Planner as optional instance?] Is the planner an optional instance or a mandatory one?
+ If the former: how can a modified lcltl discover it?
  Add an entry to the MGS and let LSF/Lustre request the MGS regularly?
+ Or make the "discovery" part of the configuration?
 % TODO: clients müssen den QoS planer auch _entdecken_
 % -> Eintrag in MGS?
 % --> das hieße ein (initialer) zusätzlicher Kommunikationsschritt mit dem MGS. Das Wissen über den QoSPlanner kann dann in den clients vorgehalten werden.
