@@ -99,7 +99,7 @@ Figure \ref{fig:swarc_overview} shows the overview of system software architectu
 
 (\textbf{{\romannumeral 1}}) The \emph{Server} module communicates with the \emph{QoS Planner frontend API} in the HPC cluster and gets OST information by the \emph{lctl\&lfs} utilities of the Lustre file system.
 
-(\textbf{{\romannumeral 2}})  The \emph{Planner} module is in charge of the supply-and-demand issue for the scheduling job QoS. It provides the state of the \emph{Storage cluster} and sets the NRS according the QoS requirement (if the upply-and-demand is matching).
+(\textbf{{\romannumeral 2}})  The \emph{Planner} module is in charge of the supply-and-demand issue for the scheduling job QoS. It provides the state of the \emph{Storage cluster} and sets the NRS according the QoS requirement (if the supply-and-demand is matching).
 
 (\textbf{{\romannumeral 3}}) The \emph{Scheduler} module contains the scheduling algorithm. It reads the schedule when checking a job request and updates the schedule. The Scheduler also registers accepted jobs to the JobMonitor.
 %(\textbf{{\romannumeral 3}}) The \emph{Scheduler} module collects the state of both the Storage cluster (by the \emph{ClusterState} module) and the scheduling state (by the \emph{ScheduleState} module). Also, the \emph{Scheduler} module monitors the job state in the Storage cluster by the \emph{JobMonitor} module.
