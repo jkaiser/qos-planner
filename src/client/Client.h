@@ -13,7 +13,7 @@
 
 #include <zhelpers.hpp>
 
-#include "../../../../../Library/Caches/CLion12/cmake/generated/a7b7e32b/a7b7e32b/Debug/src/common/rpc/proto/message.pb.h"
+#include "../common/rpc/proto/message.pb.h"
 
 
 static zmq::socket_t * s_client_socket(const std::string ipPort, zmq::context_t & context);
