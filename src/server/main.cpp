@@ -2,12 +2,12 @@
 
 #include <gflags/gflags.h>
 
-//#include "../../../../../Library/Caches/CLion12/cmake/generated/a7b7e32b/a7b7e32b/Debug/src/common/rpc/proto/message.pb.h"
 #include "../common/rpc/proto/message.pb.h"
 
 #include <zhelpers.hpp>
 
 #include "Server.h"
+#include <Planner.h>
 
 using namespace std;
 
@@ -42,9 +42,14 @@ int main(int argc, char* argv[]) {
 
     cout << "Hello, World!" << endl;
 
+    std::shared_ptr<common::Planner> planner(new common::Planner(""));
+    if (!planner->Init()) {
+        return -1;
+    }
+
 //    executeServer(ipPort);
 
-    Server s("");
+    Server s("", planner);
     s.Init();
     s.Serve(ip_port);
 

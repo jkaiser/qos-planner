@@ -26,6 +26,7 @@ const ::google::protobuf::internal::GeneratedMessageReflection*
 struct RequestOneofInstance {
   const ::rpc::Request_ResourceRequest* resourcerequest_;
   const ::rpc::Request_DeleteRequest* deleterequest_;
+  const ::rpc::Request_ListJobsRequest* listjobsrequest_;
 }* Request_default_oneof_instance_ = NULL;
 const ::google::protobuf::Descriptor* Request_DeleteRequest_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
@@ -36,6 +37,9 @@ const ::google::protobuf::internal::GeneratedMessageReflection*
 const ::google::protobuf::Descriptor* Request_ResourceRequest_ResourceDefinition_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
   Request_ResourceRequest_ResourceDefinition_reflection_ = NULL;
+const ::google::protobuf::Descriptor* Request_ListJobsRequest_descriptor_ = NULL;
+const ::google::protobuf::internal::GeneratedMessageReflection*
+  Request_ListJobsRequest_reflection_ = NULL;
 const ::google::protobuf::EnumDescriptor* Request_Type_descriptor_ = NULL;
 const ::google::protobuf::Descriptor* Error_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
@@ -63,10 +67,11 @@ void protobuf_AssignDesc_message_2eproto() {
       "message.proto");
   GOOGLE_CHECK(file != NULL);
   Request_descriptor_ = file->message_type(0);
-  static const int Request_offsets_[4] = {
+  static const int Request_offsets_[5] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Request, type_),
     PROTO2_GENERATED_DEFAULT_ONEOF_FIELD_OFFSET(Request_default_oneof_instance_, resourcerequest_),
     PROTO2_GENERATED_DEFAULT_ONEOF_FIELD_OFFSET(Request_default_oneof_instance_, deleterequest_),
+    PROTO2_GENERATED_DEFAULT_ONEOF_FIELD_OFFSET(Request_default_oneof_instance_, listjobsrequest_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Request, rt_),
   };
   Request_reflection_ =
@@ -132,6 +137,21 @@ void protobuf_AssignDesc_message_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(Request_ResourceRequest_ResourceDefinition));
+  Request_ListJobsRequest_descriptor_ = Request_descriptor_->nested_type(2);
+  static const int Request_ListJobsRequest_offsets_[1] = {
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Request_ListJobsRequest, regex_),
+  };
+  Request_ListJobsRequest_reflection_ =
+    new ::google::protobuf::internal::GeneratedMessageReflection(
+      Request_ListJobsRequest_descriptor_,
+      Request_ListJobsRequest::default_instance_,
+      Request_ListJobsRequest_offsets_,
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Request_ListJobsRequest, _has_bits_[0]),
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Request_ListJobsRequest, _unknown_fields_),
+      -1,
+      ::google::protobuf::DescriptorPool::generated_pool(),
+      ::google::protobuf::MessageFactory::generated_factory(),
+      sizeof(Request_ListJobsRequest));
   Request_Type_descriptor_ = Request_descriptor_->enum_type(0);
   Error_descriptor_ = file->message_type(1);
   static const int Error_offsets_[2] = {
@@ -151,9 +171,10 @@ void protobuf_AssignDesc_message_2eproto() {
       sizeof(Error));
   Error_errorType_descriptor_ = Error_descriptor_->enum_type(0);
   Reply_descriptor_ = file->message_type(2);
-  static const int Reply_offsets_[2] = {
+  static const int Reply_offsets_[3] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Reply, rc_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Reply, error_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Reply, return_msg_),
   };
   Reply_reflection_ =
     new ::google::protobuf::internal::GeneratedMessageReflection(
@@ -208,6 +229,8 @@ void protobuf_RegisterTypes(const ::std::string&) {
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
     Request_ResourceRequest_ResourceDefinition_descriptor_, &Request_ResourceRequest_ResourceDefinition::default_instance());
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
+    Request_ListJobsRequest_descriptor_, &Request_ListJobsRequest::default_instance());
+  ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
     Error_descriptor_, &Error::default_instance());
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
     Reply_descriptor_, &Reply::default_instance());
@@ -227,6 +250,8 @@ void protobuf_ShutdownFile_message_2eproto() {
   delete Request_ResourceRequest_reflection_;
   delete Request_ResourceRequest_ResourceDefinition::default_instance_;
   delete Request_ResourceRequest_ResourceDefinition_reflection_;
+  delete Request_ListJobsRequest::default_instance_;
+  delete Request_ListJobsRequest_reflection_;
   delete Error::default_instance_;
   delete Error_reflection_;
   delete Reply::default_instance_;
@@ -243,25 +268,28 @@ void protobuf_AddDesc_message_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
-    "\n\rmessage.proto\022\003rpc\"\257\003\n\007Request\022\037\n\004type"
+    "\n\rmessage.proto\022\003rpc\"\230\004\n\007Request\022\037\n\004type"
     "\030\001 \002(\0162\021.rpc.Request.Type\0227\n\017resourceReq"
     "uest\030\002 \001(\0132\034.rpc.Request.ResourceRequest"
     "H\000\0223\n\rdeleteRequest\030\003 \001(\0132\032.rpc.Request."
-    "DeleteRequestH\000\032(\n\rDeleteRequest\022\n\n\002ID\030\001"
-    " \003(\t\022\013\n\003all\030\002 \001(\010\032\303\001\n\017ResourceRequest\022\n\n"
-    "\002ID\030\001 \002(\t\022K\n\022requestedResources\030\002 \003(\0132/."
-    "rpc.Request.ResourceRequest.ResourceDefi"
-    "nition\032W\n\022ResourceDefinition\022\014\n\004file\030\001 \001"
-    "(\t\022\024\n\014throughputMB\030\002 \001(\005\022\016\n\006tstart\030\003 \001(\003"
-    "\022\r\n\005tstop\030\004 \001(\003\"\037\n\004Type\022\013\n\007RESERVE\020\000\022\n\n\006"
-    "DELETE\020\001B\004\n\002rt\"_\n\005Error\022#\n\005error\030\001 \002(\0162\024"
-    ".rpc.Error.errorType\022\013\n\003msg\030\002 \001(\t\"$\n\terr"
-    "orType\022\t\n\005EARGS\020\000\022\014\n\010EUNKNOWN\020\001\".\n\005Reply"
-    "\022\n\n\002rc\030\001 \002(\005\022\031\n\005error\030\002 \001(\0132\n.rpc.Error\""
-    "\216\001\n\007Message\022\037\n\004type\030\001 \002(\0162\021.rpc.Message."
-    "Type\022\037\n\007request\030\002 \001(\0132\014.rpc.RequestH\000\022\033\n"
-    "\005reply\030\003 \001(\0132\n.rpc.ReplyH\000\"\036\n\004Type\022\013\n\007RE"
-    "QUEST\020\000\022\t\n\005REPLY\020\001B\004\n\002rq", 744);
+    "DeleteRequestH\000\0227\n\017listJobsRequest\030\004 \001(\013"
+    "2\034.rpc.Request.ListJobsRequestH\000\032(\n\rDele"
+    "teRequest\022\n\n\002ID\030\001 \003(\t\022\013\n\003all\030\002 \001(\010\032\303\001\n\017R"
+    "esourceRequest\022\n\n\002ID\030\001 \002(\t\022K\n\022requestedR"
+    "esources\030\002 \003(\0132/.rpc.Request.ResourceReq"
+    "uest.ResourceDefinition\032W\n\022ResourceDefin"
+    "ition\022\014\n\004file\030\001 \001(\t\022\024\n\014throughputMB\030\002 \001("
+    "\005\022\016\n\006tstart\030\003 \001(\003\022\r\n\005tstop\030\004 \001(\003\032 \n\017List"
+    "JobsRequest\022\r\n\005regex\030\001 \001(\t\"-\n\004Type\022\013\n\007RE"
+    "SERVE\020\000\022\n\n\006DELETE\020\001\022\014\n\010LISTJOBS\020\002B\004\n\002rt\""
+    "_\n\005Error\022#\n\005error\030\001 \002(\0162\024.rpc.Error.erro"
+    "rType\022\013\n\003msg\030\002 \001(\t\"$\n\terrorType\022\t\n\005EARGS"
+    "\020\000\022\014\n\010EUNKNOWN\020\001\"B\n\005Reply\022\n\n\002rc\030\001 \002(\005\022\031\n"
+    "\005error\030\002 \001(\0132\n.rpc.Error\022\022\n\nreturn_msg\030\003"
+    " \001(\t\"\216\001\n\007Message\022\037\n\004type\030\001 \002(\0162\021.rpc.Mes"
+    "sage.Type\022\037\n\007request\030\002 \001(\0132\014.rpc.Request"
+    "H\000\022\033\n\005reply\030\003 \001(\0132\n.rpc.ReplyH\000\"\036\n\004Type\022"
+    "\013\n\007REQUEST\020\000\022\t\n\005REPLY\020\001B\004\n\002rq", 869);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "message.proto", &protobuf_RegisterTypes);
   Request::default_instance_ = new Request();
@@ -269,6 +297,7 @@ void protobuf_AddDesc_message_2eproto() {
   Request_DeleteRequest::default_instance_ = new Request_DeleteRequest();
   Request_ResourceRequest::default_instance_ = new Request_ResourceRequest();
   Request_ResourceRequest_ResourceDefinition::default_instance_ = new Request_ResourceRequest_ResourceDefinition();
+  Request_ListJobsRequest::default_instance_ = new Request_ListJobsRequest();
   Error::default_instance_ = new Error();
   Reply::default_instance_ = new Reply();
   Message::default_instance_ = new Message();
@@ -277,6 +306,7 @@ void protobuf_AddDesc_message_2eproto() {
   Request_DeleteRequest::default_instance_->InitAsDefaultInstance();
   Request_ResourceRequest::default_instance_->InitAsDefaultInstance();
   Request_ResourceRequest_ResourceDefinition::default_instance_->InitAsDefaultInstance();
+  Request_ListJobsRequest::default_instance_->InitAsDefaultInstance();
   Error::default_instance_->InitAsDefaultInstance();
   Reply::default_instance_->InitAsDefaultInstance();
   Message::default_instance_->InitAsDefaultInstance();
@@ -300,6 +330,7 @@ bool Request_Type_IsValid(int value) {
   switch(value) {
     case 0:
     case 1:
+    case 2:
       return true;
     default:
       return false;
@@ -309,6 +340,7 @@ bool Request_Type_IsValid(int value) {
 #ifndef _MSC_VER
 const Request_Type Request::RESERVE;
 const Request_Type Request::DELETE;
+const Request_Type Request::LISTJOBS;
 const Request_Type Request::Type_MIN;
 const Request_Type Request::Type_MAX;
 const int Request::Type_ARRAYSIZE;
@@ -1243,9 +1275,253 @@ void Request_ResourceRequest::Swap(Request_ResourceRequest* other) {
 // -------------------------------------------------------------------
 
 #ifndef _MSC_VER
+const int Request_ListJobsRequest::kRegexFieldNumber;
+#endif  // !_MSC_VER
+
+Request_ListJobsRequest::Request_ListJobsRequest()
+  : ::google::protobuf::Message() {
+  SharedCtor();
+  // @@protoc_insertion_point(constructor:rpc.Request.ListJobsRequest)
+}
+
+void Request_ListJobsRequest::InitAsDefaultInstance() {
+}
+
+Request_ListJobsRequest::Request_ListJobsRequest(const Request_ListJobsRequest& from)
+  : ::google::protobuf::Message() {
+  SharedCtor();
+  MergeFrom(from);
+  // @@protoc_insertion_point(copy_constructor:rpc.Request.ListJobsRequest)
+}
+
+void Request_ListJobsRequest::SharedCtor() {
+  ::google::protobuf::internal::GetEmptyString();
+  _cached_size_ = 0;
+  regex_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+}
+
+Request_ListJobsRequest::~Request_ListJobsRequest() {
+  // @@protoc_insertion_point(destructor:rpc.Request.ListJobsRequest)
+  SharedDtor();
+}
+
+void Request_ListJobsRequest::SharedDtor() {
+  if (regex_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    delete regex_;
+  }
+  if (this != default_instance_) {
+  }
+}
+
+void Request_ListJobsRequest::SetCachedSize(int size) const {
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+}
+const ::google::protobuf::Descriptor* Request_ListJobsRequest::descriptor() {
+  protobuf_AssignDescriptorsOnce();
+  return Request_ListJobsRequest_descriptor_;
+}
+
+const Request_ListJobsRequest& Request_ListJobsRequest::default_instance() {
+  if (default_instance_ == NULL) protobuf_AddDesc_message_2eproto();
+  return *default_instance_;
+}
+
+Request_ListJobsRequest* Request_ListJobsRequest::default_instance_ = NULL;
+
+Request_ListJobsRequest* Request_ListJobsRequest::New() const {
+  return new Request_ListJobsRequest;
+}
+
+void Request_ListJobsRequest::Clear() {
+  if (has_regex()) {
+    if (regex_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+      regex_->clear();
+    }
+  }
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+  mutable_unknown_fields()->Clear();
+}
+
+bool Request_ListJobsRequest::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!(EXPRESSION)) goto failure
+  ::google::protobuf::uint32 tag;
+  // @@protoc_insertion_point(parse_start:rpc.Request.ListJobsRequest)
+  for (;;) {
+    ::std::pair< ::google::protobuf::uint32, bool> p = input->ReadTagWithCutoff(127);
+    tag = p.first;
+    if (!p.second) goto handle_unusual;
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // optional string regex = 1;
+      case 1: {
+        if (tag == 10) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_regex()));
+          ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
+            this->regex().data(), this->regex().length(),
+            ::google::protobuf::internal::WireFormat::PARSE,
+            "regex");
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectAtEnd()) goto success;
+        break;
+      }
+
+      default: {
+      handle_unusual:
+        if (tag == 0 ||
+            ::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_END_GROUP) {
+          goto success;
+        }
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, mutable_unknown_fields()));
+        break;
+      }
+    }
+  }
+success:
+  // @@protoc_insertion_point(parse_success:rpc.Request.ListJobsRequest)
+  return true;
+failure:
+  // @@protoc_insertion_point(parse_failure:rpc.Request.ListJobsRequest)
+  return false;
+#undef DO_
+}
+
+void Request_ListJobsRequest::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // @@protoc_insertion_point(serialize_start:rpc.Request.ListJobsRequest)
+  // optional string regex = 1;
+  if (has_regex()) {
+    ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
+      this->regex().data(), this->regex().length(),
+      ::google::protobuf::internal::WireFormat::SERIALIZE,
+      "regex");
+    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
+      1, this->regex(), output);
+  }
+
+  if (!unknown_fields().empty()) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        unknown_fields(), output);
+  }
+  // @@protoc_insertion_point(serialize_end:rpc.Request.ListJobsRequest)
+}
+
+::google::protobuf::uint8* Request_ListJobsRequest::SerializeWithCachedSizesToArray(
+    ::google::protobuf::uint8* target) const {
+  // @@protoc_insertion_point(serialize_to_array_start:rpc.Request.ListJobsRequest)
+  // optional string regex = 1;
+  if (has_regex()) {
+    ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
+      this->regex().data(), this->regex().length(),
+      ::google::protobuf::internal::WireFormat::SERIALIZE,
+      "regex");
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        1, this->regex(), target);
+  }
+
+  if (!unknown_fields().empty()) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        unknown_fields(), target);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:rpc.Request.ListJobsRequest)
+  return target;
+}
+
+int Request_ListJobsRequest::ByteSize() const {
+  int total_size = 0;
+
+  if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    // optional string regex = 1;
+    if (has_regex()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::StringSize(
+          this->regex());
+    }
+
+  }
+  if (!unknown_fields().empty()) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        unknown_fields());
+  }
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = total_size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  return total_size;
+}
+
+void Request_ListJobsRequest::MergeFrom(const ::google::protobuf::Message& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  const Request_ListJobsRequest* source =
+    ::google::protobuf::internal::dynamic_cast_if_available<const Request_ListJobsRequest*>(
+      &from);
+  if (source == NULL) {
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+    MergeFrom(*source);
+  }
+}
+
+void Request_ListJobsRequest::MergeFrom(const Request_ListJobsRequest& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    if (from.has_regex()) {
+      set_regex(from.regex());
+    }
+  }
+  mutable_unknown_fields()->MergeFrom(from.unknown_fields());
+}
+
+void Request_ListJobsRequest::CopyFrom(const ::google::protobuf::Message& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void Request_ListJobsRequest::CopyFrom(const Request_ListJobsRequest& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool Request_ListJobsRequest::IsInitialized() const {
+
+  return true;
+}
+
+void Request_ListJobsRequest::Swap(Request_ListJobsRequest* other) {
+  if (other != this) {
+    std::swap(regex_, other->regex_);
+    std::swap(_has_bits_[0], other->_has_bits_[0]);
+    _unknown_fields_.Swap(&other->_unknown_fields_);
+    std::swap(_cached_size_, other->_cached_size_);
+  }
+}
+
+::google::protobuf::Metadata Request_ListJobsRequest::GetMetadata() const {
+  protobuf_AssignDescriptorsOnce();
+  ::google::protobuf::Metadata metadata;
+  metadata.descriptor = Request_ListJobsRequest_descriptor_;
+  metadata.reflection = Request_ListJobsRequest_reflection_;
+  return metadata;
+}
+
+
+// -------------------------------------------------------------------
+
+#ifndef _MSC_VER
 const int Request::kTypeFieldNumber;
 const int Request::kResourceRequestFieldNumber;
 const int Request::kDeleteRequestFieldNumber;
+const int Request::kListJobsRequestFieldNumber;
 #endif  // !_MSC_VER
 
 Request::Request()
@@ -1257,6 +1533,7 @@ Request::Request()
 void Request::InitAsDefaultInstance() {
   Request_default_oneof_instance_->resourcerequest_ = const_cast< ::rpc::Request_ResourceRequest*>(&::rpc::Request_ResourceRequest::default_instance());
   Request_default_oneof_instance_->deleterequest_ = const_cast< ::rpc::Request_DeleteRequest*>(&::rpc::Request_DeleteRequest::default_instance());
+  Request_default_oneof_instance_->listjobsrequest_ = const_cast< ::rpc::Request_ListJobsRequest*>(&::rpc::Request_ListJobsRequest::default_instance());
 }
 
 Request::Request(const Request& from)
@@ -1315,6 +1592,10 @@ void Request::clear_rt() {
     }
     case kDeleteRequest: {
       delete rt_.deleterequest_;
+      break;
+    }
+    case kListJobsRequest: {
+      delete rt_.listjobsrequest_;
       break;
     }
     case RT_NOT_SET: {
@@ -1383,6 +1664,19 @@ bool Request::MergePartialFromCodedStream(
         } else {
           goto handle_unusual;
         }
+        if (input->ExpectTag(34)) goto parse_listJobsRequest;
+        break;
+      }
+
+      // optional .rpc.Request.ListJobsRequest listJobsRequest = 4;
+      case 4: {
+        if (tag == 34) {
+         parse_listJobsRequest:
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
+               input, mutable_listjobsrequest()));
+        } else {
+          goto handle_unusual;
+        }
         if (input->ExpectAtEnd()) goto success;
         break;
       }
@@ -1430,6 +1724,12 @@ void Request::SerializeWithCachedSizes(
       3, this->deleterequest(), output);
   }
 
+  // optional .rpc.Request.ListJobsRequest listJobsRequest = 4;
+  if (has_listjobsrequest()) {
+    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
+      4, this->listjobsrequest(), output);
+  }
+
   if (!unknown_fields().empty()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         unknown_fields(), output);
@@ -1458,6 +1758,13 @@ void Request::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormatLite::
       WriteMessageNoVirtualToArray(
         3, this->deleterequest(), target);
+  }
+
+  // optional .rpc.Request.ListJobsRequest listJobsRequest = 4;
+  if (has_listjobsrequest()) {
+    target = ::google::protobuf::internal::WireFormatLite::
+      WriteMessageNoVirtualToArray(
+        4, this->listjobsrequest(), target);
   }
 
   if (!unknown_fields().empty()) {
@@ -1492,6 +1799,13 @@ int Request::ByteSize() const {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
           this->deleterequest());
+      break;
+    }
+    // optional .rpc.Request.ListJobsRequest listJobsRequest = 4;
+    case kListJobsRequest: {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
+          this->listjobsrequest());
       break;
     }
     case RT_NOT_SET: {
@@ -1530,6 +1844,10 @@ void Request::MergeFrom(const Request& from) {
     }
     case kDeleteRequest: {
       mutable_deleterequest()->::rpc::Request_DeleteRequest::MergeFrom(from.deleterequest());
+      break;
+    }
+    case kListJobsRequest: {
+      mutable_listjobsrequest()->::rpc::Request_ListJobsRequest::MergeFrom(from.listjobsrequest());
       break;
     }
     case RT_NOT_SET: {
@@ -1902,6 +2220,7 @@ void Error::Swap(Error* other) {
 #ifndef _MSC_VER
 const int Reply::kRcFieldNumber;
 const int Reply::kErrorFieldNumber;
+const int Reply::kReturnMsgFieldNumber;
 #endif  // !_MSC_VER
 
 Reply::Reply()
@@ -1922,9 +2241,11 @@ Reply::Reply(const Reply& from)
 }
 
 void Reply::SharedCtor() {
+  ::google::protobuf::internal::GetEmptyString();
   _cached_size_ = 0;
   rc_ = 0;
   error_ = NULL;
+  return_msg_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
@@ -1934,6 +2255,9 @@ Reply::~Reply() {
 }
 
 void Reply::SharedDtor() {
+  if (return_msg_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    delete return_msg_;
+  }
   if (this != default_instance_) {
     delete error_;
   }
@@ -1961,10 +2285,15 @@ Reply* Reply::New() const {
 }
 
 void Reply::Clear() {
-  if (_has_bits_[0 / 32] & 3) {
+  if (_has_bits_[0 / 32] & 7) {
     rc_ = 0;
     if (has_error()) {
       if (error_ != NULL) error_->::rpc::Error::Clear();
+    }
+    if (has_return_msg()) {
+      if (return_msg_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+        return_msg_->clear();
+      }
     }
   }
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
@@ -2001,6 +2330,23 @@ bool Reply::MergePartialFromCodedStream(
          parse_error:
           DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
                input, mutable_error()));
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(26)) goto parse_return_msg;
+        break;
+      }
+
+      // optional string return_msg = 3;
+      case 3: {
+        if (tag == 26) {
+         parse_return_msg:
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_return_msg()));
+          ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
+            this->return_msg().data(), this->return_msg().length(),
+            ::google::protobuf::internal::WireFormat::PARSE,
+            "return_msg");
         } else {
           goto handle_unusual;
         }
@@ -2044,6 +2390,16 @@ void Reply::SerializeWithCachedSizes(
       2, this->error(), output);
   }
 
+  // optional string return_msg = 3;
+  if (has_return_msg()) {
+    ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
+      this->return_msg().data(), this->return_msg().length(),
+      ::google::protobuf::internal::WireFormat::SERIALIZE,
+      "return_msg");
+    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
+      3, this->return_msg(), output);
+  }
+
   if (!unknown_fields().empty()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         unknown_fields(), output);
@@ -2064,6 +2420,17 @@ void Reply::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormatLite::
       WriteMessageNoVirtualToArray(
         2, this->error(), target);
+  }
+
+  // optional string return_msg = 3;
+  if (has_return_msg()) {
+    ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
+      this->return_msg().data(), this->return_msg().length(),
+      ::google::protobuf::internal::WireFormat::SERIALIZE,
+      "return_msg");
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        3, this->return_msg(), target);
   }
 
   if (!unknown_fields().empty()) {
@@ -2090,6 +2457,13 @@ int Reply::ByteSize() const {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
           this->error());
+    }
+
+    // optional string return_msg = 3;
+    if (has_return_msg()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::StringSize(
+          this->return_msg());
     }
 
   }
@@ -2125,6 +2499,9 @@ void Reply::MergeFrom(const Reply& from) {
     if (from.has_error()) {
       mutable_error()->::rpc::Error::MergeFrom(from.error());
     }
+    if (from.has_return_msg()) {
+      set_return_msg(from.return_msg());
+    }
   }
   mutable_unknown_fields()->MergeFrom(from.unknown_fields());
 }
@@ -2154,6 +2531,7 @@ void Reply::Swap(Reply* other) {
   if (other != this) {
     std::swap(rc_, other->rc_);
     std::swap(error_, other->error_);
+    std::swap(return_msg_, other->return_msg_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
     _unknown_fields_.Swap(&other->_unknown_fields_);
     std::swap(_cached_size_, other->_cached_size_);

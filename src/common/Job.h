@@ -6,6 +6,7 @@
 #define QOS_PLANNER_JOB_H
 
 
+#include <string>
 #include <chrono>
 #include <vector>
 
@@ -29,6 +30,19 @@ public:
         ACTIVE,
         DONE
     };
+
+    static std::string JobStateToString(JobState s) {
+        switch (s) {
+            case INITIALIZED:
+                return "INITIALIZED";
+            case SCHEDULED:
+                return "SCHEDULED";
+            case ACTIVE:
+                return "ACTIVE";
+            case DONE:
+                return "DONE";
+        }
+    }
 
     Job(const std::string &jobid,
         std::chrono::time_point<std::chrono::system_clock> tstart,

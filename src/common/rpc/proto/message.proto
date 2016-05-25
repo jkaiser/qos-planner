@@ -16,21 +16,25 @@ message Request {
         }
         required string ID = 1;
         repeated ResourceDefinition requestedResources = 2;
+    }
 
+    message ListJobsRequest {     // get a list of all jobs
+        optional string regex = 1; // regex for IDs. If not given, all jobs will be listed.
     }
 
     enum Type {
         RESERVE = 0;
         DELETE = 1;
+        LISTJOBS = 2;
     }
 
     required Type type = 1;
     oneof rt {
         ResourceRequest resourceRequest = 2;
         DeleteRequest deleteRequest = 3;
+        ListJobsRequest listJobsRequest = 4;
     }
 }
-
 
 
 message Error {
@@ -46,6 +50,7 @@ message Error {
 message Reply {
     required int32 rc = 1;
     optional Error error = 2;
+    optional string return_msg = 3;
 }
 
 // The main message body.

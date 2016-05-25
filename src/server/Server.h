@@ -8,11 +8,7 @@
 #include <memory>
 #include <string>
 
-#include <Scheduler.h>
-#include <ScheduleState.h>
-#include <ClusterState.h>
-#include <JobMonitor.h>
-#include <Lustre.h>
+#include <Planner.h>
 #include "../common/rpc/proto/message.pb.h"
 
 /**
@@ -28,15 +24,7 @@ class Server {
 
 private:
     std::string root_path;
-    std::shared_ptr<common::Scheduler> scheduler;
-    std::shared_ptr<common::ScheduleState> schedule_state;
-    std::shared_ptr<common::ClusterState> cluster_state;
-    std::shared_ptr<common::JobMonitor> job_monitor;
-    std::shared_ptr<common::Lustre> lustre;
-
-protected:
-    bool ServeJobSubmission(const rpc::Request_ResourceRequest &msg);
-    bool ServeJobRemove(const rpc::Request_DeleteRequest &msg);
+    std::shared_ptr<common::Planner> planner;
 
 public:
 
@@ -44,9 +32,9 @@ public:
      * Constructor
      *
      * root_path:   The path where the server will store permanent data structures. If empty, it will only
-     *              use in-memory data structures.
+     *              uses in-memory data structures.
      */
-    Server(const std::string &root_path);
+    Server(const std::string &root_path, std::shared_ptr<common::Planner> planner);
     bool Init();
     bool TearDown();
 
