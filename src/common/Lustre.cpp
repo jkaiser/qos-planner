@@ -39,7 +39,17 @@ bool LocalLustre::Init() {
 }
 
 bool LocalLustre::GetOstsForFile(const std::string &file, std::shared_ptr<std::vector<std::string>> osts) {
-    return false;
+    std::shared_ptr<std::string> getstripe_out(new std::string());
+    std::string cmd = "lfs getstripe " + file;
+
+    if (!exec(cmd.c_str(), getstripe_out)) {
+        // TODO: add error reporting
+        return false;
+    }
+
+    ParseOstsFromGetStripe(getstripe_out->c_str(), osts);
+
+    return true;
 }
 
 

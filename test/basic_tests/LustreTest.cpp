@@ -2,16 +2,13 @@
 // Created by jkaiser on 6/1/16.
 //
 
-#include "gmock/gmock.h"
+#include "gtest/gtest.h"
 
 #include <string>
 #include <vector>
 #include <memory>
 
 #include <Lustre.h>
-
-
-using ::testing::_;
 
 struct parseOstsTestset {
     std::string to_parse;
