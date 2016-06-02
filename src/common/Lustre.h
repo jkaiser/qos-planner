@@ -28,8 +28,17 @@ public:
 
     /**
      * Determines the osts for the given file and appends them to the given vector.
+     * Returns
+     *  true, if no error occured.
+     *  else, otherwise
      */
     virtual bool GetOstsForFile(const std::string &file, std::shared_ptr<std::vector<std::string>> osts) = 0;
+
+    /**
+     * Parses the output of an lfs getstripe <file> command. It is assumed that it is the command
+     * for a single file and that the call didn't return with an error.
+     */
+    static void ParseOstsFromGetStripe(std::string lfs_out, std::shared_ptr<std::vector<std::string>> osts);
 };
 
 

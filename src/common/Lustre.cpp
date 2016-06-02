@@ -3,6 +3,8 @@
 //
 
 #include "Lustre.h"
+#include <regex>
+#include <sstream>
 
 namespace common {
 
@@ -20,7 +22,7 @@ bool LocalLustre::StopJobTbfRule(std::string jobid, std::string rule_name) {
 }
 
 uint32_t LocalLustre::MBsToRPCs(const uint32_t mb_per_sec) const {
-    return mb_per_sec/max_rpc_size;   // TODO:
+    return mb_per_sec / max_rpc_size;   // TODO:
 }
 
 uint32_t LocalLustre::RPCsToMBs(const uint32_t rpc_per_sec) const {
@@ -41,4 +43,22 @@ bool LocalLustre::GetOstsForFile(const std::string &file, std::shared_ptr<std::v
 }
 
 
+void Lustre::ParseOstsFromGetStripe(std::string lfs_out, std::shared_ptr<std::vector<std::string>> osts) {
+
+    // example: '\t     3\t             2\t          0x2\t             0'
+    std::regex r("\t.+([0-9+]).+\t.+\t.*");
+
+    std::istringstream stream(lfs_out);
+    for (std::string line; std::getline(stream, line);) {
+
+        std::smatch base_match;
+        if (std::regex_match(line, base_match, r)) {
+            if (base_match.size() == 2) {
+                osts->push_back(base_match[1].str());
+            }
+        }
+    }
 }
+
+}
+
