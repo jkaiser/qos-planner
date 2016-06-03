@@ -58,7 +58,7 @@ bool JobMonitor::Init() {
         return false;
     }
 
-    // fill the monitor with existing jobs. We only consider jobs that werde touched by the monitor
+    // fill the monitor with existing jobs. We only consider jobs that were touched by the monitor
     // itself -> state == SCHEDULED or state == ACTIVE
     std::map<std::string, Job*> *existing_jobs = scheduleState->GetAllJobs();
 
