@@ -37,6 +37,11 @@ public:
     virtual bool GetOstsForFile(const std::string &file, std::shared_ptr<std::vector<std::string>> osts) = 0;
 
     /**
+     * Determines the osts for the given files and appends them to the given vector.
+     */
+    virtual bool GetOstsForFile(const std::vector<std::string> &files, std::shared_ptr<std::vector<std::string>> osts) = 0;
+
+    /**
      * Parses the output of an lfs getstripe <file> command. It is assumed that it is the command
      * for a single file and that the call didn't return with an error.
      */
@@ -64,6 +69,7 @@ public:
 
     virtual bool StopJobTbfRule(std::string jobid, std::string rule_name) override;
     virtual bool GetOstsForFile(const std::string &file, std::shared_ptr<std::vector<std::string>> osts) override;
+    virtual bool GetOstsForFile(const std::vector<std::string> &files, std::shared_ptr<std::vector<std::string>> osts);
 };
 
 }
