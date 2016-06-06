@@ -87,7 +87,7 @@ bool LocalLustre::GetOstsForFile(const std::vector<std::string> &files,
 void Lustre::ParseOstsFromGetStripe(std::string lfs_out, std::shared_ptr<std::vector<std::string>> osts) {
 
     // example: '\t     3\t             2\t          0x2\t             0'
-    std::regex r("\t.+([0-9+]).+\t.+\t.*");
+    std::regex r("\t.+([0-9]+)\t.+\t.+\t.*");
 
     std::istringstream stream(lfs_out);
     for (std::string line; std::getline(stream, line);) {
