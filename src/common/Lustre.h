@@ -42,6 +42,7 @@ public:
     static void ParseOstsFromLfsOsts(const std::string &lfs_out, std::shared_ptr<std::vector<getOstsResults>> osts);
 
     virtual bool StartJobTbfRule(std::string jobid, std::string rule_name, uint32_t rpc_rate_limit) = 0;
+    virtual bool ChangeJobTbfRule(std::string jobid, std::string rule_name, uint32_t new_rpc_rate_limit) = 0;
 
     virtual bool StopJobTbfRule(std::string jobid, std::string rule_name) = 0;
 
@@ -83,9 +84,11 @@ public:
     virtual uint32_t RPCsToMBs(const uint32_t rpc_per_sec) const override;
 
     virtual bool GetOstList(const std::string &path, std::shared_ptr<std::vector<getOstsResults>> output);
-    virtual bool StartJobTbfRule(std::string jobid, std::string rule_name, uint32_t rpc_rate_limit) override;
 
+    virtual bool StartJobTbfRule(std::string jobid, std::string rule_name, uint32_t rpc_rate_limit) override;
+    virtual bool ChangeJobTbfRule(std::string jobid, std::string rule_name, uint32_t new_rpc_rate_limit) override;
     virtual bool StopJobTbfRule(std::string jobid, std::string rule_name) override;
+
     virtual bool GetOstsForFile(const std::string &file, std::shared_ptr<std::vector<std::string>> osts) override;
     virtual bool GetOstsForFile(const std::vector<std::string> &files, std::shared_ptr<std::vector<std::string>> osts);
 };

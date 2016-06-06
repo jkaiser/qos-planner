@@ -12,15 +12,45 @@ namespace common {
 
 
 bool LocalLustre::StartJobTbfRule(std::string jobid, std::string rule_name, uint32_t rpc_rate_limit) {
-    // $ lctl set_param x.x.x.nrs_tbf_rule="[reg|hp] start rule_name jobid_list) rpc_rate_limit"
+    // $ lctl set_param x.x.x.nrs_tbf_rule="[reg|hp] start rule_name jobid_list) rpc_rate_limit" // NOTE: hp = high priority, reg = regular (?)
     // $ lctl set_param ost.OSS.ost_io.nrs_tbf_rule="[reg|hp] start rule_name jobid_list) rpc_rate_limit"
-    return false;
+
+    std::string cmd = "lctl set_param ost.OSS.ost_io.nrs_tbf_rule=\"reg start " + rule_name + " " + jobid + " " +
+                      std::to_string(rpc_rate_limit) + "\"";
+    std::shared_ptr<std::string> out(new std::string());
+
+    if (!exec(cmd.c_str(), out)) {
+        // TODO: add error reporting
+        return false;
+    }
+    return true;
+}
+
+bool LocalLustre::ChangeJobTbfRule(std::string jobid, std::string rule_name, uint32_t new_rpc_rate_limit) {
+    std::string cmd = "lctl set_param ost.OSS.ost_io.nrs_tbf_rule=\"reg change " + rule_name + " " +
+                      std::to_string(new_rpc_rate_limit) + "\"";
+    std::shared_ptr<std::string> out(new std::string());
+
+    if (!exec(cmd.c_str(), out)) {
+        // TODO: add error reporting
+        return false;
+    }
+    return true;
 }
 
 bool LocalLustre::StopJobTbfRule(std::string jobid, std::string rule_name) {
     // lctl set_param x.x.x.nrs_tbf_rule= "[reg|hp] change rule_name rate"
     // lctl set_param ost.OSS.ost_io.nrs_tbf_rule="stop loginnode"
-    return false;
+
+    std::string cmd = "lctl set_param ost.OSS.ost_io.nrs_tbf_rule=\"reg stop " + rule_name + "\"";
+    std::shared_ptr<std::string> out(new std::string());
+
+    if (!exec(cmd.c_str(), out)) {
+        // TODO: add error reporting
+        return false;
+    }
+
+    return true;
 }
 
 uint32_t LocalLustre::MBsToRPCs(const uint32_t mb_per_sec) const {
