@@ -6,7 +6,9 @@
 
 namespace common {
 
-bool MemoryClusterState::getState(const std::string &id, NodeState *state) const {
+bool MemoryClusterState::getState(const std::string &id, NodeState *state) {
+    std::unique_lock<std::mutex> lck(state_mut);
+
     auto it = this->nodeMap.find(id);
     if (it == this->nodeMap.end()) {
         return false;
@@ -30,6 +32,11 @@ std::vector<std::string> *MemoryClusterState::getNodes() {
 
 bool MemoryClusterState::Init() {
 
+    if (!Update()) {    // perform an initial update first
+        return false;
+    }
+
+    // start updating thread.
     if (not update_thread_started) {
         update_thread = std::thread(&MemoryClusterState::updateRepeatedly, this);
         update_thread_started = true;
@@ -37,11 +44,11 @@ bool MemoryClusterState::Init() {
         return false;
     }
 
-
     return true;
 }
 
 bool MemoryClusterState::TearDown() {
+    std::unique_lock<std::mutex> lck(state_mut);
 
     if (!update_thread_exit_flag) {
         update_thread_exit_flag = true;
@@ -73,7 +80,9 @@ void MemoryClusterState::updateRepeatedly() {
 
     while(!update_thread_exit_flag) {
 
-        Update();
+        if (!Update()) {
+           //TODO: add error logging here, but don't exit the thread as it might be an temporary error
+        };
         std::this_thread::sleep_for(std::chrono::seconds(1));
     }
 
@@ -81,10 +90,12 @@ void MemoryClusterState::updateRepeatedly() {
 
 bool MemoryClusterState::Update() {
     std::shared_ptr<std::vector<Lustre::getOstsResults>> r (new std::vector<Lustre::getOstsResults>());
+
     if (!lustre->GetOstList("", r)) {
         return false;
     }
 
+    std::unique_lock<std::mutex> lck(state_mut);
     for (auto &it : *r) {
         this->nodeMap[it.number] = {it.uuid, 0, 0}; // TODO: obviously the performance values are wrong. Replace with correct ones!
     }

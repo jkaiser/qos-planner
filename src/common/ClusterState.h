@@ -10,6 +10,7 @@
 #include <map>
 #include <vector>
 #include <stdint.h>
+#include <mutex>
 
 #include <thread>
 
@@ -44,7 +45,7 @@ public:
     /**
      * Get the state of the OST with the given id
      */
-    virtual bool getState(const std::string &id, NodeState *state) const = 0;
+    virtual bool getState(const std::string &id, NodeState *state) = 0;
     virtual std::vector<std::string> *getNodes() = 0;
 
     virtual void UpdateNode(const std::string &name, const NodeState &node_state) = 0;
@@ -63,6 +64,8 @@ private:
     std::thread update_thread;
     bool update_thread_exit_flag = false;
 
+    std::mutex state_mut;
+
     void updateRepeatedly();
 
 protected:
@@ -76,7 +79,7 @@ public:
     virtual bool Init() override;
     virtual bool TearDown() override;
     virtual std::vector<std::string> *getNodes() override;
-    virtual bool getState(const std::string &id, NodeState *state) const override;
+    virtual bool getState(const std::string &id, NodeState *state) override;
     virtual void UpdateNode(const std::string &name, const NodeState &node_state) override;
 };
 }
