@@ -3,8 +3,10 @@
 //
 
 #include "Lustre.h"
+
 #include <regex>
 #include <sstream>
+#include <unordered_set>
 
 namespace common {
 
@@ -49,6 +51,35 @@ bool LocalLustre::GetOstsForFile(const std::string &file, std::shared_ptr<std::v
 
     ParseOstsFromGetStripe(getstripe_out->c_str(), osts);
 
+    return true;
+}
+
+bool LocalLustre::GetOstsForFile(const std::vector<std::string> &files,
+                                 std::shared_ptr<std::vector<std::string>> osts) {
+    std::shared_ptr<std::string> getstripe_out(new std::string());
+    std::ostringstream oss;
+    if (!osts->empty()) {
+        std::copy(osts->begin(), osts->end(), std::ostream_iterator<std::string> (oss, " "));   // theoretically, there is a " " too much at the end, but it doesn't hurt us
+    }
+    std::string cmd = "lfs getstripe " + oss.str();
+
+    if (!exec(cmd.c_str(), getstripe_out)) {
+        // TODO: add error reporting
+        return false;
+    }
+
+    ParseOstsFromGetStripe(getstripe_out->c_str(), osts);
+
+    // there may be double entries in the vector
+    std::unordered_set<std::string> ost_set;
+    for (auto &o : *osts) {
+        ost_set.insert(o);
+    }
+
+    osts->clear();
+    for (auto &o : ost_set) {
+        osts->push_back(o);
+    }
     return true;
 }
 
