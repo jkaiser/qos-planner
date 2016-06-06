@@ -6,11 +6,14 @@
 #define QOS_PLANNER_CLUSTERSTATE_H
 
 #include <string>
+
 #include <map>
 #include <vector>
 #include <stdint.h>
 
 #include <thread>
+
+#include "Lustre.h"
 
 namespace common {
 
@@ -37,6 +40,10 @@ public:
 
     virtual bool Init() = 0;
     virtual bool TearDown() = 0;
+
+    /**
+     * Get the state of the OST with the given id
+     */
     virtual bool getState(const std::string &id, NodeState *state) const = 0;
     virtual std::vector<std::string> *getNodes() = 0;
 
@@ -50,6 +57,7 @@ class MemoryClusterState : public ClusterState {
 
 private:
     std::map<std::string, NodeState> nodeMap;
+    std::shared_ptr<common::Lustre> lustre;
 
     bool update_thread_started;
     std::thread update_thread;
@@ -62,6 +70,9 @@ protected:
 
 
 public:
+    MemoryClusterState();
+    MemoryClusterState(std::shared_ptr<common::Lustre> l);
+
     virtual bool Init() override;
     virtual bool TearDown() override;
     virtual std::vector<std::string> *getNodes() override;

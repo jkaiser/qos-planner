@@ -80,12 +80,26 @@ void MemoryClusterState::updateRepeatedly() {
 }
 
 bool MemoryClusterState::Update() {
-    //TODO: Implement update mechanism -> Needs an Lustre implementation!!!
-    return false;
+    std::shared_ptr<std::vector<Lustre::getOstsResults>> r (new std::vector<Lustre::getOstsResults>());
+    if (!lustre->GetOstList("", r)) {
+        return false;
+    }
+
+    for (auto &it : *r) {
+        this->nodeMap[it.number] = {it.uuid, 0, 0}; // TODO: obviously the performance values are wrong. Replace with correct ones!
+    }
+    return true;
 }
 
 void MemoryClusterState::UpdateNode(const std::string &name, const NodeState &node_state) {
     nodeMap[name] = node_state;
 }
+
+MemoryClusterState::MemoryClusterState(std::shared_ptr<common::Lustre> l) {
+    lustre = l;
+}
+
+MemoryClusterState::MemoryClusterState() { }
+
 
 }

@@ -14,7 +14,7 @@ Planner::Planner(std::string root_path) : root_path(root_path) {
 
 //    lustre = dynamic_pointer_cast(new LocalLustre());
     lustre = std::shared_ptr<LocalLustre>(new LocalLustre());
-    cluster = std::shared_ptr<MemoryClusterState>(new MemoryClusterState());
+    cluster = std::shared_ptr<MemoryClusterState>(new MemoryClusterState(lustre));
     schedule = std::shared_ptr<MemoryScheduleState>(new MemoryScheduleState());
     jobMonitor = std::shared_ptr<JobMonitor>(new JobMonitor());
     scheduler = std::shared_ptr<Scheduler>(new Scheduler(schedule, jobMonitor, cluster, lustre));

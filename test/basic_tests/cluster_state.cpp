@@ -6,10 +6,14 @@
 #include "gtest/gtest.h"
 
 #include <ClusterState.h>
+#include <Lustre.h>
+#include "MockLustre.h"
 
 
 TEST(MemClusterState, InitTeardown) {
-    common::MemoryClusterState mcs;
+    common::MockLustre *lustre = new common::MockLustre();
+    std::shared_ptr<common::Lustre> l (lustre);
+    common::MemoryClusterState mcs(l);
     EXPECT_TRUE(mcs.Init());
 
     std::this_thread::sleep_for(std::chrono::seconds(1)); // give the thread time to start
@@ -17,7 +21,9 @@ TEST(MemClusterState, InitTeardown) {
 };
 
 TEST(MemClusterState, GetState) {
-    common::MemoryClusterState mcs;
+    common::MockLustre *lustre = new common::MockLustre();
+    std::shared_ptr<common::Lustre> l (lustre);
+    common::MemoryClusterState mcs(l);
     EXPECT_TRUE(mcs.Init());
 
     EXPECT_TRUE(mcs.getNodes()->empty());
