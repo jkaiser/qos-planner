@@ -10,6 +10,7 @@
 #include <map>
 #include <memory>
 #include <iostream>
+#include <tuple>
 
 #include <Lustre.h>
 
@@ -48,3 +49,39 @@ INSTANTIATE_TEST_CASE_P(OstParsing, ParseOstsTest, ::testing::Values(
         parseOstsTestset{"schlarbm\nlmm_stripe_count:   1\nlmm_stripe_size:    1048576\nlmm_pattern:        1\nlmm_layout_gen:     0\nlmm_stripe_offset:  0\n\tobdidx\t\t objid\t\t objid\t\t group\n\t     0\t      42258134\t    0x284ced6\t             0\n\nschlarbm\nlmm_stripe_count:   1\nlmm_stripe_size:    1048576\nlmm_pattern:        1\nlmm_layout_gen:     0\nlmm_stripe_offset:  0\n\tobdidx\t\t objid\t\t objid\t\t group\n\t     0\t      42258134\t    0x284ced6\t             0\n\n",
                          {{"0", 2}}}
 ));
+
+struct parseOstsFromLfsOstsTestset {
+    std::string to_parse;
+    std::vector<std::tuple<std::string, std::string, std::string>> to_find;
+};
+
+
+class ParseOstsFromLfsOstsTest : public ::testing::TestWithParam<parseOstsFromLfsOstsTestset> {
+};
+
+TEST_P(ParseOstsFromLfsOstsTest, ParseOsts) {
+    auto pt = GetParam();
+
+    std::shared_ptr<std::vector<common::Lustre::getOstsResults>> results (new(std::vector<common::Lustre::getOstsResults>));
+//    std::shared_ptr<std::vector<std::string>> results(new std::vector<std::string>());
+    common::Lustre::ParseOstsFromLfsOsts(pt.to_parse, results);
+
+    for (int i = 0; i < results->size(); i++) {
+        ASSERT_STREQ(std::get<0>(pt.to_find[i]).c_str(), results->at(i).number.c_str()) << "Found wrong ost id";
+        ASSERT_STREQ(std::get<1>(pt.to_find[i]).c_str(), results->at(i).uuid.c_str()) << "Found wrong ost uuid";
+        ASSERT_STREQ(std::get<2>(pt.to_find[i]).c_str(), results->at(i).status.c_str()) << "Found wrong ost state";
+    }
+
+    ASSERT_EQ(pt.to_find.size(), results->size()) << "Some results are missing";
+}
+
+INSTANTIATE_TEST_CASE_P(GetOstParsing, ParseOstsFromLfsOstsTest, ::testing::Values(
+        parseOstsFromLfsOstsTestset{"OBDS::\n0: lustret4-OST0000_UUID ACTIVE\n",
+                                    {std::make_tuple("0", "lustret4-OST0000_UUID", "ACTIVE")}},
+        parseOstsFromLfsOstsTestset{"OBDS::\n0: lustret4-OST0000_UUID ACTIVE\n1: lustret4-OST0001_UUID ACTIVE\n2: lustret4-OST0002_UUID ACTIVE\n3: lustret4-OST0003_UUID ACTIVE\n",
+        {std::make_tuple("0", "lustret4-OST0000_UUID", "ACTIVE"),
+         std::make_tuple("1", "lustret4-OST0001_UUID", "ACTIVE"),
+         std::make_tuple("2", "lustret4-OST0002_UUID", "ACTIVE"),
+         std::make_tuple("3", "lustret4-OST0003_UUID", "ACTIVE")}}
+));
+

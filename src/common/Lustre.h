@@ -24,6 +24,23 @@ public:
     virtual uint32_t MBsToRPCs(const uint32_t mb_per_sec) const = 0;
     virtual uint32_t RPCsToMBs(const uint32_t rpc_per_sec) const = 0;
 
+    struct getOstsResults {
+        std::string number;
+        std::string uuid;
+        std::string status;
+    };
+    /**
+     * lists all osts of Lustre. This is the equivalent of an "lfs osts <path>" call.
+     *
+     * params:
+     *  path:   If a path is provided (= nonempty string) that is located on a lustre mounted file system then only the OSTs belonging to that filesystem are displayed.
+     *
+     * Returns:
+     *      true, if successfull
+     */
+    virtual bool GetOstList(const std::string &path, std::shared_ptr<std::vector<getOstsResults>> output) = 0;
+    static void ParseOstsFromLfsOsts(const std::string &lfs_out, std::shared_ptr<std::vector<getOstsResults>> osts);
+
     virtual bool StartJobTbfRule(std::string jobid, std::string rule_name, uint32_t rpc_rate_limit) = 0;
 
     virtual bool StopJobTbfRule(std::string jobid, std::string rule_name) = 0;
@@ -65,6 +82,7 @@ public:
     virtual uint32_t MBsToRPCs(const uint32_t mb_per_sec) const override;
     virtual uint32_t RPCsToMBs(const uint32_t rpc_per_sec) const override;
 
+    virtual bool GetOstList(const std::string &path, std::shared_ptr<std::vector<getOstsResults>> output);
     virtual bool StartJobTbfRule(std::string jobid, std::string rule_name, uint32_t rpc_rate_limit) override;
 
     virtual bool StopJobTbfRule(std::string jobid, std::string rule_name) override;

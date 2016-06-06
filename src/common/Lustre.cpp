@@ -83,6 +83,19 @@ bool LocalLustre::GetOstsForFile(const std::vector<std::string> &files,
     return true;
 }
 
+bool LocalLustre::GetOstList(const std::string &path, std::shared_ptr<std::vector<getOstsResults>> output) {
+        std::shared_ptr<std::string> cmd_out(new std::string());
+    std::string cmd = "lfs osts " + path;
+
+    if (!exec(cmd.c_str(), cmd_out)) {
+        // TODO: add error reporting
+        return false;
+    }
+
+    ParseOstsFromLfsOsts(*cmd_out, output);
+
+    return true;
+}
 
 void Lustre::ParseOstsFromGetStripe(std::string lfs_out, std::shared_ptr<std::vector<std::string>> osts) {
 
@@ -101,5 +114,27 @@ void Lustre::ParseOstsFromGetStripe(std::string lfs_out, std::shared_ptr<std::ve
     }
 }
 
+void Lustre::ParseOstsFromLfsOsts(const std::string &lfs_out,
+                                  std::shared_ptr<std::vector<common::Lustre::getOstsResults>> out) {
+
+    // example: "OBDS::\n0: lustret4-OST0000_UUID ACTIVE\n1: lustret4-OST0001_UUID ACTIVE\n2: lustret4-OST0002_UUID ACTIVE\n3: lustret4-OST0003_UUID ACTIVE\n"
+    std::regex r("([0-9]+): ([_[:alnum:]-]+) ([[:alnum:]]+)");
+
+    std::istringstream stream(lfs_out);
+    for (std::string line; std::getline(stream, line);) {
+
+        std::smatch base_match;
+        if (std::regex_match(line, base_match, r)) {
+            if (base_match.size() == 4) {
+                common::Lustre::getOstsResults foo = {base_match[1].str(), base_match[2].str(), base_match[3].str()};
+                out->push_back(foo);
+            }
+        }
+    }
 }
+
+
+}
+
+
 
