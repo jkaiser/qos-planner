@@ -63,7 +63,6 @@ TEST_P(ParseOstsFromLfsOstsTest, ParseOsts) {
     auto pt = GetParam();
 
     std::shared_ptr<std::vector<common::Lustre::getOstsResults>> results (new(std::vector<common::Lustre::getOstsResults>));
-//    std::shared_ptr<std::vector<std::string>> results(new std::vector<std::string>());
     common::Lustre::ParseOstsFromLfsOsts(pt.to_parse, results);
 
     for (int i = 0; i < results->size(); i++) {
