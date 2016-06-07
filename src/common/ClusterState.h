@@ -57,6 +57,7 @@ public:
 class MemoryClusterState : public ClusterState {
 
 private:
+    uint32_t default_rpc_rate_;
     std::map<std::string, NodeState> nodeMap;
     std::shared_ptr<common::Lustre> lustre;
 

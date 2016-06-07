@@ -85,7 +85,6 @@ void MemoryClusterState::updateRepeatedly() {
         };
         std::this_thread::sleep_for(std::chrono::seconds(1));
     }
-
 }
 
 bool MemoryClusterState::Update() {
@@ -97,8 +96,11 @@ bool MemoryClusterState::Update() {
 
     std::unique_lock<std::mutex> lck(state_mut);
     for (auto &it : *r) {
-        this->nodeMap[it.number] = {it.uuid, 0, 0}; // TODO: obviously the performance values are wrong. Replace with correct ones!
+        // TODO: obviously, the following performance values are wild guesses. Replace with correct ones! Implement some heuristic to derive some initial max value?
+        //this->nodeMap[it.number] = {it.uuid, 0, 0};
+        this->nodeMap[it.number] = {it.uuid, 0, default_rpc_rate_};
     }
+
     return true;
 }
 
@@ -108,9 +110,11 @@ void MemoryClusterState::UpdateNode(const std::string &name, const NodeState &no
 
 MemoryClusterState::MemoryClusterState(std::shared_ptr<common::Lustre> l) {
     lustre = l;
+    MemoryClusterState();
 }
 
-MemoryClusterState::MemoryClusterState() { }
-
+MemoryClusterState::MemoryClusterState() {
+    default_rpc_rate_ = 500;
+}
 
 }
