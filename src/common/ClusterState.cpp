@@ -6,23 +6,23 @@
 
 namespace common {
 
-bool MemoryClusterState::getState(const std::string &id, NodeState *state) {
+bool MemoryClusterState::getOstState(const std::string &id, OSTWorkload *state) {
     std::lock_guard<std::mutex> lck(state_mut);
 
-    auto it = this->nodeMap.find(id);
-    if (it == this->nodeMap.end()) {
+    auto it = this->ost_state_map.find(id);
+    if (it == this->ost_state_map.end()) {
         return false;
     }
     *state = it->second;
     return true;
 }
 
-std::vector<std::string> *MemoryClusterState::getNodes() {
+std::vector<std::string> *MemoryClusterState::GetOSTList() {
     std::lock_guard<std::mutex> lck(state_mut);
     std::vector<std::string> *names = new std::vector<std::string>();
-    names->reserve(this->nodeMap.size());
+    names->reserve(this->ost_state_map.size());
 
-    for (auto i = this->nodeMap.begin(); i != this->nodeMap.end(); i++) {
+    for (auto i = this->ost_state_map.begin(); i != this->ost_state_map.end(); i++) {
         names->push_back(i->second.name);
     }
 
@@ -96,8 +96,8 @@ bool MemoryClusterState::Update() {
     std::unique_lock<std::mutex> lck(state_mut);
     for (auto &it : *r) {
         // TODO: obviously, the following performance values are wild guesses. Replace with correct ones! Implement some heuristic to derive some initial max value?
-        //this->nodeMap[it.number] = {it.uuid, 0, 0};
-        this->nodeMap[it.number] = {it.uuid, 0, default_rpc_rate_};
+        //this->ost_state_map[it.number] = {it.uuid, 0, 0};
+        this->ost_state_map[it.number] = {it.uuid, 0, default_rpc_rate_};
     }
 
     lck.unlock();
@@ -105,8 +105,8 @@ bool MemoryClusterState::Update() {
     return true;
 }
 
-void MemoryClusterState::UpdateNode(const std::string &name, const NodeState &node_state) {
-    nodeMap[name] = node_state;
+void MemoryClusterState::UpdateNode(const std::string &name, const OSTWorkload &node_state) {
+    ost_state_map[name] = node_state;
 }
 
 MemoryClusterState::MemoryClusterState(std::shared_ptr<common::Lustre> l) :  update_thread_started(false),

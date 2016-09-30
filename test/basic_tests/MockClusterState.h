@@ -12,9 +12,10 @@
 namespace common {
 class MockClusterState : public MemoryClusterState {
 public:
-    MOCK_METHOD0(getNodes, std::vector<std::string>*());
-    MOCK_METHOD2(getState, bool(const std::string&, NodeState*));
-    MOCK_METHOD2(UpdateNode, void(const std::string&, const NodeState&));
+    MOCK_METHOD0(GetOSTList, std::vector<std::string>*());
+
+    MOCK_METHOD2(getOstState, bool(const std::string&, OSTWorkload*));
+    MOCK_METHOD2(UpdateNode, void(const std::string&, const OSTWorkload&));
 };
 }
 

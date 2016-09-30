@@ -84,12 +84,12 @@ TEST_F(SchedulerTest, ScheduleSimpleJob) {
     std::vector<std::string> osts = CreateSingleOstList();
     job1->setOsts(osts);
 
-    common::NodeState node_state = {"OST_a", 0, 100};
+    common::OSTWorkload node_state = {"OST_a", 0, 100};
     std::vector<std::string> nodes = {"OST_a"};
 
 
-    ON_CALL(*mock_cluster_state, getNodes()).WillByDefault(testing::Return(&nodes));
-    ON_CALL(*mock_cluster_state, getState(osts[0], _)).WillByDefault(testing::DoAll(testing::SetArgPointee<1>(node_state), testing::Return(true)));
+    ON_CALL(*mock_cluster_state, GetOSTList()).WillByDefault(testing::Return(&nodes));
+    ON_CALL(*mock_cluster_state, getOstState(osts[0], _)).WillByDefault(testing::DoAll(testing::SetArgPointee<1>(node_state), testing::Return(true)));
 
     EXPECT_CALL(*mock_scheduler_state, AddJob(_,_,_)).WillOnce(testing::Return(true));
     EXPECT_CALL(*mock_job_monitor, RegisterJob(_)).WillOnce(testing::Return(true));
@@ -110,12 +110,12 @@ TEST_F(SchedulerTest, ScheduleTooBigJob) {
     std::vector<std::string> osts = CreateSingleOstList();
     job1->setOsts(osts);
 
-    common::NodeState node_state = {"OST_a", 0, 100};
+    common::OSTWorkload node_state = {"OST_a", 0, 100};
     std::vector<std::string> nodes = {"OST_a"};
 
 
-    ON_CALL(*mock_cluster_state, getNodes()).WillByDefault(testing::Return(&nodes));
-    ON_CALL(*mock_cluster_state, getState(osts[0], _)).WillByDefault(testing::DoAll(testing::SetArgPointee<1>(node_state), testing::Return(true)));
+    ON_CALL(*mock_cluster_state, GetOSTList()).WillByDefault(testing::Return(&nodes));
+    ON_CALL(*mock_cluster_state, getOstState(osts[0], _)).WillByDefault(testing::DoAll(testing::SetArgPointee<1>(node_state), testing::Return(true)));
 
     EXPECT_CALL(*mock_job_monitor, RegisterJob(_)).Times(0);
     EXPECT_CALL(*mock_scheduler_state, AddJob(_,_,_)).Times(0);
@@ -128,7 +128,7 @@ TEST_F(SchedulerTest, ScheduleTooBigJob) {
 TEST_F(SchedulerTest, RemoveNonExistingJob) {
     common::Scheduler scheduler(mocked_sstate, mocked_jobmon, mocked_cstate, mocked_ll);
 
-    common::NodeState node_state = {"OST_a", 0, 100};
+    common::OSTWorkload node_state = {"OST_a", 0, 100};
     std::vector<std::string> nodes = {"OST_a"};
 
     auto job1 = new common::Job("job1",

@@ -23,8 +23,8 @@ bool Scheduler::ScheduleJob(common::Job &job) {
         }
 
 
-        NodeState node_state;
-        if (!cluster_state->getState(ost, &node_state)) {
+        OSTWorkload node_state;
+        if (!cluster_state->getOstState(ost, &node_state)) {
             return false;
         }
 
@@ -61,8 +61,8 @@ bool Scheduler::RemoveJob(const std::string &jobid) {
 bool Scheduler::GetMaxLoadInTimeInterval(std::string ost, std::chrono::system_clock::time_point start,
                                          std::chrono::system_clock::time_point end, uint32_t *maxLoadMBSec) {
 
-    NodeState node_state;
-    if (!cluster_state->getState(ost, &node_state)) {
+    OSTWorkload node_state;
+    if (!cluster_state->getOstState(ost, &node_state)) {
         return false;
     }
 

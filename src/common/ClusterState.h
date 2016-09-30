@@ -21,7 +21,7 @@ namespace common {
 /**
  * Simple representation of a node's current workload (the actual measured one)
  */
-struct NodeState {
+struct OSTWorkload {
     std::string name;
     uint32_t rpcSec;
     uint32_t maxRpcSec;
@@ -45,10 +45,10 @@ public:
     /**
      * Get the state of the OST with the given id
      */
-    virtual bool getState(const std::string &id, NodeState *state) = 0;
-    virtual std::vector<std::string> *getNodes() = 0;
+    virtual bool getOstState(const std::string &ost_id, OSTWorkload *ost_workload) = 0;
+    virtual std::vector<std::string> *GetOSTList() = 0;
 
-    virtual void UpdateNode(const std::string &name, const NodeState &node_state) = 0;
+    virtual void UpdateNode(const std::string &name, const OSTWorkload &ost_workload) = 0;
 };
 
 /**
@@ -58,7 +58,7 @@ class MemoryClusterState : public ClusterState {
 
 private:
     static const uint32_t default_rpc_rate_ = 500;
-    std::map<std::string, NodeState> nodeMap;
+    std::map<std::string, OSTWorkload> ost_state_map;
     std::shared_ptr<common::Lustre> lustre;
 
     bool update_thread_started;
@@ -81,9 +81,9 @@ public:
 
     virtual bool Init() override;
     virtual bool TearDown() override;
-    virtual std::vector<std::string> *getNodes() override;
-    virtual bool getState(const std::string &id, NodeState *state) override;
-    virtual void UpdateNode(const std::string &name, const NodeState &node_state) override;
+    virtual std::vector<std::string> *GetOSTList() override;
+    virtual bool getOstState(const std::string &id, OSTWorkload *state) override;
+    virtual void UpdateNode(const std::string &name, const OSTWorkload &node_state) override;
 };
 }
 #endif //QOS_PLANNER_CLUSTERSTATE_H
