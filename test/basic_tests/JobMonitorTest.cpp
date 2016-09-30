@@ -77,7 +77,8 @@ TEST(JobMonitor, StartStopJob) {
             .WillOnce(DoAll(testing::SetArgPointee<1>(common::Job::SCHEDULED), testing::Return(true)))
             .WillOnce(DoAll(testing::SetArgPointee<1>(common::Job::ACTIVE), testing::Return(true)));
     EXPECT_CALL(*scheduleState, UpdateJob(job1->getJobid(), _)).Times(2).WillRepeatedly(testing::Return(true));
-    EXPECT_CALL(*scheduleState, GetJobEnd(job1->getJobid(), _)).WillOnce(testing::DoAll(testing::SetArgPointee<1>(job1->getTend()), testing::Return(true)));
+    EXPECT_CALL(*scheduleState, GetJobEnd(job1->getJobid(), _)).WillOnce(testing::DoAll(testing::SetArgPointee<1>(
+            job1->GetEndTime()), testing::Return(true)));
     ON_CALL(*scheduleState, GetJobThroughput(job1->getJobid(), _)).WillByDefault(testing::Return(true));
     EXPECT_CALL(*lustre, StartJobTbfRule(job1->getJobid(), _, _)).WillOnce(testing::Return(true));
     EXPECT_CALL(*lustre, StopJobTbfRule(job1->getJobid(), _)).WillOnce(testing::Return(true));
@@ -140,7 +141,7 @@ TEST(JobMonitor, RegisterUnregisterJob) {
                                 std::chrono::system_clock::now() + std::chrono::hours(1),
                                 42);
 
-    ON_CALL(*scheduleState, GetJobEnd(_, _)).WillByDefault(DoAll(testing::SetArgPointee<1>(job1->getTend()),testing::Return(true)));
+    ON_CALL(*scheduleState, GetJobEnd(_, _)).WillByDefault(DoAll(testing::SetArgPointee<1>(job1->GetEndTime()),testing::Return(true)));
 
 
     EXPECT_CALL(*scheduleState, GetJobStatus(job1->getJobid(), _))

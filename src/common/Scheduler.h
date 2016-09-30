@@ -40,15 +40,14 @@ private:
                                   std::chrono::system_clock::time_point end,
                                   uint32_t *maxLoadMBSec);
 
+    bool AreEnoughResAvail(const Job &job, uint32_t max_ost_mb_sec, const OSTWorkload &node_state) const;
+
 public:
     /**
      * Constructor. It is assumed that the given instances already are initialized and ready to be used.
      */
-    Scheduler(std::shared_ptr<ScheduleState> schedule, std::shared_ptr<JobMonitor> job_monitor,
-              std::shared_ptr<ClusterState> cluster_state, std::shared_ptr<Lustre> lustre)
-            : schedule(schedule), job_monitor(job_monitor), cluster_state(cluster_state), lustre(lustre) {
-        this->job_monitor = job_monitor;
-    }
+    Scheduler(std::shared_ptr<ScheduleState> &schedule, std::shared_ptr<JobMonitor> job_monitor,
+              std::shared_ptr<ClusterState> cluster_state, std::shared_ptr<Lustre> lustre);
 
     bool Init();
     bool TearDown();
@@ -71,6 +70,9 @@ public:
      * false:   else
      */
     bool RemoveJob(const std::string &jobid);
+
+
+    bool JobDoesNotExist(const std::string &jobid, Job::JobState &state) const;
 };
 
 }

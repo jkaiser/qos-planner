@@ -64,7 +64,7 @@ bool MemoryScheduleState::AddJob(const std::string &jobid, const Job &job, const
         std::list<Job*> *ost_sched = &schedule[ost];
         auto it = ost_sched->begin();
         for (; it != ost_sched->end(); it++) {
-            if ((*it)->getTstart() > job.getTstart()) {
+            if ((*it)->GetStartTime() > job.GetStartTime()) {
                 break;
             }
         }
@@ -156,7 +156,7 @@ bool MemoryScheduleState::GetJobEnd(const std::string jobid, std::chrono::system
         return false;
     }
 
-    *tend = it->second->getTend();
+    *tend = it->second->GetEndTime();
     return true;
 }
 

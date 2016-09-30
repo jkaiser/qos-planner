@@ -21,7 +21,7 @@ JobMonitor::JobMonitor(std::shared_ptr<ScheduleState> st, std::shared_ptr<Lustre
 
 bool JobMonitor::RegisterJob(const common::Job &job) {
     std::unique_lock<std::mutex> lock(job_priority_queue_mutex);
-    JobPriorityQueue::WaitingItem *wt = new JobPriorityQueue::WaitingItem(job.getJobid(), job.getTstart(), Job::JobEvent::JOBSTART);
+    JobPriorityQueue::WaitingItem *wt = new JobPriorityQueue::WaitingItem(job.getJobid(), job.GetStartTime(), Job::JobEvent::JOBSTART);
     job_priority_queue.Push(wt);
     return true;
 }
@@ -68,12 +68,12 @@ bool JobMonitor::Init() {
         switch (job.second->getState()) {
 
             case Job::SCHEDULED:
-                wt = new JobPriorityQueue::WaitingItem(job.second->getJobid(), job.second->getTstart(), Job::JobEvent::JOBSTART);
+                wt = new JobPriorityQueue::WaitingItem(job.second->getJobid(), job.second->GetStartTime(), Job::JobEvent::JOBSTART);
                 job_priority_queue.Push(wt);
                 break;
 
             case Job::ACTIVE:
-                wt = new JobPriorityQueue::WaitingItem(job.second->getJobid(), job.second->getTend(), Job::JobEvent::JOBSTOP);
+                wt = new JobPriorityQueue::WaitingItem(job.second->getJobid(), job.second->GetEndTime(), Job::JobEvent::JOBSTOP);
                 job_priority_queue.Push(wt);
                 break;
 
