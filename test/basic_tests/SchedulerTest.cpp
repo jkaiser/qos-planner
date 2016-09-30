@@ -18,10 +18,10 @@ using ::testing::_;
 class SchedulerTest : public ::testing::Test {
 
 protected:
-    common::MockClusterState *mock_cluster_state = new common::MockClusterState();
-    common::MockScheduleState *mock_scheduler_state = new common::MockScheduleState();
-    common::MockJobMonitor *mock_job_monitor = new common::MockJobMonitor();
-    common::MockLustre *mock_lustre = new common::MockLustre();
+    common::MockClusterState *mock_cluster_state;
+    common::MockScheduleState *mock_scheduler_state;
+    common::MockJobMonitor *mock_job_monitor;
+    common::MockLustre *mock_lustre;
 
     std::shared_ptr<common::ClusterState> mocked_cstate;
     std::shared_ptr<common::ScheduleState> mocked_sstate;
@@ -94,9 +94,9 @@ TEST_F(SchedulerTest, ScheduleOnNonExistingClusterShouldFail) {
 TEST_F(SchedulerTest, ScheduleJobWithEnoughResourcesShouldSucceed) {
     common::Scheduler scheduler(mocked_sstate, mocked_jobmon, mocked_cstate, mocked_ll);
 
-    auto job1 = CreateJob("job1", 1, 1);
+    auto job = CreateJob("job", 1, 1);
     std::vector<std::string> osts_touched_by_job = CreateSingleOstList();
-    job1->setOsts(osts_touched_by_job);
+    job->setOsts(osts_touched_by_job);
 
     std::vector<std::string> osts_in_system = osts_touched_by_job;
     common::OSTWorkload ost_workload = {osts_touched_by_job[0], 0, 100};
@@ -109,10 +109,31 @@ TEST_F(SchedulerTest, ScheduleJobWithEnoughResourcesShouldSucceed) {
     EXPECT_CALL(*mock_job_monitor, RegisterJob(_)).WillOnce(testing::Return(true));
 
     scheduler.Init();
-    EXPECT_TRUE(scheduler.ScheduleJob(*job1)) << "job should be scheduled";
-    delete job1;
+    EXPECT_TRUE(scheduler.ScheduleJob(*job)) << "job should be scheduled";
+    delete job;
 }
 
+TEST_F(SchedulerTest, ScheduleOnEdgeJobShouldSucceed) {
+    common::Scheduler scheduler(mocked_sstate, mocked_jobmon, mocked_cstate, mocked_ll);
+
+    auto job = CreateJob("job", 1, 100);
+    std::vector<std::string> osts_touched_by_job = CreateSingleOstList();
+    job->setOsts(osts_touched_by_job);
+
+    std::vector<std::string> osts_in_system = osts_touched_by_job;
+    common::OSTWorkload ost_workload = {osts_touched_by_job[0], 0, 100};
+
+    ON_CALL(*mock_cluster_state, GetOSTList()).WillByDefault(testing::Return(&osts_in_system));
+    ON_CALL(*mock_cluster_state, getOstState(osts_touched_by_job[0], _)).WillByDefault(
+            testing::DoAll(testing::SetArgPointee<1>(ost_workload), testing::Return(true)));
+
+    EXPECT_CALL(*mock_scheduler_state, AddJob(_, _, _)).WillOnce(testing::Return(true));
+    EXPECT_CALL(*mock_job_monitor, RegisterJob(_)).WillOnce(testing::Return(true));
+
+    scheduler.Init();
+    EXPECT_TRUE(scheduler.ScheduleJob(*job)) << "job should be scheduled";
+    delete job;
+}
 
 TEST_F(SchedulerTest, ScheduleTooBigJob) {
     common::Scheduler scheduler(mocked_sstate, mocked_jobmon, mocked_cstate, mocked_ll);
@@ -136,6 +157,32 @@ TEST_F(SchedulerTest, ScheduleTooBigJob) {
     delete job;
 }
 
+TEST_F(SchedulerTest, RemoveExistingJobShouldSucceed) {
+    common::Scheduler scheduler(mocked_sstate, mocked_jobmon, mocked_cstate, mocked_ll);
+
+    auto job = CreateJob("job", 1, 1);
+    std::vector<std::string> osts_touched_by_job = CreateSingleOstList();
+    job->setOsts(osts_touched_by_job);
+
+    std::vector<std::string> osts_in_system = osts_touched_by_job;
+    common::OSTWorkload ost_workload = {osts_touched_by_job[0], 0, 100};
+
+    ON_CALL(*mock_cluster_state, GetOSTList()).WillByDefault(testing::Return(&osts_in_system));
+    ON_CALL(*mock_cluster_state, getOstState(osts_touched_by_job[0], _)).WillByDefault(
+            testing::DoAll(testing::SetArgPointee<1>(ost_workload), testing::Return(true)));
+
+    EXPECT_CALL(*mock_scheduler_state, AddJob(_, _, _)).WillOnce(testing::Return(true));
+    EXPECT_CALL(*mock_scheduler_state, RemoveJob(job->getJobid())).WillOnce(testing::Return(true));
+    EXPECT_CALL(*mock_scheduler_state, GetJobStatus(job->getJobid(), _)).WillOnce(testing::DoAll(testing::SetArgPointee<1>(common::Job::SCHEDULED),testing::Return(true)));
+    EXPECT_CALL(*mock_job_monitor, RegisterJob(_)).WillOnce(testing::Return(true));
+
+    EXPECT_CALL(*mock_job_monitor, UnregisterJob(_)).Times(1);
+
+    scheduler.Init();
+    scheduler.ScheduleJob(*job);
+    EXPECT_TRUE(scheduler.RemoveJob(job->getJobid())) << "Call should succeed if job exist";
+    delete job;
+}
 
 TEST_F(SchedulerTest, RemoveNonExistingJobShouldFail) {
     common::Scheduler scheduler(mocked_sstate, mocked_jobmon, mocked_cstate, mocked_ll);
