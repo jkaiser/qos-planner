@@ -17,6 +17,7 @@ public:
     MOCK_METHOD2(UpdateJob, bool(std::string, Job::JobState));
     MOCK_METHOD2(GetJobThroughput,bool(std::string, uint32_t*));
     MOCK_METHOD0(GetAllJobs, std::map<std::string, Job*> *());
+    MOCK_METHOD1(RemoveJob, bool (const std::string&));
     MOCK_METHOD3(AddJob, bool(const std::string&, const Job &, const std::vector<std::string>&));
 };
 }
