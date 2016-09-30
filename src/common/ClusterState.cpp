@@ -7,7 +7,7 @@
 namespace common {
 
 bool MemoryClusterState::getState(const std::string &id, NodeState *state) {
-    std::unique_lock<std::mutex> lck(state_mut);
+    std::lock_guard<std::mutex> lck(state_mut);
 
     auto it = this->nodeMap.find(id);
     if (it == this->nodeMap.end()) {
@@ -18,6 +18,7 @@ bool MemoryClusterState::getState(const std::string &id, NodeState *state) {
 }
 
 std::vector<std::string> *MemoryClusterState::getNodes() {
+    std::lock_guard<std::mutex> lck(state_mut);
     std::vector<std::string> *names = new std::vector<std::string>();
     names->reserve(this->nodeMap.size());
 
@@ -53,8 +54,8 @@ bool MemoryClusterState::TearDown() {
     while (update_thread_is_active) {
         update_thread_finish_cv.wait(lck);
     }
-    update_thread.join();
     lck.unlock();
+    update_thread.join();
     return true;
 }
 
@@ -63,6 +64,10 @@ bool MemoryClusterState::TearDown() {
 void MemoryClusterState::updateRepeatedly() {
 
     std::unique_lock<std::mutex> lck(state_mut);
+    if (update_thread_exit_flag) {
+        lck.unlock();
+        return;
+    }
     update_thread_is_active = true;
     update_thread_finish_cv.notify_all();
     lck.unlock();
@@ -88,12 +93,14 @@ bool MemoryClusterState::Update() {
         return false;
     }
 
-    std::lock_guard<std::mutex> lck(state_mut);
+    std::unique_lock<std::mutex> lck(state_mut);
     for (auto &it : *r) {
         // TODO: obviously, the following performance values are wild guesses. Replace with correct ones! Implement some heuristic to derive some initial max value?
         //this->nodeMap[it.number] = {it.uuid, 0, 0};
         this->nodeMap[it.number] = {it.uuid, 0, default_rpc_rate_};
     }
+
+    lck.unlock();
 
     return true;
 }
