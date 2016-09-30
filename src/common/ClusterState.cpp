@@ -36,7 +36,6 @@ bool MemoryClusterState::Init() {
         return false;
     }
 
-    // start updating thread.
     if (not update_thread_started) {
         update_thread = std::thread(&MemoryClusterState::updateRepeatedly, this);
         update_thread_started = true;
@@ -50,33 +49,23 @@ bool MemoryClusterState::Init() {
 bool MemoryClusterState::TearDown() {
     std::unique_lock<std::mutex> lck(state_mut);
 
-    if (!update_thread_exit_flag) {
-        update_thread_exit_flag = true;
-        std::chrono::seconds max_wait_time(30); // 30 seconds to wait
-        auto tstart = std::chrono::system_clock::now();
-
-        bool successful_joined = false;
-        while (std::chrono::system_clock::now() < tstart + max_wait_time) {
-            if (update_thread.joinable()) {
-                update_thread.join();
-                successful_joined = true;
-                break;
-            } else {
-                std::this_thread::sleep_for(std::chrono::seconds(1));
-            }
-        }
-
-        if (not successful_joined) {
-            return false;
-        }
+    update_thread_exit_flag = true;
+    while (update_thread_is_active) {
+        update_thread_finish_cv.wait(lck);
     }
-
+    update_thread.join();
+    lck.unlock();
     return true;
 }
 
 
 
 void MemoryClusterState::updateRepeatedly() {
+
+    std::unique_lock<std::mutex> lck(state_mut);
+    update_thread_is_active = true;
+    update_thread_finish_cv.notify_all();
+    lck.unlock();
 
     while(!update_thread_exit_flag) {
 
@@ -85,6 +74,11 @@ void MemoryClusterState::updateRepeatedly() {
         };
         std::this_thread::sleep_for(std::chrono::seconds(1));
     }
+
+    lck.lock();
+    update_thread_is_active = false;
+    update_thread_finish_cv.notify_all();
+    lck.unlock();
 }
 
 bool MemoryClusterState::Update() {
@@ -94,7 +88,7 @@ bool MemoryClusterState::Update() {
         return false;
     }
 
-    std::unique_lock<std::mutex> lck(state_mut);
+    std::lock_guard<std::mutex> lck(state_mut);
     for (auto &it : *r) {
         // TODO: obviously, the following performance values are wild guesses. Replace with correct ones! Implement some heuristic to derive some initial max value?
         //this->nodeMap[it.number] = {it.uuid, 0, 0};
@@ -108,13 +102,14 @@ void MemoryClusterState::UpdateNode(const std::string &name, const NodeState &no
     nodeMap[name] = node_state;
 }
 
-MemoryClusterState::MemoryClusterState(std::shared_ptr<common::Lustre> l) {
+MemoryClusterState::MemoryClusterState(std::shared_ptr<common::Lustre> l) :  update_thread_started(false),
+                                                                             update_thread_is_active(false),
+                                                                             update_thread_exit_flag(false) {
     lustre = l;
-    MemoryClusterState();
 }
 
-MemoryClusterState::MemoryClusterState() {
-    default_rpc_rate_ = 500;
-}
+MemoryClusterState::MemoryClusterState() : update_thread_started(false),
+    update_thread_is_active(false),
+    update_thread_exit_flag(false) {}
 
 }
