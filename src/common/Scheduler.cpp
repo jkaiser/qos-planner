@@ -9,9 +9,7 @@ Scheduler::Scheduler(std::shared_ptr<ScheduleState> &schedule,
                      std::shared_ptr<JobMonitor> job_monitor,
                      std::shared_ptr<ClusterState> cluster_state,
                      std::shared_ptr<Lustre> lustre)
-            : schedule(schedule), job_monitor(job_monitor), cluster_state(cluster_state), lustre(lustre) {
-        this->job_monitor = job_monitor;
-}
+            : schedule(schedule), job_monitor(job_monitor), cluster_state(cluster_state), lustre(lustre) {}
 
 bool Scheduler::ScheduleJob(common::Job &job) {
 
