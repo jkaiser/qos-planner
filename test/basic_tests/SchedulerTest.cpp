@@ -14,24 +14,50 @@
 
 using ::testing::_;
 
-TEST(Scheduler, ScheduleOnEmptyCluster) {
 
-    common::MockClusterState *cluster_state = new common::MockClusterState();
-    common::MockScheduleState *schedule_state = new common::MockScheduleState();
-    common::MockJobMonitor *job_monitor = new common::MockJobMonitor();
-    common::MockLustre *lustre = new common::MockLustre();
+class SchedulerTest : public ::testing::Test {
 
-    std::shared_ptr<common::ClusterState> cs (cluster_state);
-    std::shared_ptr<common::ScheduleState> ss (schedule_state);
-    std::shared_ptr<common::MockLustre> ll (lustre);
-    std::shared_ptr<common::JobMonitor> jm (job_monitor);
+protected:
+    common::MockClusterState *mock_cluster_state = new common::MockClusterState();
+    common::MockScheduleState *mock_scheduler_state = new common::MockScheduleState();
+    common::MockJobMonitor *mock_job_monitor = new common::MockJobMonitor();
+    common::MockLustre *mock_lustre = new common::MockLustre();
 
-    common::Scheduler scheduler(ss, jm, cs, ll);
-    //common::Scheduler scheduler(&schedule_state, &job_monitor, &cluster_state, &lustre);
+    std::shared_ptr<common::ClusterState> mocked_cstate;
+    std::shared_ptr<common::ScheduleState> mocked_sstate;
+    std::shared_ptr<common::MockLustre> mocked_ll;
+    std::shared_ptr<common::JobMonitor> mocked_jobmon;
 
-    // we assume an empty cluster -> no job must be scheduled
-    EXPECT_CALL(*job_monitor, RegisterJob(_)).Times(0);
-    EXPECT_CALL(*schedule_state, AddJob(_,_,_)).Times(0);
+    virtual void SetUp() {
+        mock_cluster_state = new common::MockClusterState();
+        mock_scheduler_state = new common::MockScheduleState();
+        mock_job_monitor = new common::MockJobMonitor();
+        mock_lustre = new common::MockLustre();
+
+        mocked_cstate = std::shared_ptr<common::ClusterState>(mock_cluster_state);
+        mocked_sstate = std::shared_ptr<common::ScheduleState>(mock_scheduler_state);
+        mocked_ll = std::shared_ptr<common::MockLustre>(mock_lustre);
+        mocked_jobmon = std::shared_ptr<common::JobMonitor>(mock_job_monitor);
+    }
+
+    virtual void TearDown() {
+        mocked_cstate.reset();
+        mocked_sstate.reset();
+        mocked_ll.reset();
+        mocked_jobmon.reset();
+
+        mock_cluster_state = nullptr;
+        mock_scheduler_state = nullptr;
+        mock_job_monitor = nullptr;
+        mock_lustre = nullptr;
+    }
+};
+
+TEST_F(SchedulerTest, ScheduleOnEmptyCluster) {
+    common::Scheduler scheduler(mocked_sstate, mocked_jobmon, mocked_cstate, mocked_ll);
+
+    EXPECT_CALL(*mock_job_monitor, RegisterJob(_)).Times(0);
+    EXPECT_CALL(*mock_scheduler_state, AddJob(_,_,_)).Times(0);
 
     auto job1 = new common::Job("job1",
                                 std::chrono::system_clock::now(),
@@ -44,39 +70,29 @@ TEST(Scheduler, ScheduleOnEmptyCluster) {
     delete job1;
 }
 
-TEST(Scheduler, ScheduleSimpleJob) {
+std::vector<std::string> CreateSingleOstList() {
+    return {"OST"};
+}
 
-    common::MockClusterState *cluster_state = new common::MockClusterState();
-    common::MockScheduleState *schedule_state = new common::MockScheduleState();
-    common::MockJobMonitor *job_monitor = new common::MockJobMonitor();
-    common::MockLustre *lustre = new common::MockLustre();
-
-    std::shared_ptr<common::ClusterState> cs (cluster_state);
-    std::shared_ptr<common::ScheduleState> ss (schedule_state);
-    std::shared_ptr<common::MockLustre> ll (lustre);
-    std::shared_ptr<common::JobMonitor> jm (job_monitor);
-
-    common::Scheduler scheduler(ss, jm, cs, ll);
-    //common::Scheduler scheduler(&schedule_state, &job_monitor, &cluster_state, &lustre);
-
+TEST_F(SchedulerTest, ScheduleSimpleJob) {
+    common::Scheduler scheduler(mocked_sstate, mocked_jobmon, mocked_cstate, mocked_ll);
 
     auto job1 = new common::Job("job1",
                                 std::chrono::system_clock::now(),
                                 std::chrono::system_clock::now() + std::chrono::milliseconds(1),
                                 1);
-    std::vector<std::string> osts = {"OST_a"};
+    std::vector<std::string> osts = CreateSingleOstList();
     job1->setOsts(osts);
 
     common::NodeState node_state = {"OST_a", 0, 100};
     std::vector<std::string> nodes = {"OST_a"};
 
 
-    ON_CALL(*cluster_state, getNodes()).WillByDefault(testing::Return(&nodes));
-    ON_CALL(*cluster_state, getState("OST_a", _)).WillByDefault(testing::DoAll(testing::SetArgPointee<1>(node_state), testing::Return(true)));
+    ON_CALL(*mock_cluster_state, getNodes()).WillByDefault(testing::Return(&nodes));
+    ON_CALL(*mock_cluster_state, getState(osts[0], _)).WillByDefault(testing::DoAll(testing::SetArgPointee<1>(node_state), testing::Return(true)));
 
-    // we assume an empty cluster -> no job must be scheduled
-    EXPECT_CALL(*schedule_state, AddJob(_,_,_)).WillOnce(testing::Return(true));
-    EXPECT_CALL(*job_monitor, RegisterJob(_)).WillOnce(testing::Return(true));
+    EXPECT_CALL(*mock_scheduler_state, AddJob(_,_,_)).WillOnce(testing::Return(true));
+    EXPECT_CALL(*mock_job_monitor, RegisterJob(_)).WillOnce(testing::Return(true));
 
     EXPECT_TRUE(scheduler.Init());
     EXPECT_TRUE(scheduler.ScheduleJob(*job1)) << "job should be scheduled";
@@ -84,59 +100,33 @@ TEST(Scheduler, ScheduleSimpleJob) {
 }
 
 
-TEST(Scheduler, ScheduleTooBigJob) {
-
-    common::MockClusterState *cluster_state = new common::MockClusterState();
-    common::MockScheduleState *schedule_state = new common::MockScheduleState();
-    common::MockJobMonitor *job_monitor = new common::MockJobMonitor();
-    common::MockLustre *lustre = new common::MockLustre();
-
-    std::shared_ptr<common::ClusterState> cs (cluster_state);
-    std::shared_ptr<common::ScheduleState> ss (schedule_state);
-    std::shared_ptr<common::MockLustre> ll (lustre);
-    std::shared_ptr<common::JobMonitor> jm (job_monitor);
-
-    common::Scheduler scheduler(ss, jm, cs, ll);
-
+TEST_F(SchedulerTest, ScheduleTooBigJob) {
+    common::Scheduler scheduler(mocked_sstate, mocked_jobmon, mocked_cstate, mocked_ll);
 
     auto job1 = new common::Job("job1",
                                 std::chrono::system_clock::now(),
                                 std::chrono::system_clock::now() + std::chrono::milliseconds(1),
                                 1000);
-    std::vector<std::string> osts = {"OST_a"};
+    std::vector<std::string> osts = CreateSingleOstList();
     job1->setOsts(osts);
 
     common::NodeState node_state = {"OST_a", 0, 100};
     std::vector<std::string> nodes = {"OST_a"};
 
 
-    ON_CALL(*cluster_state, getNodes()).WillByDefault(testing::Return(&nodes));
-    ON_CALL(*cluster_state, getState("OST_a", _)).WillByDefault(testing::DoAll(testing::SetArgPointee<1>(node_state), testing::Return(true)));
+    ON_CALL(*mock_cluster_state, getNodes()).WillByDefault(testing::Return(&nodes));
+    ON_CALL(*mock_cluster_state, getState(osts[0], _)).WillByDefault(testing::DoAll(testing::SetArgPointee<1>(node_state), testing::Return(true)));
 
-    // we assume an empty cluster -> no job must be scheduled
-    EXPECT_CALL(*job_monitor, RegisterJob(_)).Times(0);
-    EXPECT_CALL(*schedule_state, AddJob(_,_,_)).Times(0);
+    EXPECT_CALL(*mock_job_monitor, RegisterJob(_)).Times(0);
+    EXPECT_CALL(*mock_scheduler_state, AddJob(_,_,_)).Times(0);
 
     EXPECT_FALSE(scheduler.ScheduleJob(*job1)) << "job should not be scheduled";
     delete job1;
 }
 
 
-TEST(Scheduler, RemoveNonExistingJob) {
-
-    common::MockClusterState *cluster_state = new common::MockClusterState();
-    common::MockScheduleState *schedule_state = new common::MockScheduleState();
-    common::MockJobMonitor *job_monitor = new common::MockJobMonitor();
-    common::MockLustre *lustre = new common::MockLustre();
-
-    std::shared_ptr<common::ClusterState> cs (cluster_state);
-    std::shared_ptr<common::ScheduleState> ss (schedule_state);
-    std::shared_ptr<common::MockLustre> ll (lustre);
-    std::shared_ptr<common::JobMonitor> jm (job_monitor);
-
-    common::Scheduler scheduler(ss, jm, cs, ll);
-    //common::Scheduler scheduler(&schedule_state, &job_monitor, &cluster_state, &lustre);
-
+TEST_F(SchedulerTest, RemoveNonExistingJob) {
+    common::Scheduler scheduler(mocked_sstate, mocked_jobmon, mocked_cstate, mocked_ll);
 
     common::NodeState node_state = {"OST_a", 0, 100};
     std::vector<std::string> nodes = {"OST_a"};
@@ -145,11 +135,11 @@ TEST(Scheduler, RemoveNonExistingJob) {
                                 std::chrono::system_clock::now(),
                                 std::chrono::system_clock::now() + std::chrono::milliseconds(1),
                                 1000);
-    std::vector<std::string> osts = {"OST_a"};
+    std::vector<std::string> osts = CreateSingleOstList();
     job1->setOsts(osts);
 
     // we assume an empty cluster -> no job must be scheduled
-    EXPECT_CALL(*job_monitor, UnregisterJob(_)).Times(0);
+    EXPECT_CALL(*mock_job_monitor, UnregisterJob(_)).Times(0);
 
     EXPECT_FALSE(scheduler.RemoveJob(job1->getJobid())) << "Call should fail if job doesn't exist";
     delete job1;
