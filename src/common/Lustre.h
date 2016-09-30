@@ -83,14 +83,14 @@ public:
     virtual uint32_t MBsToRPCs(const uint32_t mb_per_sec) const override;
     virtual uint32_t RPCsToMBs(const uint32_t rpc_per_sec) const override;
 
-    virtual bool GetOstList(const std::string &path, std::shared_ptr<std::vector<getOstsResults>> output);
+    virtual bool GetOstList(const std::string &path, std::shared_ptr<std::vector<getOstsResults>> output) override;
 
     virtual bool StartJobTbfRule(std::string jobid, std::string rule_name, uint32_t rpc_rate_limit) override;
     virtual bool ChangeJobTbfRule(std::string jobid, std::string rule_name, uint32_t new_rpc_rate_limit) override;
     virtual bool StopJobTbfRule(std::string jobid, std::string rule_name) override;
 
     virtual bool GetOstsForFile(const std::string &file, std::shared_ptr<std::vector<std::string>> osts) override;
-    virtual bool GetOstsForFile(const std::vector<std::string> &files, std::shared_ptr<std::vector<std::string>> osts);
+    virtual bool GetOstsForFile(const std::vector<std::string> &files, std::shared_ptr<std::vector<std::string>> osts) override;
 };
 
 }
