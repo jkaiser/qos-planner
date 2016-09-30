@@ -15,6 +15,7 @@ class MockLustre : public LocalLustre {
 public:
     MOCK_METHOD3(StartJobTbfRule, bool(std::string, std::string, uint32_t));
     MOCK_METHOD2(StopJobTbfRule, bool(std::string, std::string));
+    MOCK_METHOD2(GetOstList, bool(const std::string&, std::shared_ptr<std::vector<getOstsResults> >));
 };
 }
 

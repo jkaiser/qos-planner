@@ -34,10 +34,10 @@ protected:
         mock_job_monitor = new common::MockJobMonitor();
         mock_lustre = new common::MockLustre();
 
-        mocked_cstate = std::shared_ptr<common::ClusterState>(mock_cluster_state);
-        mocked_sstate = std::shared_ptr<common::ScheduleState>(mock_scheduler_state);
-        mocked_ll = std::shared_ptr<common::MockLustre>(mock_lustre);
-        mocked_jobmon = std::shared_ptr<common::JobMonitor>(mock_job_monitor);
+        mocked_cstate.reset(mock_cluster_state);
+        mocked_sstate.reset(mock_scheduler_state);
+        mocked_ll.reset(mock_lustre);
+        mocked_jobmon.reset(mock_job_monitor);
     }
 
     virtual void TearDown() {
