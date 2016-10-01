@@ -65,10 +65,9 @@ private:
 
     void FillWithExistingJobs();
     bool isThereAReadyJob() const;
+
 public:
     JobMonitor();
-//    JobMonitor(common::ScheduleState *st, Lustre *lustre);
-//    JobMonitor(common::ScheduleState *st, Lustre *lustre, uint32_t waiting_time_sec);
     JobMonitor(std::shared_ptr<ScheduleState> st, std::shared_ptr<Lustre> lustre);
     /**
      * waiting_time_sec: The time the internal threads sleeps before checking for an exit flag (set by a Teardown call)

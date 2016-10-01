@@ -50,7 +50,7 @@ void Server::Serve(const std::string ip_port) {
         }
 
         if (msg.type() == rpc::Message::REPLY) {
-           // invalid atm. We don't send requests and, therefore, don't expect repies.
+           // invalid atm. We don't send requests and, therefore, don't expect replies.
             continue;
         }
 
