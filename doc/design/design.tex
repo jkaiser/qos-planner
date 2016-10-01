@@ -21,7 +21,7 @@
 
 \section{Abstract}
 
-Lustre introduced Quality of Service (QoS) settings in version 2.4 by extending the Network Request Scheduler (NRS) with a Token Bucket Filter (TBF) strategy.
+Lustre introduced Quality of Service (QoS) settings in version 2.4 by extending the Network Request JobSchedulerDynWorkloads (NRS) with a Token Bucket Filter (TBF) strategy.
 The extension allows administrators to set QoS based on jobID, userID, or NID and guarantees that an OST provides the configured throughput as long as it is not working close to its full performance.
 However, this mechanism does not provide enough functionality for a comprehensive QoS management of thousands of jobs per day.
 Additionally, there must be an instance that considers the different QoS requirements of High Performance Computing (HPC) jobs so that HPC jobs can be started when their resource requirements can be met.
@@ -103,8 +103,8 @@ Figure \ref{fig:swarc_overview} shows the overview of system software architectu
 %(\textbf{{\romannumeral 2}})  The \emph{Planner} module is in charge of the supply-and-demand issue for the scheduling job QoS. It provides the state of the \emph{Storage cluster} and sets the NRS according the QoS requirement (if the supply-and-demand is matching).
 (\textbf{{\romannumeral 2}})  The \emph{Planner} module is in charge of the supply-and-demand issue for the scheduling job QoS. It interpretes the requests starts the request processing depending on the request type.
 
-(\textbf{{\romannumeral 3}}) The \emph{Scheduler} module contains the scheduling algorithm. It reads the schedule when checking a job request and updates the schedule. The Scheduler also registers accepted jobs to the JobMonitor.
-%(\textbf{{\romannumeral 3}}) The \emph{Scheduler} module collects the state of both the Storage cluster (by the \emph{ClusterState} module) and the scheduling state (by the \emph{ScheduleState} module). Also, the \emph{Scheduler} module monitors the job state in the Storage cluster by the \emph{JobMonitor} module.
+(\textbf{{\romannumeral 3}}) The \emph{JobSchedulerDynWorkloads} module contains the scheduling algorithm. It reads the schedule when checking a job request and updates the schedule. The JobSchedulerDynWorkloads also registers accepted jobs to the JobMonitor.
+%(\textbf{{\romannumeral 3}}) The \emph{JobSchedulerDynWorkloads} module collects the state of both the Storage cluster (by the \emph{ClusterState} module) and the scheduling state (by the \emph{ScheduleState} module). Also, the \emph{JobSchedulerDynWorkloads} module monitors the job state in the Storage cluster by the \emph{JobMonitor} module.
 
 (\textbf{{\romannumeral 4}}) The \emph{ClusterState} module collects the Storage cluster state (including network). This includes the set of OSS/OSTs as well as the current workload per OSS/OST.
 

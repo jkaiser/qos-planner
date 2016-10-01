@@ -9,11 +9,9 @@
 #include "MockJobMonitor.h"
 #include "MockLustre.h"
 
-#include <Scheduler.h>
-
+#include <JobSchedulerDynWorkloads.h>
 
 using ::testing::_;
-
 
 class SchedulerTest : public ::testing::Test {
 
@@ -51,34 +49,36 @@ protected:
         mock_job_monitor = nullptr;
         mock_lustre = nullptr;
     }
+
+    std::vector<std::string> CreateSingleOstList() {
+        return {"OST_a"};
+    }
+
+    common::Job *CreateJob(const std::string &jobname, int duration_in_ms, int min_storage_bandwidth) {
+        return new common::Job(jobname,
+                               std::chrono::system_clock::now(),
+                               std::chrono::system_clock::now() + std::chrono::milliseconds(duration_in_ms),
+                               min_storage_bandwidth);
+    }
 };
 
 
-std::vector<std::string> CreateSingleOstList() {
-    return {"OST_a"};
-}
 
-common::Job *CreateJob(const std::string &jobname, int duration_in_ms, int min_storage_bandwidth) {
-    return new common::Job(jobname,
-                           std::chrono::system_clock::now(),
-                           std::chrono::system_clock::now() + std::chrono::milliseconds(duration_in_ms),
-                           min_storage_bandwidth);
-}
 
 
 TEST_F(SchedulerTest, InitShouldSucceed) {
-    common::Scheduler scheduler(mocked_sstate, mocked_jobmon, mocked_cstate, mocked_ll);
+    common::JobSchedulerDynWorkloads scheduler(mocked_sstate, mocked_jobmon, mocked_cstate, mocked_ll);
     EXPECT_TRUE(scheduler.Init());
 }
 
 TEST_F(SchedulerTest, TeardownShouldSucceed) {
-    common::Scheduler scheduler(mocked_sstate, mocked_jobmon, mocked_cstate, mocked_ll);
+    common::JobSchedulerDynWorkloads scheduler(mocked_sstate, mocked_jobmon, mocked_cstate, mocked_ll);
     scheduler.Init();
     EXPECT_TRUE(scheduler.TearDown());
 }
 
 TEST_F(SchedulerTest, ScheduleOnNonExistingClusterShouldFail) {
-    common::Scheduler scheduler(mocked_sstate, mocked_jobmon, mocked_cstate, mocked_ll);
+    common::JobSchedulerDynWorkloads scheduler(mocked_sstate, mocked_jobmon, mocked_cstate, mocked_ll);
 
     EXPECT_CALL(*mock_job_monitor, RegisterJob(_)).Times(0);
     EXPECT_CALL(*mock_scheduler_state, AddJob(_, _, _)).Times(0);
@@ -92,7 +92,7 @@ TEST_F(SchedulerTest, ScheduleOnNonExistingClusterShouldFail) {
 }
 
 TEST_F(SchedulerTest, ScheduleJobWithEnoughResourcesShouldSucceed) {
-    common::Scheduler scheduler(mocked_sstate, mocked_jobmon, mocked_cstate, mocked_ll);
+    common::JobSchedulerDynWorkloads scheduler(mocked_sstate, mocked_jobmon, mocked_cstate, mocked_ll);
 
     auto job = CreateJob("job", 1, 1);
     std::vector<std::string> osts_touched_by_job = CreateSingleOstList();
@@ -114,7 +114,7 @@ TEST_F(SchedulerTest, ScheduleJobWithEnoughResourcesShouldSucceed) {
 }
 
 TEST_F(SchedulerTest, ScheduleOnEdgeJobShouldSucceed) {
-    common::Scheduler scheduler(mocked_sstate, mocked_jobmon, mocked_cstate, mocked_ll);
+    common::JobSchedulerDynWorkloads scheduler(mocked_sstate, mocked_jobmon, mocked_cstate, mocked_ll);
 
     auto job = CreateJob("job", 1, 100);
     std::vector<std::string> osts_touched_by_job = CreateSingleOstList();
@@ -136,7 +136,7 @@ TEST_F(SchedulerTest, ScheduleOnEdgeJobShouldSucceed) {
 }
 
 TEST_F(SchedulerTest, ScheduleTooBigJob) {
-    common::Scheduler scheduler(mocked_sstate, mocked_jobmon, mocked_cstate, mocked_ll);
+    common::JobSchedulerDynWorkloads scheduler(mocked_sstate, mocked_jobmon, mocked_cstate, mocked_ll);
 
     auto job = CreateJob("job", 1, 1000);
     std::vector<std::string> touched_osts_for_job = CreateSingleOstList();
@@ -158,7 +158,7 @@ TEST_F(SchedulerTest, ScheduleTooBigJob) {
 }
 
 TEST_F(SchedulerTest, RemoveExistingJobShouldSucceed) {
-    common::Scheduler scheduler(mocked_sstate, mocked_jobmon, mocked_cstate, mocked_ll);
+    common::JobSchedulerDynWorkloads scheduler(mocked_sstate, mocked_jobmon, mocked_cstate, mocked_ll);
 
     auto job = CreateJob("job", 1, 1);
     std::vector<std::string> osts_touched_by_job = CreateSingleOstList();
@@ -185,7 +185,7 @@ TEST_F(SchedulerTest, RemoveExistingJobShouldSucceed) {
 }
 
 TEST_F(SchedulerTest, RemoveNonExistingJobShouldFail) {
-    common::Scheduler scheduler(mocked_sstate, mocked_jobmon, mocked_cstate, mocked_ll);
+    common::JobSchedulerDynWorkloads scheduler(mocked_sstate, mocked_jobmon, mocked_cstate, mocked_ll);
 
     auto job = CreateJob("job", 1, 1000);
     std::vector<std::string> osts_touched_by_job = CreateSingleOstList();

@@ -2,7 +2,7 @@ include_directories(../../src/common)
 
 file(GLOB SRCS *.cpp)
 
-add_executable(runBasicTests ${SRCS} LustreTest.cpp utilTest.cpp)
+add_executable(runBasicTests ${SRCS} LustreTest.cpp utilTest.cpp JobSchedulerStaticWorkloadsTest.cpp)
 target_link_libraries(runBasicTests gtest gmock common)
 
 # small helper to run the test within the CLion IDE...

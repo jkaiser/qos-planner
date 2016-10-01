@@ -17,7 +17,7 @@ Planner::Planner(std::string root_path) : root_path(root_path) {
     cluster = std::shared_ptr<MemoryClusterState>(new MemoryClusterState(lustre));
     schedule = std::shared_ptr<MemoryScheduleState>(new MemoryScheduleState());
     jobMonitor = std::shared_ptr<JobMonitor>(new JobMonitor());
-    scheduler = std::shared_ptr<Scheduler>(new Scheduler(schedule, jobMonitor, cluster, lustre));
+    scheduler = std::shared_ptr<JobSchedulerDynWorkloads>(new JobSchedulerDynWorkloads(schedule, jobMonitor, cluster, lustre));
 }
 
 bool Planner::Init() {

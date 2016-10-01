@@ -10,9 +10,9 @@
 #include "JobMonitor.h"
 #include "ClusterState.h"
 #include "Lustre.h"
+#include "JobScheduler.h"
 
 namespace common {
-
 /**
  *
  * Example:
@@ -24,7 +24,7 @@ namespace common {
  * sched.Remove(j.getJobid());
  *
  */
-class Scheduler {
+class JobSchedulerDynWorkloads : public JobScheduler {
 
 private:
     std::mutex scheduler_mut;
@@ -42,37 +42,20 @@ private:
 
     bool AreEnoughResAvail(const Job &job, uint32_t max_ost_mb_sec, const OSTWorkload &node_state) const;
 
+    bool JobDoesNotExist(const std::string &jobid, Job::JobState &state) const;
+
 public:
+
     /**
      * Constructor. It is assumed that the given instances already are initialized and ready to be used.
      */
-    Scheduler(std::shared_ptr<ScheduleState> &schedule, std::shared_ptr<JobMonitor> job_monitor,
+    JobSchedulerDynWorkloads(std::shared_ptr<ScheduleState> &schedule, std::shared_ptr<JobMonitor> job_monitor,
               std::shared_ptr<ClusterState> cluster_state, std::shared_ptr<Lustre> lustre);
-
     bool Init();
     bool TearDown();
-    /**
-     * Tries to schedule the given job with respect to the current schedule and the resource requirements of the job. The
-     * call fails if the job
-     *
-     * Returns
-     * true:    if the job was scheduled successfully
-     * false:   else
-     */
-    bool ScheduleJob(Job &job);
 
-    /**
-     * Removes the job from the schedule. If the job currently is active, the call also will remove any existing Lustre
-     * settings for the job.
-     *
-     * Returns:
-     * true:    if the job was removed successfully
-     * false:   else
-     */
-    bool RemoveJob(const std::string &jobid);
-
-
-    bool JobDoesNotExist(const std::string &jobid, Job::JobState &state) const;
+    virtual bool ScheduleJob(Job &job) override;
+    virtual bool RemoveJob(const std::string &jobid) override;
 };
 
 }
