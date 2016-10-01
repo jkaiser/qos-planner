@@ -42,6 +42,7 @@ private:
     std::shared_ptr<ScheduleState> scheduleState;
 
     std::mutex job_priority_queue_mutex;
+    std::condition_variable job_priority_queue_cv;
     JobPriorityQueue job_priority_queue;
 
     /** in-flight jobs are jobs which currently are processed by the internal thread

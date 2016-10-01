@@ -125,21 +125,18 @@ void JobMonitor::Monitor() {
     lk.unlock();
 
     while (!monitor_thread_exit_flag) {
-
         lk.lock();
-        if (isThereAReadyJob()) {
+        while(isThereAReadyJob()) {
             JobPriorityQueue::WaitingItem *wt = job_priority_queue.Pop();
             lk.unlock();
 
             Handle(wt->jobid, wt->eventType);
-
             delete wt;
-        } else {
-            lk.unlock();
-
-            std::this_thread::sleep_for(std::chrono::seconds(waiting_time_sec));
+            lk.lock();
         }
 
+        job_priority_queue_cv.wait_for(lk, std::chrono::seconds(waiting_time_sec));
+        lk.unlock();
     }
 
     lk.lock();
@@ -190,6 +187,8 @@ void JobMonitor::Monitor() {
     std::unique_lock<std::mutex> lock(job_priority_queue_mutex);
     JobPriorityQueue::WaitingItem *wt = new JobPriorityQueue::WaitingItem(jobid, tend, Job::JobEvent::JOBSTOP);
     job_priority_queue.Push(wt);
+    job_priority_queue_cv.notify_all();
+    lock.unlock();
 
     return true;
 }
@@ -230,6 +229,8 @@ bool JobMonitor::UnregisterJob(const Job &job) {
     if (!job_priority_queue.Remove(job.getJobid())) {
         //TODO: give a warning here. This should not happen but isn't critical here since we remove anyway.
     }
+    job_priority_queue_cv.notify_all();
+    lk.unlock();
 
     // 3) check if we have to do more
     Job::JobState job_state;
