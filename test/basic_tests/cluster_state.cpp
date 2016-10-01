@@ -33,8 +33,8 @@ protected:
 };
 
 void compareWorkloads(const common::OSTWorkload &expected_wl, const common::OSTWorkload &returned_wl) {
-    EXPECT_STREQ(expected_wl.name.c_str(), returned_wl.name.c_str());
-    EXPECT_EQ(expected_wl.rpcSec, returned_wl.rpcSec);
+    EXPECT_STREQ(expected_wl.ost.c_str(), returned_wl.ost.c_str());
+    EXPECT_EQ(expected_wl.currentRpcSec, returned_wl.currentRpcSec);
     EXPECT_EQ(expected_wl.maxRpcSec, returned_wl.maxRpcSec);
 }
 
@@ -57,10 +57,10 @@ TEST_F(MemClusterStateTest, GetStateReturnsCorrectWorkload) {
 
     EXPECT_TRUE(mem_cluster_state->GetOSTList()->empty());
     common::OSTWorkload workload = {"n1", 42, 17};
-    mem_cluster_state->UpdateNode(workload.name, workload);
+    mem_cluster_state->UpdateNode(workload.ost, workload);
 
     common::OSTWorkload returned_workload;
-    EXPECT_TRUE(mem_cluster_state->getOstState(workload.name, &returned_workload));
+    EXPECT_TRUE(mem_cluster_state->getOstState(workload.ost, &returned_workload));
     compareWorkloads(workload, returned_workload);
 
     mem_cluster_state->TearDown();

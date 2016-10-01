@@ -15,11 +15,6 @@
 
 namespace common {
 
-struct Workload {
-    uint32_t current_rpc_per_sec;
-    uint32_t max_rpc_per_sec;
-};
-
 /**
  * Abstract class. The ScheduleState holds and manages the schedule. The schedule is the set of accepted jobs.
  */

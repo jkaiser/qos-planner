@@ -22,8 +22,8 @@ namespace common {
  * Simple representation of a node's current workload (the actual measured one)
  */
 struct OSTWorkload {
-    std::string name;
-    uint32_t rpcSec;
+    std::string ost;
+    uint32_t currentRpcSec;
     uint32_t maxRpcSec;
 };
 

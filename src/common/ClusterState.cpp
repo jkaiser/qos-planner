@@ -23,7 +23,7 @@ namespace common {
         names->reserve(this->ost_state_map.size());
 
         for (auto i = this->ost_state_map.begin(); i != this->ost_state_map.end(); i++) {
-            names->push_back(i->second.name);
+            names->push_back(i->second.ost);
         }
 
         return names;

@@ -79,7 +79,7 @@ bool Scheduler::ScheduleJob(common::Job &job) {
     }
 
 
-    uint32_t max_load_mb_sec;
+    uint32_t max_load_mb_sec = 0;
     for (auto job : *job_list) {
 
         if ((job->GetStartTime() > end) || (job->GetEndTime() < start)) {   // is the job outside of the time interval?
@@ -92,16 +92,10 @@ bool Scheduler::ScheduleJob(common::Job &job) {
 }
 
 bool Scheduler::Init() {
-    if (schedule == nullptr) {
+    if ((schedule == nullptr) || (job_monitor == nullptr) || (lustre == nullptr)) {
         return false;
     }
 
-    if (job_monitor == nullptr) {
-        return false;
-    }
-    if (lustre == nullptr) {
-        return false;
-    }
     return true;
 }
 
