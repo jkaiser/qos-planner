@@ -20,7 +20,7 @@ JobMonitor::JobMonitor(std::shared_ptr<ScheduleState> st, std::shared_ptr<Lustre
         waiting_time_sec(waiting_time_sec) {}
 
 bool JobMonitor::RegisterJob(const common::Job &job) {
-    std::unique_lock<std::mutex> lock(job_priority_queue_mutex);
+    std::lock_guard<std::mutex> lock(job_priority_queue_mutex);
     JobPriorityQueue::WaitingItem *wt = new JobPriorityQueue::WaitingItem(job.getJobid(), job.GetStartTime(), Job::JobEvent::JOBSTART);
     job_priority_queue.Push(wt);
     return true;
@@ -58,34 +58,7 @@ bool JobMonitor::Init() {
         return false;
     }
 
-    // fill the monitor with existing jobs. We only consider jobs that were touched by the monitor
-    // itself -> state == SCHEDULED or state == ACTIVE
-    std::map<std::string, Job*> *existing_jobs = scheduleState->GetAllJobs();
-
-    std::unique_lock<std::mutex> lock(job_priority_queue_mutex);
-    for (auto job : *existing_jobs) {
-        JobPriorityQueue::WaitingItem *wt;
-        switch (job.second->getState()) {
-
-            case Job::SCHEDULED:
-                wt = new JobPriorityQueue::WaitingItem(job.second->getJobid(), job.second->GetStartTime(), Job::JobEvent::JOBSTART);
-                job_priority_queue.Push(wt);
-                break;
-
-            case Job::ACTIVE:
-                wt = new JobPriorityQueue::WaitingItem(job.second->getJobid(), job.second->GetEndTime(), Job::JobEvent::JOBSTOP);
-                job_priority_queue.Push(wt);
-                break;
-
-            case Job::INITIALIZED:break;    // job is there, but never was scheduled -> to do
-            case Job::DONE:break;           // job is finished -> nothing to do
-        }
-        delete job.second;
-    }
-    existing_jobs->clear();
-    delete existing_jobs;
-    lock.unlock();
-
+    FillWithExistingJobs();
 
     if (not monitor_thread_started) {
         monitor_thread = std::thread(&JobMonitor::Monitor, this);
@@ -97,8 +70,37 @@ bool JobMonitor::Init() {
     return true;
 }
 
+    void JobMonitor::FillWithExistingJobs() {
+        // We only consider jobs that were touched by the monitor itself -> state == SCHEDULED or state == ACTIVE
+        std::map<std::string, Job*> *existing_jobs = scheduleState->GetAllJobs();
 
-bool JobMonitor::TearDown() {
+        std::unique_lock<std::mutex> lock(job_priority_queue_mutex);
+        for (auto job : *existing_jobs) {
+            JobPriorityQueue::WaitingItem *wt;
+            switch (job.second->getState()) {
+
+                case Job::SCHEDULED:
+                    wt = new JobPriorityQueue::WaitingItem(job.second->getJobid(), job.second->GetStartTime(), Job::JOBSTART);
+                    job_priority_queue.Push(wt);
+                    break;
+
+                case Job::ACTIVE:
+                    wt = new JobPriorityQueue::WaitingItem(job.second->getJobid(), job.second->GetEndTime(), Job::JOBSTOP);
+                    job_priority_queue.Push(wt);
+                    break;
+
+                case Job::INITIALIZED:break;    // job is there, but never was scheduled -> to do
+                case Job::DONE:break;           // job is finished -> nothing to do
+            }
+            delete job.second;
+        }
+        existing_jobs->clear();
+        delete existing_jobs;
+        lock.unlock();
+    }
+
+
+    bool JobMonitor::TearDown() {
 
     std::unique_lock<std::mutex> lock(job_priority_queue_mutex);
     monitor_thread_exit_flag = true;
@@ -125,8 +127,7 @@ void JobMonitor::Monitor() {
     while (!monitor_thread_exit_flag) {
 
         lk.lock();
-        if ((job_priority_queue.Peek() != nullptr ) &&
-                    (job_priority_queue.Peek()->time_of_event < std::chrono::system_clock::now())) {
+        if (isThereAReadyJob()) {
             JobPriorityQueue::WaitingItem *wt = job_priority_queue.Pop();
             lk.unlock();
 
@@ -148,8 +149,13 @@ void JobMonitor::Monitor() {
 
 }
 
+    bool JobMonitor::isThereAReadyJob() const {
+        return (job_priority_queue.Peek() != nullptr ) &&
+               (job_priority_queue.Peek()->time_of_event < std::__1::chrono::system_clock::now());
+    }
 
-bool JobMonitor::StartJob(const std::string &jobid) {
+
+    bool JobMonitor::StartJob(const std::string &jobid) {
 
     Job::JobState job_state;
     if (!scheduleState->GetJobStatus(jobid, &job_state)) {   // job was removed in the meantime

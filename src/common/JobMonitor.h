@@ -62,6 +62,8 @@ private:
     bool StartJob(const std::string &jobid);
     bool StopJob(const std::string &jobid);
 
+    void FillWithExistingJobs();
+    bool isThereAReadyJob() const;
 public:
     JobMonitor();
 //    JobMonitor(common::ScheduleState *st, Lustre *lustre);
@@ -73,7 +75,9 @@ public:
     JobMonitor(std::shared_ptr<ScheduleState> st, std::shared_ptr<Lustre> lustre, uint32_t waiting_time_sec);
     virtual bool Init();
     virtual bool TearDown();
+
     virtual bool RegisterJob(const Job &job);
+
     virtual bool UnregisterJob(const Job &job);
 };
 }
