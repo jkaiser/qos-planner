@@ -3,7 +3,7 @@
 //
 
 #include "Planner.h"
-
+#include "JobSchedulerStaticWorkloads.h"
 #include <unordered_set>
 #include <regex>
 
@@ -12,12 +12,11 @@ namespace common {
 
 Planner::Planner(std::string root_path) : root_path(root_path) {
 
-//    lustre = dynamic_pointer_cast(new LocalLustre());
     lustre = std::shared_ptr<LocalLustre>(new LocalLustre());
     cluster = std::shared_ptr<MemoryClusterState>(new MemoryClusterState(lustre));
     schedule = std::shared_ptr<MemoryScheduleState>(new MemoryScheduleState());
     jobMonitor = std::shared_ptr<JobMonitor>(new JobMonitor());
-    scheduler = std::shared_ptr<JobSchedulerDynWorkloads>(new JobSchedulerDynWorkloads(schedule, jobMonitor, cluster, lustre));
+    scheduler = std::shared_ptr<JobSchedulerStaticWorkloads>(new JobSchedulerStaticWorkloads(schedule, jobMonitor, lustre));
 }
 
 bool Planner::Init() {
@@ -42,22 +41,12 @@ bool Planner::Init() {
         return false;
     }
 
-    if (!scheduler->Init()) {
-        jobMonitor->TearDown();
-        cluster->TearDown();
-        schedule->TearDown();
-        return false;
-    }
-
     return true;
 }
 
 bool Planner::TearDown() {
     bool ret = true;
 
-    //TODO: implement error messages
-    ret &= scheduler->TearDown();
-    scheduler.reset();
 
     ret &= jobMonitor->TearDown();
     jobMonitor.reset();

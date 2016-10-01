@@ -8,7 +8,8 @@
 #include <string>
 #include <memory>
 #include "Lustre.h"
-#include "JobSchedulerDynWorkloads.h"
+#include "JobScheduler.h"
+#include "JobMonitor.h"
 #include "ScheduleState.h"
 #include "ClusterState.h"
 #include "../common/rpc/proto/message.pb.h"
@@ -40,7 +41,7 @@ private:
     const std::string root_path;
     std::shared_ptr<Lustre> lustre;
     std::shared_ptr<ClusterState> cluster;
-    std::shared_ptr<JobSchedulerDynWorkloads> scheduler;
+    std::shared_ptr<JobScheduler> scheduler;
     std::shared_ptr<ScheduleState> schedule;
     std::shared_ptr<JobMonitor> jobMonitor;
 
