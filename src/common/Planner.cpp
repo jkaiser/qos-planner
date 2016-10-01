@@ -72,7 +72,7 @@ bool Planner::ServeJobSubmission(const rpc::Request_ResourceRequest &request) {
     int min_read_throughput = 0;
     std::unordered_set<std::string> osts_set;
 
-    for (auto it = request.requestedresources().begin(); it != request.requestedresources().begin(); it++) {
+    for (auto it = request.requestedresources().begin(); it != request.requestedresources().end(); it++) {
 
         // update min_read_throughput
         if (min_read_throughput < it->throughputmb()) {
