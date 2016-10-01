@@ -36,9 +36,10 @@ private:
     bool monitor_thread_started = false;
     std::thread monitor_thread;
     bool monitor_thread_exit_flag = false;
+    bool monitor_thread_is_active = false;
+    std::condition_variable monitor_thread_finish_cv;
 
     std::shared_ptr<ScheduleState> scheduleState;
-//    ScheduleState *scheduleState = nullptr;
 
     std::mutex job_priority_queue_mutex;
     JobPriorityQueue job_priority_queue;

@@ -99,25 +99,17 @@ bool JobMonitor::Init() {
 
 
 bool JobMonitor::TearDown() {
-    if (!monitor_thread_exit_flag) {
-        monitor_thread_exit_flag = true;
-        std::chrono::seconds max_wait_time(30); // 30 seconds to wait
-        auto tstart = std::chrono::system_clock::now();
 
-        bool successful_joined = false;
-        while (std::chrono::system_clock::now() < tstart + max_wait_time) {
-            if (monitor_thread.joinable()) {
-                monitor_thread.join();
-                successful_joined = true;
-                break;
-            } else {
-                std::this_thread::sleep_for(std::chrono::seconds(1));
-            }
-        }
+    std::unique_lock<std::mutex> lock(job_priority_queue_mutex);
+    monitor_thread_exit_flag = true;
+    while (monitor_thread_is_active) {
+        monitor_thread_finish_cv.wait(lock);
+    }
+    lock.unlock();
 
-        if (not successful_joined) {
-            return false;
-        }
+
+    if (monitor_thread.joinable()) {
+        monitor_thread.join();
     }
 
     return true;
@@ -125,27 +117,35 @@ bool JobMonitor::TearDown() {
 
 void JobMonitor::Monitor() {
 
-    std::unique_lock<std::mutex> lk(job_priority_queue_mutex, std::defer_lock);
+    std::unique_lock<std::mutex> lk(job_priority_queue_mutex);
+    monitor_thread_is_active = true;
+    monitor_thread_finish_cv.notify_all();
+    lk.unlock();
+
     while (!monitor_thread_exit_flag) {
 
-//        job_priority_queue_mutex.lock();
         lk.lock();
         if ((job_priority_queue.Peek() != nullptr ) &&
                     (job_priority_queue.Peek()->time_of_event < std::chrono::system_clock::now())) {
             JobPriorityQueue::WaitingItem *wt = job_priority_queue.Pop();
             lk.unlock();
-//            job_priority_queue_mutex.unlock();
 
             Handle(wt->jobid, wt->eventType);
 
             delete wt;
         } else {
             lk.unlock();
-//            job_priority_queue_mutex.unlock();
+
             std::this_thread::sleep_for(std::chrono::seconds(waiting_time_sec));
         }
 
     }
+
+    lk.lock();
+    monitor_thread_is_active = false;
+    monitor_thread_finish_cv.notify_all();
+    lk.unlock();
+
 }
 
 
