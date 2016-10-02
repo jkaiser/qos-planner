@@ -4,48 +4,53 @@
 
 #include "Server.h"
 
-#include <zhelpers.hpp>
 #include <unordered_set>
 
 
-Server::Server(const std::string &root_path,
-               std::shared_ptr<common::Planner> planner) : root_path(root_path), planner(planner) {
+#include <spdlog/spdlog.h>
+
+Server::Server(const std::string &ip_port, const std::string &root_path,
+               std::shared_ptr<common::Planner> planner) : ip_port_(ip_port), root_path(root_path), planner(planner) {
 }
 
 
 bool Server::Init() {
+    spdlog::get("console")->info("Init server");
 
     if (!root_path.empty()) {
         return false;   // classes with permanent data structures are not yet implemented
     }
-    return true;
-}
-
-bool Server::TearDown() {
-
-    // TODO: stop internal thread for accepting requests first
-    return planner->TearDown();
-}
-
-void Server::Serve(const std::string ip_port) {
 
     srandom ((unsigned) time (NULL));
 
+    initZMQ();
 
+    return true;
+}
+
+void Server::initZMQ() {
     zmq::context_t context(1);
-    zmq::socket_t server(context, ZMQ_REP);
-    server.bind(ip_port);
+    server.reset(new zmq::socket_t(context, ZMQ_REP));
+    server->bind(ip_port_);
+}
+
+bool Server::TearDown() {
+    // TODO: stop internal thread for accepting requests first
+    return true;
+}
+
+void Server::Serve() {
+
+    spdlog::get("console")->info("start serving");
 
     while (1) {
-        std::string request = s_recv (server);
+        std::string request = s_recv(*server);
 
         std::cout << "I: normal request (" << request << ")" << std::endl;
 
         rpc::Message msg;
         if (!msg.ParseFromString(request)) {    // is it a valid parseable msg?
-            msg.set_type(rpc::Message::REPLY);
-            msg.mutable_reply()->set_rc(1);
-            s_send (server, msg.SerializeAsString());
+            ProcessUnparsableMsg(msg);
             continue;
         }
 
@@ -79,6 +84,12 @@ void Server::Serve(const std::string ip_port) {
             msg.mutable_reply()->set_rc(1);
         }
 
-        s_send (server, msg.SerializeAsString());
+        s_send (*server, msg.SerializeAsString());
     }
+}
+
+void Server::ProcessUnparsableMsg(rpc::Message &msg) const {
+    msg.set_type(rpc::Message::REPLY);
+    msg.mutable_reply()->set_rc(1);
+    s_send (*server, msg.SerializeAsString());
 }
