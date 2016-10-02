@@ -14,7 +14,7 @@ Planner::Planner(std::string &root_path, std::string &ost_limits_file) : root_pa
     lustre.reset(new LocalLustre());
     cluster.reset(new MemoryClusterState(lustre));
     schedule.reset(new MemoryScheduleState());
-    jobMonitor.reset(new JobMonitor());
+    jobMonitor.reset(new JobMonitor(schedule, lustre, 10));
     scheduler.reset(new JobSchedulerStaticWorkloads(schedule, jobMonitor, lustre, ost_limits_file));
 }
 
