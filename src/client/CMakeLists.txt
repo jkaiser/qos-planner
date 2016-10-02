@@ -5,6 +5,9 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
 find_library(ZMQ_LIB zmq)
 
+find_package(Protobuf REQUIRED)
+include_directories(${PROTOBUF_INCLUDE_DIRS})
+
 include_directories(../common/communication)
 
 set(SOURCE_FILES main.cpp ../common/communication/zhelpers.hpp ../common/communication/zmq.hpp Client.cpp Client.h)
