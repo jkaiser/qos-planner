@@ -66,14 +66,20 @@ private:
     void FillWithExistingJobs();
     bool isThereAReadyJob() const;
 
+    void RemoveJobFromPrioQueue(const Job &job);
+    void BlockJob(const Job &job);
+    void UnblockJob(const Job &job);
 public:
     JobMonitor();
     JobMonitor(std::shared_ptr<ScheduleState> st, std::shared_ptr<Lustre> lustre);
+
     /**
      * waiting_time_sec: The time the internal threads sleeps before checking for an exit flag (set by a Teardown call)
      */
     JobMonitor(std::shared_ptr<ScheduleState> st, std::shared_ptr<Lustre> lustre, uint32_t waiting_time_sec);
+
     virtual bool Init();
+
     virtual bool TearDown();
 
     virtual bool RegisterJob(const Job &job);
