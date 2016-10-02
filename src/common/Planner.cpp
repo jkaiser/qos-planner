@@ -11,12 +11,11 @@ namespace common {
 
 
 Planner::Planner(std::string root_path) : root_path(root_path) {
-
-    lustre = std::shared_ptr<LocalLustre>(new LocalLustre());
-    cluster = std::shared_ptr<MemoryClusterState>(new MemoryClusterState(lustre));
-    schedule = std::shared_ptr<MemoryScheduleState>(new MemoryScheduleState());
-    jobMonitor = std::shared_ptr<JobMonitor>(new JobMonitor());
-    scheduler = std::shared_ptr<JobSchedulerStaticWorkloads>(new JobSchedulerStaticWorkloads(schedule, jobMonitor, lustre));
+    lustre.reset(new LocalLustre());
+    cluster.reset(new MemoryClusterState(lustre));
+    schedule.reset(new MemoryScheduleState());
+    jobMonitor.reset(new JobMonitor());
+    scheduler.reset(new JobSchedulerStaticWorkloads(schedule, jobMonitor, lustre));
 }
 
 bool Planner::Init() {
@@ -46,7 +45,6 @@ bool Planner::Init() {
 
 bool Planner::TearDown() {
     bool ret = true;
-
 
     ret &= jobMonitor->TearDown();
     jobMonitor.reset();
