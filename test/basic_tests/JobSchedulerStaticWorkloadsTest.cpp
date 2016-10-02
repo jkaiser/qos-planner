@@ -85,15 +85,20 @@ TEST_F(JobSchedStaticWL, ScheduleJobOnEmptyClusterWithEnoughResShouldPass) {
     std::vector<std::string> osts_touched_by_job = CreateSingleOstList();
     job->setOsts(osts_touched_by_job);
 
+    auto job2 = CreateJob("job2", 1, 1);
+    job2->setOsts(osts_touched_by_job);
+
     std::map<std::string, uint32_t> ost_resources;
     ost_resources[osts_touched_by_job[0]] = 100;
     scheduler->UpdateLimits(ost_resources);
 
-    EXPECT_CALL(*mock_scheduler_state, AddJob(_, _, _)).WillOnce(testing::Return(true));
-    EXPECT_CALL(*mock_job_monitor, RegisterJob(_)).WillOnce(testing::Return(true));
+    EXPECT_CALL(*mock_scheduler_state, AddJob(_, _, _)).WillRepeatedly(testing::Return(true));
+    EXPECT_CALL(*mock_job_monitor, RegisterJob(_)).WillRepeatedly(testing::Return(true));
 
     EXPECT_TRUE(scheduler->ScheduleJob(*job));
+    EXPECT_TRUE(scheduler->ScheduleJob(*job2));
     delete job;
+    delete job2;
 }
 
 TEST_F(JobSchedStaticWL, ScheduleJobClusterWithonEdgeResShouldPass) {

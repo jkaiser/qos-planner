@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include <gflags/gflags.h>
+#include <glog/logging.h>
 
 #include "../common/rpc/proto/message.pb.h"
 
@@ -38,12 +39,16 @@ DEFINE_string(port, "5555", "Port to use.");
 DEFINE_string(ost_limits, "", "Config file defining the max MB/s per ost.");
 
 int main(int argc, char* argv[]) {
+    google::InitGoogleLogging(argv[0]);
     gflags::ParseCommandLineFlags(&argc, &argv, true);
+
     string ip_port = FLAGS_ip + ":" + FLAGS_port;
 
     cout << "Hello, World!" << endl;
+    LOG(ERROR) << "Hello World from the logger";
 
-    std::shared_ptr<common::Planner> planner(new common::Planner("", ost_limits));
+    std::string root_path = "";
+    std::shared_ptr<common::Planner> planner(new common::Planner(root_path, FLAGS_ost_limits));
     if (!planner->Init()) {
         return -1;
     }
