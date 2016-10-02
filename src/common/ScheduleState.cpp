@@ -7,18 +7,18 @@
 namespace common {
 
 bool MemoryScheduleState::Init() {
-    std::unique_lock<std::mutex> lck(schedule_mut);
+    std::lock_guard<std::mutex> lck(schedule_mut);
     return true;
 }
 
 bool MemoryScheduleState::TearDown() {
-    std::unique_lock<std::mutex> lck(schedule_mut);
+    std::lock_guard<std::mutex> lck(schedule_mut);
     return true;
 }
 
 const std::map<std::string, std::list<Job*>> *MemoryScheduleState::GetClusterState() {
 
-    std::unique_lock<std::mutex> lck(schedule_mut);
+    std::lock_guard<std::mutex> lck(schedule_mut);
     auto new_sched = new std::map<std::string, std::list<Job*>>();
 
     for (auto &&it : schedule) {
@@ -29,7 +29,7 @@ const std::map<std::string, std::list<Job*>> *MemoryScheduleState::GetClusterSta
 }
 
 const std::list<Job *> *MemoryScheduleState::GetOSTState(const std::string &ost) {
-    std::unique_lock<std::mutex> lck(schedule_mut);
+    std::lock_guard<std::mutex> lck(schedule_mut);
     std::map<std::string, std::list<Job*>>::const_iterator it = schedule.find(ost);
     if (it == schedule.end()) {
         return nullptr;
@@ -38,7 +38,7 @@ const std::list<Job *> *MemoryScheduleState::GetOSTState(const std::string &ost)
 }
 
 void MemoryScheduleState::Reset() {
-    std::unique_lock<std::mutex> lck(schedule_mut);
+    std::lock_guard<std::mutex> lck(schedule_mut);
 
     for (auto &&job : jobs) {
         delete job.second;
@@ -48,7 +48,7 @@ void MemoryScheduleState::Reset() {
 }
 
 bool MemoryScheduleState::AddJob(const std::string &jobid, const Job &job, const std::vector<std::string> &osts) {
-    std::unique_lock<std::mutex> lck(schedule_mut);
+    std::lock_guard<std::mutex> lck(schedule_mut);
 
     if (jobs.find(jobid) != jobs.end()) {
         return false;
@@ -78,7 +78,7 @@ bool MemoryScheduleState::AddJob(const std::string &jobid, const Job &job, const
 
 
 bool MemoryScheduleState::RemoveJob(const std::string &jobid) {
-    std::unique_lock<std::mutex> lck(schedule_mut);
+    std::lock_guard<std::mutex> lck(schedule_mut);
 
     if (jobs.find(jobid) == jobs.end()) {
         return false;
@@ -104,7 +104,7 @@ bool MemoryScheduleState::RemoveJob(const std::string &jobid) {
 }
 
 bool MemoryScheduleState::UpdateJob(std::string jobid, Job::JobState new_state) {
-    std::unique_lock<std::mutex> lck(schedule_mut);
+    std::lock_guard<std::mutex> lck(schedule_mut);
 
     auto it = jobs.find(jobid);
     if (it == jobs.end()) {
@@ -116,7 +116,7 @@ bool MemoryScheduleState::UpdateJob(std::string jobid, Job::JobState new_state) 
 }
 
 std::map<std::string, Job *> *MemoryScheduleState::GetAllJobs() {
-    std::unique_lock<std::mutex> lck(schedule_mut);
+    std::lock_guard<std::mutex> lck(schedule_mut);
 
     auto new_map = new std::map<std::string, Job*>();
 
@@ -128,7 +128,7 @@ std::map<std::string, Job *> *MemoryScheduleState::GetAllJobs() {
 }
 
 bool MemoryScheduleState::GetJobThroughput(std::string jobid, uint32_t *throughput) {
-    std::unique_lock<std::mutex> lck(schedule_mut);
+    std::lock_guard<std::mutex> lck(schedule_mut);
     auto it = jobs.find(jobid);
     if (it == jobs.end()) {
         return false;
@@ -139,7 +139,7 @@ bool MemoryScheduleState::GetJobThroughput(std::string jobid, uint32_t *throughp
 }
 
 bool MemoryScheduleState::GetJobStatus(const std::string jobid, Job::JobState *state) {
-    std::unique_lock<std::mutex> lck(schedule_mut);
+    std::lock_guard<std::mutex> lck(schedule_mut);
     auto it = jobs.find(jobid);
     if (it == jobs.end()) {
         return false;
@@ -150,7 +150,7 @@ bool MemoryScheduleState::GetJobStatus(const std::string jobid, Job::JobState *s
 }
 
 bool MemoryScheduleState::GetJobEnd(const std::string jobid, std::chrono::system_clock::time_point *tend) {
-    std::unique_lock<std::mutex> lck(schedule_mut);
+    std::lock_guard<std::mutex> lck(schedule_mut);
     auto it = jobs.find(jobid);
     if (it == jobs.end()) {
         return false;
