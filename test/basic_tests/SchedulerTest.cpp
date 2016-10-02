@@ -74,7 +74,7 @@ TEST_F(SchedulerTest, InitShouldSucceed) {
 TEST_F(SchedulerTest, TeardownShouldSucceed) {
     common::JobSchedulerDynWorkloads scheduler(mocked_sstate, mocked_jobmon, mocked_cstate, mocked_ll);
     scheduler.Init();
-    EXPECT_TRUE(scheduler.TearDown());
+    EXPECT_TRUE(scheduler.Teardown());
 }
 
 TEST_F(SchedulerTest, ScheduleOnNonExistingClusterShouldFail) {

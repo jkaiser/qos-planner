@@ -51,8 +51,8 @@ public:
      */
     JobSchedulerDynWorkloads(std::shared_ptr<ScheduleState> &schedule, std::shared_ptr<JobMonitor> job_monitor,
               std::shared_ptr<ClusterState> cluster_state, std::shared_ptr<Lustre> lustre);
-    bool Init();
-    bool TearDown();
+    virtual bool Init() override;
+    virtual bool Teardown() override;
 
     virtual bool ScheduleJob(Job &job) override;
     virtual bool RemoveJob(const std::string &jobid) override;

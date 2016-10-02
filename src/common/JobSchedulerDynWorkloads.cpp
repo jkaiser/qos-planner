@@ -103,7 +103,7 @@ bool JobSchedulerDynWorkloads::Init() {
     return true;
 }
 
-bool JobSchedulerDynWorkloads::TearDown() {
+bool JobSchedulerDynWorkloads::Teardown() {
     return true; // noop
 }
 

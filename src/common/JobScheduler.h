@@ -31,6 +31,9 @@ public:
      * false:   else
      */
     virtual bool RemoveJob(const std::string &jobid) = 0;
+
+    virtual bool Init() = 0;
+    virtual bool Teardown() = 0;
 };
 }
 

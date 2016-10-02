@@ -3,20 +3,22 @@
 //
 
 #include "JobSchedulerStaticWorkloads.h"
+#include "OSTLimitConfigParser.h"
+
+#include <fstream>
 
 namespace common {
 
 JobSchedulerStaticWorkloads::JobSchedulerStaticWorkloads(std::shared_ptr<ScheduleState> &schedule,
                                                    std::shared_ptr<JobMonitor> job_monitor,
-                                                   std::shared_ptr<Lustre> lustre)
-        : schedule(schedule), job_monitor(job_monitor), lustre(lustre) {}
+                                                   std::shared_ptr<Lustre> lustre,
+                                                   std::string &ost_limits_file)
+        : schedule(schedule), job_monitor(job_monitor), lustre(lustre), ost_limits_file(ost_limits_file) {}
 
 bool JobSchedulerStaticWorkloads::ScheduleJob(common::Job &job) {
     std::lock_guard<std::mutex> lck(scheduler_mut);
 
     for (auto ost : job.getOsts()) {
-        // get the resource utilization for the timeframe of the job
-
         uint32_t max_ost_mb_sec;
         if (!GetMaxLoadInTimeInterval(ost, job.GetStartTime(), job.GetEndTime(), &max_ost_mb_sec)) {
             return false;   // invalid OST? TODO: report an error here
@@ -40,7 +42,7 @@ bool JobSchedulerStaticWorkloads::ScheduleJob(common::Job &job) {
 }
 
 bool JobSchedulerStaticWorkloads::AreEnoughResAvail(const Job &job, const std::string &ost, uint32_t max_ost_mb_sec) {
-    std::map<std::string, uint32_t>::iterator it = osts_max_mbs_limits_.find(ost);
+    std::map<std::string, float>::iterator it = osts_max_mbs_limits_.find(ost);
     if (it == osts_max_mbs_limits_.end()) {
         return false; // no information about that ost
     }
@@ -86,6 +88,28 @@ bool JobSchedulerStaticWorkloads::JobDoesNotExist(const std::string &jobid, Job:
 void JobSchedulerStaticWorkloads::UpdateLimits(const std::map<std::string, uint32_t> &new_limits) {
     osts_max_mbs_limits_.clear();
     osts_max_mbs_limits_.insert(new_limits.begin(), new_limits.end());
+}
+
+bool JobSchedulerStaticWorkloads::Init() {
+
+    if (!ost_limits_file.empty()) {
+        std::ifstream is(ost_limits_file, std::ifstream::in);
+        if (!is.is_open()) {
+            return false;
+        }
+
+        OSTLimitConfigParser p;
+        if (!p.Parse(is)) {
+            return false;
+        }
+
+        osts_max_mbs_limits_ = p.GetLimits();
+    }
+    return true;
+}
+
+bool JobSchedulerStaticWorkloads::Teardown() {
+    return true;
 }
 
 }

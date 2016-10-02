@@ -17,6 +17,7 @@ class JobSchedStaticWL : public ::testing::Test {
 
 protected:
 
+    std::string ost_limits_cfg_file;
     common::MockScheduleState *mock_scheduler_state;
     common::MockJobMonitor *mock_job_monitor;
     common::MockLustre *mock_lustre;
@@ -37,7 +38,7 @@ protected:
         mocked_ll.reset(mock_lustre);
         mocked_jobmon.reset(mock_job_monitor);
 
-        scheduler.reset(new common::JobSchedulerStaticWorkloads(mocked_sstate, mocked_jobmon, mocked_ll));
+        scheduler.reset(new common::JobSchedulerStaticWorkloads(mocked_sstate, mocked_jobmon, mocked_ll, ost_limits_cfg_file));
         scheduler->UpdateLimits(limits);
     }
 

@@ -35,6 +35,7 @@ void executeServer(const string ipPort) {
 
 DEFINE_string(ip, "*", "IP to listen to.");
 DEFINE_string(port, "5555", "Port to use.");
+DEFINE_string(ost_limits, "", "Config file defining the max MB/s per ost.");
 
 int main(int argc, char* argv[]) {
     gflags::ParseCommandLineFlags(&argc, &argv, true);
@@ -42,7 +43,7 @@ int main(int argc, char* argv[]) {
 
     cout << "Hello, World!" << endl;
 
-    std::shared_ptr<common::Planner> planner(new common::Planner(""));
+    std::shared_ptr<common::Planner> planner(new common::Planner("", ost_limits));
     if (!planner->Init()) {
         return -1;
     }

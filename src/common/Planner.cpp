@@ -10,12 +10,12 @@
 namespace common {
 
 
-Planner::Planner(std::string root_path) : root_path(root_path) {
+Planner::Planner(std::string &root_path, std::string &ost_limits_file) : root_path(root_path), ost_limits_file(ost_limits_file) {
     lustre.reset(new LocalLustre());
     cluster.reset(new MemoryClusterState(lustre));
     schedule.reset(new MemoryScheduleState());
     jobMonitor.reset(new JobMonitor());
-    scheduler.reset(new JobSchedulerStaticWorkloads(schedule, jobMonitor, lustre));
+    scheduler.reset(new JobSchedulerStaticWorkloads(schedule, jobMonitor, lustre, ost_limits_file));
 }
 
 bool Planner::Init() {

@@ -20,9 +20,10 @@ namespace common {
 class JobSchedulerStaticWorkloads : public JobScheduler {
 
 private:
+    std::string ost_limits_file;
     std::mutex scheduler_mut;
 
-    std::map<std::string, uint32_t> osts_max_mbs_limits_;
+    std::map<std::string, float> osts_max_mbs_limits_;
 
     std::shared_ptr<ScheduleState> schedule;
     std::shared_ptr<JobMonitor> job_monitor;
@@ -35,9 +36,14 @@ private:
                                   uint32_t *maxLoadMBSec);
 
     bool AreEnoughResAvail(const Job &job, const std::string &ost, uint32_t max_ost_mb_sec);
+
 public:
 
-    JobSchedulerStaticWorkloads(std::shared_ptr<ScheduleState> &schedule, std::shared_ptr<JobMonitor> job_monitor, std::shared_ptr<Lustre> lustre);
+    JobSchedulerStaticWorkloads(std::shared_ptr<ScheduleState> &schedule, std::shared_ptr<JobMonitor> job_monitor,
+                                std::shared_ptr<Lustre> lustre, std::string &ost_limits_file);
+
+    virtual bool Init() override;
+    virtual bool Teardown() override;
     virtual bool ScheduleJob(Job &job) override;
 
     virtual bool RemoveJob(const std::string &jobid) override;
