@@ -7,6 +7,9 @@
 #include <unordered_set>
 #include <regex>
 
+#include <spdlog/spdlog.h>
+
+
 namespace common {
 
 
@@ -19,17 +22,19 @@ Planner::Planner(std::string &root_path, std::string &ost_limits_file) : root_pa
 
 bool Planner::Init() {
 
-    //TODO: Add error logging
     if (!lustre->Init()) {
+        spdlog::get("console")->critical("Initializing lustre connector failed");
         return false;
     }
 
     if (!schedule->Init()) {
+        spdlog::get("console")->critical("Initializing schedule failed");
         return false;
     }
 
     if (!jobMonitor->Init()) {
         schedule->TearDown();
+        spdlog::get("console")->critical("Initializing job monitor failed");
         return false;
     }
 
