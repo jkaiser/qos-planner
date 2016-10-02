@@ -13,6 +13,7 @@
 #include <mutex>
 
 #include <thread>
+#include <condition_variable>
 
 #include "Lustre.h"
 
