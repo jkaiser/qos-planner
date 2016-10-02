@@ -12,7 +12,6 @@ namespace common {
 
 Planner::Planner(std::string &root_path, std::string &ost_limits_file) : root_path(root_path), ost_limits_file(ost_limits_file) {
     lustre.reset(new LocalLustre());
-    cluster.reset(new MemoryClusterState(lustre));
     schedule.reset(new MemoryScheduleState());
     jobMonitor.reset(new JobMonitor(schedule, lustre, 10));
     scheduler.reset(new JobSchedulerStaticWorkloads(schedule, jobMonitor, lustre, ost_limits_file));
@@ -29,13 +28,7 @@ bool Planner::Init() {
         return false;
     }
 
-    if (!cluster->Init()) {
-        schedule->TearDown();
-        return false;
-    }
-
     if (!jobMonitor->Init()) {
-        cluster->TearDown();
         schedule->TearDown();
         return false;
     }
@@ -48,9 +41,6 @@ bool Planner::TearDown() {
 
     ret &= jobMonitor->TearDown();
     jobMonitor.reset();
-
-    ret &= cluster->TearDown();
-    cluster.reset();
 
     ret &= schedule->TearDown();
     schedule.reset();

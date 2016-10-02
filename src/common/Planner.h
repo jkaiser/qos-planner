@@ -41,7 +41,6 @@ private:
     const std::string root_path;
     const std::string ost_limits_file;
     std::shared_ptr<Lustre> lustre;
-    std::shared_ptr<ClusterState> cluster;
     std::shared_ptr<JobScheduler> scheduler;
     std::shared_ptr<ScheduleState> schedule;
     std::shared_ptr<JobMonitor> jobMonitor;
