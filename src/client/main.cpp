@@ -22,7 +22,7 @@ void setupLogging(bool verbose) {
 
 DEFINE_string(ip, "localhost", "IP to connect to.");
 DEFINE_string(port, "5555", "Port to use.");
-DEFINE_bool(v, true, "verbose");
+DEFINE_bool(v, false, "verbose");
 
 
 // ./client <ID> <TP> <Tstart> <Tend>
