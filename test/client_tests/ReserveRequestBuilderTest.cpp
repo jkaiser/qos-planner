@@ -17,18 +17,18 @@ protected:
 };
 
 TEST_F(ReserveRequestBuilderTest, ParseInvalidConsoleInputMustFail) {
-    ASSERT_FALSE(rb.Parse("", 10, "30", request));
-    ASSERT_FALSE(rb.Parse("/foo/bar", 0, "30", request));
     ASSERT_FALSE(rb.Parse("/foo/bar", 10, "", request));
 }
 
 TEST_F(ReserveRequestBuilderTest, ParseValidConsoleInputMustSucceed) {
+    ASSERT_TRUE(rb.Parse("", 10, "30", request));
+    ASSERT_TRUE(rb.Parse("/foo/bar", 0, "30", request));
     ASSERT_TRUE(rb.Parse("/foo/bar", 10, "30", request));
     ASSERT_TRUE(rb.Parse("/foo/bar,/foo/bar2", 10, "30", request));
 }
 
 
-TEST_F(ReserveRequestBuilderTest, CorrenctlyParseCOnsoleInput) {
+TEST_F(ReserveRequestBuilderTest, CorrectlyParseConsoleInput) {
 
     rb.Parse("/foo/bar", 10, "30", request);
     ASSERT_EQ(rpc::Request::Type::Request_Type_RESERVE, request.type());

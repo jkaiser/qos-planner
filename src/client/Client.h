@@ -35,16 +35,18 @@ private:
     void InitializeZMQSocket();
 
     void ProcessReply(std::string &reply);
+
+    bool trySendRequestAndReceiveReply(const std::shared_ptr<rpc::Request> &request, std::string &reply);
+
+    bool IsInputValid(const std::string &filenames, const std::string &tStart) const;
+
 public:
 
     Client(std::string ipPort);
 
     bool Init();
-
     bool requestResources(const std::string &filenames, int throughput, const std::string &Tstart);
     bool requestResources(std::string request);
-
-    bool trySendRequestAndReceiveReply(const std::shared_ptr<rpc::Request> &request, std::string &reply);
 };
 
 

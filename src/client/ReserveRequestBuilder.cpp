@@ -11,7 +11,7 @@ bool
 ReserveRequestBuilder::Parse(const std::string &filenames, int throughput, const std::string &time_end,
                              rpc::Request &request) const {
 
-    if (filenames.empty() || (throughput == 0) || time_end.empty()) {
+    if (time_end.empty()) {
         return false;
     }
 
@@ -41,11 +41,13 @@ ReserveRequestBuilder::tryParseIntVals(const std::string &time_end,
 }
 
 void ReserveRequestBuilder::addFilenames(const std::string &filenames, rpc::Request &request) const {
-    if (filenames.find(',') == -1) {
+    if (filenames.empty()) {
+        request.mutable_resourcerequest();
+    } else if (filenames.find(',') == -1) {
         request.mutable_resourcerequest()->add_files(filenames);
     } else {
-        std::__1::stringstream ss(filenames);
-        std::__1::string fname;
+        std::stringstream ss(filenames);
+        std::string fname;
         while (getline(ss, fname, ',')) {
             request.mutable_resourcerequest()->add_files(fname);
         }

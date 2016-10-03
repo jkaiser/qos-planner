@@ -32,6 +32,10 @@ void Client::InitializeZMQSocket() {
 
 bool Client::requestResources(const std::string &filenames, int throughput, const std::string &tStart) {
 
+    if(!IsInputValid(filenames, tStart)) {
+        return false;
+    }
+
     std::shared_ptr<rpc::Request> request(new rpc::Request);
     ReserveRequestBuilder rrb;
     if (!rrb.Parse(filenames, throughput, tStart, *request)) {
@@ -50,8 +54,18 @@ bool Client::requestResources(const std::string &filenames, int throughput, cons
     return true;
 }
 
-bool
-Client::trySendRequestAndReceiveReply(const std::shared_ptr<rpc::Request> &request, std::string &reply) {
+bool Client::IsInputValid(const std::string &filenames, const std::string &tStart) const {
+    if (filenames.empty()) {
+        spdlog::get("console")->error("at least one file must be given");
+        return false;
+    } else if (tStart.empty()) {
+        spdlog::get("console")->error("a start date must be given");
+        return false;
+    }
+    return true;
+}
+
+bool Client::trySendRequestAndReceiveReply(const std::shared_ptr<rpc::Request> &request, std::string &reply) {
     std::string raw_msg = request->SerializeAsString();
     if (!sendAndReceiveRequest(raw_msg, reply)) {
         spdlog::get("console")->error("getting the request the server failed");
