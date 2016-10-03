@@ -4,6 +4,14 @@ project(client)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
 find_library(ZMQ_LIB zmq)
+if(NOT ZMQ_LIB)
+    message(FATAL_ERROR "zmq library not found")
+endif()
+
+find_library(GFLAGS_LIB gflags)
+if(NOT GFLAGS_LIB)
+    message(FATAL_ERROR "gflags library not found")
+endif()
 
 find_package(Protobuf REQUIRED)
 include_directories(${PROTOBUF_INCLUDE_DIRS})

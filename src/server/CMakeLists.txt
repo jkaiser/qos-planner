@@ -19,12 +19,6 @@ if(NOT GFLAGS_LIB)
     message(FATAL_ERROR "gflags library not found")
 endif()
 
-
-find_library(G3LOG_LIB g3logger)
-if(NOT G3LOG_LIB)
-    message(FATAL_ERROR "g3log library not found")
-endif()
-
 include_directories(../common)
 include_directories(../common/communication)
 
