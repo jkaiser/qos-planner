@@ -35,7 +35,7 @@ private:
 
     bool trySendRequestAndReceiveReply(std::shared_ptr<rpc::Message> &request, std::string &reply);
 
-    bool IsInputValid(const std::string &filenames, const std::string &tStart) const;
+    bool IsInputValid(const std::string &filenames, const std::string &tEnd) const;
 
     bool TryBuildMessage(const std::string &filenames, int throughput, const std::string &tEnd,
                          std::shared_ptr<rpc::Message> &msg) const;

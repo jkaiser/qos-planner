@@ -84,12 +84,12 @@ bool Client::TryBuildMessage(const std::string &filenames, int throughput, const
     return true;
 }
 
-bool Client::IsInputValid(const std::string &filenames, const std::string &tStart) const {
+bool Client::IsInputValid(const std::string &filenames, const std::string &tEnd) const {
     if (filenames.empty()) {
         spdlog::get("console")->error("at least one file must be given");
         return false;
-    } else if (tStart.empty()) {
-        spdlog::get("console")->error("a start date must be given");
+    } else if (tEnd.empty()) {
+        spdlog::get("console")->error("an end date must be given");
         return false;
     }
     return true;
