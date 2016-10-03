@@ -16,9 +16,6 @@
 #include "../common/rpc/proto/message.pb.h"
 
 
-static zmq::socket_t * s_client_socket(const std::string ipPort, zmq::context_t & context);
-static bool sendAndReceive(const std::string ipPort, const std::string &rawMsg, std::string &reply);
-
 class Client {
 
 private:
@@ -36,16 +33,19 @@ private:
 
     void ProcessReply(std::string &reply);
 
-    bool trySendRequestAndReceiveReply(const std::shared_ptr<rpc::Request> &request, std::string &reply);
+    bool trySendRequestAndReceiveReply(std::shared_ptr<rpc::Message> &request, std::string &reply);
 
     bool IsInputValid(const std::string &filenames, const std::string &tStart) const;
+
+    bool TryBuildMessage(const std::string &filenames, int throughput, const std::string &tEnd,
+                         std::shared_ptr<rpc::Message> &msg) const;
 
 public:
 
     Client(std::string ipPort);
-
     bool Init();
-    bool requestResources(const std::string &filenames, int throughput, const std::string &Tstart);
+    bool requestResources(const std::string &filenames, int throughput, const std::string &tEnd);
+
     bool requestResources(std::string request);
 };
 

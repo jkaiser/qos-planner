@@ -30,27 +30,57 @@ void Client::InitializeZMQSocket() {
 
 }
 
-bool Client::requestResources(const std::string &filenames, int throughput, const std::string &tStart) {
+bool Client::requestResources(std::string request) {
 
-    if(!IsInputValid(filenames, tStart)) {
-        return false;
-    }
-
-    std::shared_ptr<rpc::Request> request(new rpc::Request);
-    ReserveRequestBuilder rrb;
-    if (!rrb.Parse(filenames, throughput, tStart, *request)) {
-        spdlog::get("console")->error("couldn't parse parameters: {}", request->DebugString());
-        return false;
-    }
-
-    spdlog::get("console")->debug("will send: {}", request->DebugString());
+    rpc::Message msg = buildMessage();
+    spdlog::get("console")->debug("will send: {}", msg.DebugString());
 
     std::string reply;
-    if (!trySendRequestAndReceiveReply(request, reply)){
+    std::string raw_msg = msg.SerializeAsString();
+    if (!sendAndReceiveRequest(raw_msg, reply)) {
+        spdlog::get("console")->error("getting the request the server failed");
         return false;
     }
 
     ProcessReply(reply);
+    return true;
+}
+
+bool Client::requestResources(const std::string &filenames, int throughput, const std::string &tEnd) {
+
+    if(!IsInputValid(filenames, tEnd)) {
+        return false;
+    }
+
+    std::shared_ptr<rpc::Message> msg (new rpc::Message());
+    if (!TryBuildMessage(filenames, throughput, tEnd, msg)) {
+        return false;
+    };
+
+
+    spdlog::get("console")->debug("will send: {}", msg->DebugString());
+
+    std::string reply;
+    if (!trySendRequestAndReceiveReply(msg, reply)){
+        return false;
+    }
+
+    ProcessReply(reply);
+    return true;
+}
+
+bool Client::TryBuildMessage(const std::string &filenames, int throughput, const std::string &tEnd,
+                             std::shared_ptr<rpc::Message> &msg) const {
+    msg->set_type(rpc::Message::REQUEST);
+
+    std::shared_ptr<rpc::Request> request(new rpc::Request);
+    ReserveRequestBuilder rrb;
+    if (!rrb.Parse(filenames, throughput, tEnd, *request)) {
+        spdlog::get("console")->error("couldn't parse parameters: {}", request->DebugString());
+        return false;
+    }
+
+    msg->mutable_request()->CopyFrom(*request);
     return true;
 }
 
@@ -65,28 +95,12 @@ bool Client::IsInputValid(const std::string &filenames, const std::string &tStar
     return true;
 }
 
-bool Client::trySendRequestAndReceiveReply(const std::shared_ptr<rpc::Request> &request, std::string &reply) {
+bool Client::trySendRequestAndReceiveReply(std::shared_ptr<rpc::Message> &request, std::string &reply) {
     std::string raw_msg = request->SerializeAsString();
     if (!sendAndReceiveRequest(raw_msg, reply)) {
         spdlog::get("console")->error("getting the request the server failed");
         return false;
     }
-    return true;
-}
-
-bool Client::requestResources(std::string request) {
-
-    rpc::Message msg = buildMessage();
-    spdlog::get("console")->debug("will send: {}", msg.DebugString());
-
-    std::string reply;
-    std::string raw_msg = msg.SerializeAsString();
-    if (!sendAndReceiveRequest(raw_msg, reply)) {
-        spdlog::get("console")->error("getting the request the server failed");
-        return false;
-    }
-
-    ProcessReply(reply);
     return true;
 }
 
