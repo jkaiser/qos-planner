@@ -35,3 +35,4 @@ endif()
 # etc. as appropriate
 
 add_subdirectory(basic_tests)
+add_subdirectory(client_tests)
