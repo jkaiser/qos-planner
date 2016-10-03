@@ -105,7 +105,7 @@ void protobuf_AssignDesc_message_2eproto() {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Request_ResourceRequest, id_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Request_ResourceRequest, throughputmb_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Request_ResourceRequest, tstart_),
-    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Request_ResourceRequest, tstop_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Request_ResourceRequest, durationsec_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Request_ResourceRequest, files_),
   };
   Request_ResourceRequest_reflection_ =
@@ -271,26 +271,26 @@ void protobuf_AddDesc_message_2eproto_impl() {
 
   protobuf_InitDefaults_message_2eproto();
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
-    "\n\rmessage.proto\022\003rpc\"\302\003\n\007Request\022\037\n\004type"
+    "\n\rmessage.proto\022\003rpc\"\310\003\n\007Request\022\037\n\004type"
     "\030\001 \001(\0162\021.rpc.Request.Type\0227\n\017resourceReq"
     "uest\030\002 \001(\0132\034.rpc.Request.ResourceRequest"
     "H\000\0223\n\rdeleteRequest\030\003 \001(\0132\032.rpc.Request."
     "DeleteRequestH\000\0227\n\017listJobsRequest\030\004 \001(\013"
     "2\034.rpc.Request.ListJobsRequestH\000\032(\n\rDele"
-    "teRequest\022\n\n\002ID\030\001 \003(\t\022\013\n\003all\030\002 \001(\010\032a\n\017Re"
+    "teRequest\022\n\n\002ID\030\001 \003(\t\022\013\n\003all\030\002 \001(\010\032g\n\017Re"
     "sourceRequest\022\n\n\002ID\030\001 \001(\t\022\024\n\014throughputM"
-    "B\030\002 \001(\005\022\016\n\006tstart\030\003 \001(\003\022\r\n\005tstop\030\004 \001(\003\022\r"
-    "\n\005files\030\005 \003(\t\032 \n\017ListJobsRequest\022\r\n\005rege"
-    "x\030\001 \001(\t\":\n\004Type\022\013\n\007INVALID\020\000\022\013\n\007RESERVE\020"
-    "\001\022\n\n\006DELETE\020\002\022\014\n\010LISTJOBS\020\003B\004\n\002rt\"_\n\005Err"
-    "or\022#\n\005error\030\001 \001(\0162\024.rpc.Error.errorType\022"
-    "\013\n\003msg\030\002 \001(\t\"$\n\terrorType\022\t\n\005EARGS\020\000\022\014\n\010"
-    "EUNKNOWN\020\001\"B\n\005Reply\022\n\n\002rc\030\001 \001(\005\022\031\n\005error"
-    "\030\002 \001(\0132\n.rpc.Error\022\022\n\nreturn_msg\030\003 \001(\t\"\216"
-    "\001\n\007Message\022\037\n\004type\030\001 \001(\0162\021.rpc.Message.T"
-    "ype\022\037\n\007request\030\002 \001(\0132\014.rpc.RequestH\000\022\033\n\005"
-    "reply\030\003 \001(\0132\n.rpc.ReplyH\000\"\036\n\004Type\022\013\n\007REQ"
-    "UEST\020\000\022\t\n\005REPLY\020\001B\004\n\002rqb\006proto3", 791);
+    "B\030\002 \001(\005\022\016\n\006tstart\030\003 \001(\003\022\023\n\013durationSec\030\004"
+    " \001(\003\022\r\n\005files\030\005 \003(\t\032 \n\017ListJobsRequest\022\r"
+    "\n\005regex\030\001 \001(\t\":\n\004Type\022\013\n\007INVALID\020\000\022\013\n\007RE"
+    "SERVE\020\001\022\n\n\006DELETE\020\002\022\014\n\010LISTJOBS\020\003B\004\n\002rt\""
+    "_\n\005Error\022#\n\005error\030\001 \001(\0162\024.rpc.Error.erro"
+    "rType\022\013\n\003msg\030\002 \001(\t\"$\n\terrorType\022\t\n\005EARGS"
+    "\020\000\022\014\n\010EUNKNOWN\020\001\"B\n\005Reply\022\n\n\002rc\030\001 \001(\005\022\031\n"
+    "\005error\030\002 \001(\0132\n.rpc.Error\022\022\n\nreturn_msg\030\003"
+    " \001(\t\"\216\001\n\007Message\022\037\n\004type\030\001 \001(\0162\021.rpc.Mes"
+    "sage.Type\022\037\n\007request\030\002 \001(\0132\014.rpc.Request"
+    "H\000\022\033\n\005reply\030\003 \001(\0132\n.rpc.ReplyH\000\"\036\n\004Type\022"
+    "\013\n\007REQUEST\020\000\022\t\n\005REPLY\020\001B\004\n\002rqb\006proto3", 797);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "message.proto", &protobuf_RegisterTypes);
   ::google::protobuf::internal::OnShutdown(&protobuf_ShutdownFile_message_2eproto);
@@ -622,7 +622,7 @@ void Request_DeleteRequest::InternalSwap(Request_DeleteRequest* other) {
 const int Request_ResourceRequest::kIDFieldNumber;
 const int Request_ResourceRequest::kThroughputMBFieldNumber;
 const int Request_ResourceRequest::kTstartFieldNumber;
-const int Request_ResourceRequest::kTstopFieldNumber;
+const int Request_ResourceRequest::kDurationSecFieldNumber;
 const int Request_ResourceRequest::kFilesFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
@@ -764,18 +764,18 @@ bool Request_ResourceRequest::MergePartialFromCodedStream(
         } else {
           goto handle_unusual;
         }
-        if (input->ExpectTag(32)) goto parse_tstop;
+        if (input->ExpectTag(32)) goto parse_durationSec;
         break;
       }
 
-      // optional int64 tstop = 4;
+      // optional int64 durationSec = 4;
       case 4: {
         if (tag == 32) {
-         parse_tstop:
+         parse_durationSec:
 
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    ::google::protobuf::int64, ::google::protobuf::internal::WireFormatLite::TYPE_INT64>(
-                 input, &tstop_)));
+                 input, &durationsec_)));
         } else {
           goto handle_unusual;
         }
@@ -846,9 +846,9 @@ void Request_ResourceRequest::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteInt64(3, this->tstart(), output);
   }
 
-  // optional int64 tstop = 4;
-  if (this->tstop() != 0) {
-    ::google::protobuf::internal::WireFormatLite::WriteInt64(4, this->tstop(), output);
+  // optional int64 durationSec = 4;
+  if (this->durationsec() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt64(4, this->durationsec(), output);
   }
 
   // repeated string files = 5;
@@ -889,9 +889,9 @@ void Request_ResourceRequest::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormatLite::WriteInt64ToArray(3, this->tstart(), target);
   }
 
-  // optional int64 tstop = 4;
-  if (this->tstop() != 0) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteInt64ToArray(4, this->tstop(), target);
+  // optional int64 durationSec = 4;
+  if (this->durationsec() != 0) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt64ToArray(4, this->durationsec(), target);
   }
 
   // repeated string files = 5;
@@ -933,11 +933,11 @@ size_t Request_ResourceRequest::ByteSizeLong() const {
         this->tstart());
   }
 
-  // optional int64 tstop = 4;
-  if (this->tstop() != 0) {
+  // optional int64 durationSec = 4;
+  if (this->durationsec() != 0) {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::Int64Size(
-        this->tstop());
+        this->durationsec());
   }
 
   // repeated string files = 5;
@@ -992,8 +992,8 @@ void Request_ResourceRequest::UnsafeMergeFrom(const Request_ResourceRequest& fro
   if (from.tstart() != 0) {
     set_tstart(from.tstart());
   }
-  if (from.tstop() != 0) {
-    set_tstop(from.tstop());
+  if (from.durationsec() != 0) {
+    set_durationsec(from.durationsec());
   }
 }
 
@@ -1024,7 +1024,7 @@ void Request_ResourceRequest::InternalSwap(Request_ResourceRequest* other) {
   id_.Swap(&other->id_);
   std::swap(throughputmb_, other->throughputmb_);
   std::swap(tstart_, other->tstart_);
-  std::swap(tstop_, other->tstop_);
+  std::swap(durationsec_, other->durationsec_);
   files_.UnsafeArenaSwap(&other->files_);
   _internal_metadata_.Swap(&other->_internal_metadata_);
   std::swap(_cached_size_, other->_cached_size_);
@@ -1812,18 +1812,18 @@ void Request_ResourceRequest::set_tstart(::google::protobuf::int64 value) {
   // @@protoc_insertion_point(field_set:rpc.Request.ResourceRequest.tstart)
 }
 
-// optional int64 tstop = 4;
-void Request_ResourceRequest::clear_tstop() {
-  tstop_ = GOOGLE_LONGLONG(0);
+// optional int64 durationSec = 4;
+void Request_ResourceRequest::clear_durationsec() {
+  durationsec_ = GOOGLE_LONGLONG(0);
 }
-::google::protobuf::int64 Request_ResourceRequest::tstop() const {
-  // @@protoc_insertion_point(field_get:rpc.Request.ResourceRequest.tstop)
-  return tstop_;
+::google::protobuf::int64 Request_ResourceRequest::durationsec() const {
+  // @@protoc_insertion_point(field_get:rpc.Request.ResourceRequest.durationSec)
+  return durationsec_;
 }
-void Request_ResourceRequest::set_tstop(::google::protobuf::int64 value) {
+void Request_ResourceRequest::set_durationsec(::google::protobuf::int64 value) {
   
-  tstop_ = value;
-  // @@protoc_insertion_point(field_set:rpc.Request.ResourceRequest.tstop)
+  durationsec_ = value;
+  // @@protoc_insertion_point(field_set:rpc.Request.ResourceRequest.durationSec)
 }
 
 // repeated string files = 5;

@@ -8,35 +8,18 @@
 #include <spdlog/spdlog.h>
 
 bool
-ReserveRequestBuilder::Parse(const std::string &filenames, int throughput, const std::string &time_end,
+ReserveRequestBuilder::Parse(const std::string &filenames, int throughput, int duration_sec,
                              rpc::Request &request) const {
 
-    if (time_end.empty()) {
-        return false;
-    }
-
-    int tend = 0;
-    if (!tryParseIntVals(time_end, tend)) {
+    if (duration_sec <= 0) {
         return false;
     }
 
     request.set_type(rpc::Request::Type::Request_Type_RESERVE);
     request.mutable_resourcerequest()->set_throughputmb(throughput);
-    request.mutable_resourcerequest()->set_tstop(tend);
+    request.mutable_resourcerequest()->set_durationsec(duration_sec);
 
     addFilenames(filenames, request);
-    return true;
-}
-
-bool
-ReserveRequestBuilder::tryParseIntVals(const std::string &time_end,
-                                       int &tend) const {
-    try {
-        tend = stoi(time_end);
-    } catch (...) {
-        spdlog::get("console")->debug("invalid values given");
-        return false;
-    }
     return true;
 }
 

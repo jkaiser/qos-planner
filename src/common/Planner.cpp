@@ -60,7 +60,7 @@ bool Planner::ServeJobSubmission(const rpc::Request_ResourceRequest &request) {
     }
 
     auto tstart = std::chrono::system_clock::now();
-    auto tend = std::chrono::system_clock::from_time_t(request.tstop());
+    auto tend = tstart + std::chrono::seconds(request.durationsec());;
 
     int min_read_throughput = 0;
     std::unordered_set<std::string> osts_set;

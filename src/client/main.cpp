@@ -24,10 +24,11 @@ DEFINE_string(ip, "localhost", "IP to connect to.");
 DEFINE_string(port, "5555", "Port to use.");
 DEFINE_string(filenames, "", "comma seperated list of files");
 DEFINE_int32(throughput, 0, "requested throughput in MB/s");
-DEFINE_string(Tstart, "0", "start time of the reservation");
+DEFINE_int32(duration, "0", "duration of the reservation in seconds");
 DEFINE_bool(v, false, "verbose");
 
 
+// ./client -filenames /foo/bar,/foo/bar2 -throughput 10 -Tend 10
 // ./client <ID> <TP> <Tstart> <Tend>
 int main(int argc, char *argv[]) {
     gflags::ParseCommandLineFlags(&argc, &argv, true);
@@ -40,7 +41,7 @@ int main(int argc, char *argv[]) {
         spdlog::get("console")->critical("initialization failed");
     }
 
-    c.requestResources(FLAGS_filenames, FLAGS_throughput, FLAGS_Tstart);
+    c.requestResources(FLAGS_filenames, FLAGS_throughput, FLAGS_duration);
 
     return 0;
 }

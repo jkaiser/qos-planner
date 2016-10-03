@@ -35,16 +35,16 @@ private:
 
     bool trySendRequestAndReceiveReply(std::shared_ptr<rpc::Message> &request, std::string &reply);
 
-    bool IsInputValid(const std::string &filenames, const std::string &tEnd) const;
+    bool IsInputValid(const std::string &filenames, int duration) const;
 
-    bool TryBuildMessage(const std::string &filenames, int throughput, const std::string &tEnd,
+    bool TryBuildMessage(const std::string &filenames, int throughput, int duration,
                          std::shared_ptr<rpc::Message> &msg) const;
 
 public:
 
     Client(std::string ipPort);
     bool Init();
-    bool requestResources(const std::string &filenames, int throughput, const std::string &tEnd);
+    bool requestResources(const std::string &filenames, int throughput, int duration_sec);
 
     bool requestResources(std::string request);
 };

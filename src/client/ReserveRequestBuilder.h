@@ -11,11 +11,9 @@
 class ReserveRequestBuilder {
 
 public:
-    bool Parse(const std::string &filenames, int throughput, const std::string &time_end, rpc::Request &request) const;
+    bool Parse(const std::string &filenames, int throughput, int duration, rpc::Request &request) const;
 
     void addFilenames(const std::string &filenames, rpc::Request &request) const;
-
-    bool tryParseIntVals(const std::string &time_end, int &tend) const;
 };
 
 

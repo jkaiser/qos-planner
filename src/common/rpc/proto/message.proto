@@ -11,7 +11,7 @@ message Request {
         string ID = 1;
         int32 throughputMB = 2;
         int64 tstart = 3;
-        int64 tstop = 4;
+        int64 durationSec = 4;
         repeated string files = 5;
     }
 

@@ -302,11 +302,11 @@ class Request_ResourceRequest : public ::google::protobuf::Message /* @@protoc_i
   ::google::protobuf::int64 tstart() const;
   void set_tstart(::google::protobuf::int64 value);
 
-  // optional int64 tstop = 4;
-  void clear_tstop();
-  static const int kTstopFieldNumber = 4;
-  ::google::protobuf::int64 tstop() const;
-  void set_tstop(::google::protobuf::int64 value);
+  // optional int64 durationSec = 4;
+  void clear_durationsec();
+  static const int kDurationSecFieldNumber = 4;
+  ::google::protobuf::int64 durationsec() const;
+  void set_durationsec(::google::protobuf::int64 value);
 
   // repeated string files = 5;
   int files_size() const;
@@ -331,7 +331,7 @@ class Request_ResourceRequest : public ::google::protobuf::Message /* @@protoc_i
   ::google::protobuf::RepeatedPtrField< ::std::string> files_;
   ::google::protobuf::internal::ArenaStringPtr id_;
   ::google::protobuf::int64 tstart_;
-  ::google::protobuf::int64 tstop_;
+  ::google::protobuf::int64 durationsec_;
   ::google::protobuf::int32 throughputmb_;
   mutable int _cached_size_;
   friend void  protobuf_InitDefaults_message_2eproto_impl();
@@ -1142,18 +1142,18 @@ inline void Request_ResourceRequest::set_tstart(::google::protobuf::int64 value)
   // @@protoc_insertion_point(field_set:rpc.Request.ResourceRequest.tstart)
 }
 
-// optional int64 tstop = 4;
-inline void Request_ResourceRequest::clear_tstop() {
-  tstop_ = GOOGLE_LONGLONG(0);
+// optional int64 durationSec = 4;
+inline void Request_ResourceRequest::clear_durationsec() {
+  durationsec_ = GOOGLE_LONGLONG(0);
 }
-inline ::google::protobuf::int64 Request_ResourceRequest::tstop() const {
-  // @@protoc_insertion_point(field_get:rpc.Request.ResourceRequest.tstop)
-  return tstop_;
+inline ::google::protobuf::int64 Request_ResourceRequest::durationsec() const {
+  // @@protoc_insertion_point(field_get:rpc.Request.ResourceRequest.durationSec)
+  return durationsec_;
 }
-inline void Request_ResourceRequest::set_tstop(::google::protobuf::int64 value) {
+inline void Request_ResourceRequest::set_durationsec(::google::protobuf::int64 value) {
   
-  tstop_ = value;
-  // @@protoc_insertion_point(field_set:rpc.Request.ResourceRequest.tstop)
+  durationsec_ = value;
+  // @@protoc_insertion_point(field_set:rpc.Request.ResourceRequest.durationSec)
 }
 
 // repeated string files = 5;

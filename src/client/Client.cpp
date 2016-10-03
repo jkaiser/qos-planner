@@ -46,14 +46,14 @@ bool Client::requestResources(std::string request) {
     return true;
 }
 
-bool Client::requestResources(const std::string &filenames, int throughput, const std::string &tEnd) {
+bool Client::requestResources(const std::string &filenames, int throughput, int duration_sec) {
 
-    if(!IsInputValid(filenames, tEnd)) {
+    if(!IsInputValid(filenames, duration_sec)) {
         return false;
     }
 
     std::shared_ptr<rpc::Message> msg (new rpc::Message());
-    if (!TryBuildMessage(filenames, throughput, tEnd, msg)) {
+    if (!TryBuildMessage(filenames, throughput, duration_sec, msg)) {
         return false;
     };
 
@@ -69,13 +69,13 @@ bool Client::requestResources(const std::string &filenames, int throughput, cons
     return true;
 }
 
-bool Client::TryBuildMessage(const std::string &filenames, int throughput, const std::string &tEnd,
+bool Client::TryBuildMessage(const std::string &filenames, int throughput, int duration,
                              std::shared_ptr<rpc::Message> &msg) const {
     msg->set_type(rpc::Message::REQUEST);
 
     std::shared_ptr<rpc::Request> request(new rpc::Request);
     ReserveRequestBuilder rrb;
-    if (!rrb.Parse(filenames, throughput, tEnd, *request)) {
+    if (!rrb.Parse(filenames, throughput, duration, *request)) {
         spdlog::get("console")->error("couldn't parse parameters: {}", request->DebugString());
         return false;
     }
@@ -84,11 +84,11 @@ bool Client::TryBuildMessage(const std::string &filenames, int throughput, const
     return true;
 }
 
-bool Client::IsInputValid(const std::string &filenames, const std::string &tEnd) const {
+bool Client::IsInputValid(const std::string &filenames, int duration) const {
     if (filenames.empty()) {
         spdlog::get("console")->error("at least one file must be given");
         return false;
-    } else if (tEnd.empty()) {
+    } else if (duration <= 0) {
         spdlog::get("console")->error("an end date must be given");
         return false;
     }
@@ -113,7 +113,7 @@ rpc::Message Client::buildMessage() const {
 
     req->mutable_resourcerequest()->set_throughputmb(100);
     req->mutable_resourcerequest()->set_tstart(0);
-    req->mutable_resourcerequest()->set_tstop(42);
+    req->mutable_resourcerequest()->set_durationsec(42);
 
     req->mutable_resourcerequest()->add_files("foo");
     return msg;
