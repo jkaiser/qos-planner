@@ -23,7 +23,7 @@ void setupLogging(bool verbose) {
 DEFINE_string(ip, "localhost", "IP to connect to.");
 DEFINE_string(port, "5555", "Port to use.");
 DEFINE_string(filenames, "", "comma seperated list of files");
-DEFINE_int32(throughput, "", "requested throughput in MB/s");
+DEFINE_int32(throughput, 0, "requested throughput in MB/s");
 DEFINE_string(Tstart, "0", "start time of the reservation");
 DEFINE_bool(v, false, "verbose");
 
