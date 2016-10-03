@@ -17,22 +17,31 @@
 
 
 static zmq::socket_t * s_client_socket(const std::string ipPort, zmq::context_t & context);
-static bool sendAndReceive(const std::string ipPort, const std::string &rawMsg, std::string reply);
+static bool sendAndReceive(const std::string ipPort, const std::string &rawMsg, std::string &reply);
 
 class Client {
 
 private:
     std::string ipPort;
+    std::shared_ptr<zmq::socket_t> client;
+    zmq::context_t *context;
+    const int request_timeout = 1000;
+    const int request_retries = 3;
 
+    rpc::Message buildMessage() const;
+
+    bool sendAndReceiveRequest(std::string &raw_msg, std::string &reply);
+
+    void InitializeZMQSocket();
+
+    void ProcessReply(std::string &reply);
 public:
+
     Client(std::string ipPort);
 
-    bool Init() {
-        return true;
-    }
+    bool Init();
 
     bool requestResources(std::string request);
-
 };
 
 
