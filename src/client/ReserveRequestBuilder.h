@@ -9,11 +9,12 @@
 #include <rpc/proto/message.pb.h>
 
 class ReserveRequestBuilder {
+private:
+    void addFilenames(const std::string &filenames, rpc::Request &request) const;
 
 public:
-    bool Parse(const std::string &filenames, int throughput, int duration, rpc::Request &request) const;
-
-    void addFilenames(const std::string &filenames, rpc::Request &request) const;
+    bool BuildRequest(const std::string &id, const std::string &filenames, int throughput, int duration,
+                      rpc::Request &request) const;
 };
 
 

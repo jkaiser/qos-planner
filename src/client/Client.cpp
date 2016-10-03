@@ -48,12 +48,12 @@ bool Client::requestResources(std::string request) {
 
 bool Client::requestResources(const std::string &filenames, int throughput, int duration_sec) {
 
-    if(!IsInputValid(filenames, duration_sec)) {
+    if(!IsInputValid(id, filenames, duration_sec)) {
         return false;
     }
 
     std::shared_ptr<rpc::Message> msg (new rpc::Message());
-    if (!TryBuildMessage(filenames, throughput, duration_sec, msg)) {
+    if (!TryBuildMessage(id, filenames, throughput, duration_sec, msg)) {
         return false;
     };
 
@@ -69,13 +69,13 @@ bool Client::requestResources(const std::string &filenames, int throughput, int 
     return true;
 }
 
-bool Client::TryBuildMessage(const std::string &filenames, int throughput, int duration,
+bool Client::TryBuildMessage(const std::string &id, const std::string &filenames, int throughput, int duration,
                              std::shared_ptr<rpc::Message> &msg) const {
     msg->set_type(rpc::Message::REQUEST);
 
     std::shared_ptr<rpc::Request> request(new rpc::Request);
     ReserveRequestBuilder rrb;
-    if (!rrb.Parse(filenames, throughput, duration, *request)) {
+    if (!rrb.BuildRequest(id, filenames, throughput, duration, *request)) {
         spdlog::get("console")->error("couldn't parse parameters: {}", request->DebugString());
         return false;
     }
@@ -84,8 +84,11 @@ bool Client::TryBuildMessage(const std::string &filenames, int throughput, int d
     return true;
 }
 
-bool Client::IsInputValid(const std::string &filenames, int duration) const {
+bool Client::IsInputValid(const std::string &id, const std::string &filenames, int duration) const {
     if (filenames.empty()) {
+        spdlog::get("console")->error("no id given");
+        return false;
+    } else if (filenames.empty()) {
         spdlog::get("console")->error("at least one file must be given");
         return false;
     } else if (duration <= 0) {
@@ -157,5 +160,9 @@ void Client::ProcessReply(std::string &reply) {
         spdlog::get("console")->error("got invalid answer");
     else
         spdlog::get("console")->debug("got answer: {}", msg.DebugString());
+}
+
+bool Client::removeReservation(const std::string &reservation_id) {
+    return false;
 }
 

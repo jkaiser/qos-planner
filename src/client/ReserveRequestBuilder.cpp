@@ -8,14 +8,16 @@
 #include <spdlog/spdlog.h>
 
 bool
-ReserveRequestBuilder::Parse(const std::string &filenames, int throughput, int duration_sec,
-                             rpc::Request &request) const {
+ReserveRequestBuilder::BuildRequest(const std::string &id, const std::string &filenames, int throughput,
+                                    int duration_sec,
+                                    rpc::Request &request) const {
 
     if (duration_sec <= 0) {
         return false;
     }
 
     request.set_type(rpc::Request::Type::Request_Type_RESERVE);
+    request.mutable_resourcerequest()->set_id(id);
     request.mutable_resourcerequest()->set_throughputmb(throughput);
     request.mutable_resourcerequest()->set_durationsec(duration_sec);
 
