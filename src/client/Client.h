@@ -25,8 +25,6 @@ private:
     const int request_timeout = 1000;
     const int request_retries = 3;
 
-    rpc::Message buildMessage() const;
-
     bool sendAndReceiveRequest(std::string &raw_msg, std::string &reply);
 
     void InitializeZMQSocket();
@@ -45,8 +43,6 @@ public:
     Client(std::string ipPort);
     bool Init();
     bool requestResources(const std::string &id, const std::string &filenames, int throughput, int duration_sec);
-    bool requestResources(std::string request);
-
     bool removeReservation(const std::string &reservation_id);
 };
 

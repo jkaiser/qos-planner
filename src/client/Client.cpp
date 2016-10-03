@@ -31,22 +31,6 @@ void Client::InitializeZMQSocket() {
 
 }
 
-bool Client::requestResources(std::string request) {
-
-    rpc::Message msg = buildMessage();
-    spdlog::get("console")->debug("will send: {}", msg.DebugString());
-
-    std::string reply;
-    std::string raw_msg = msg.SerializeAsString();
-    if (!sendAndReceiveRequest(raw_msg, reply)) {
-        spdlog::get("console")->error("getting the request the server failed");
-        return false;
-    }
-
-    ProcessReply(reply);
-    return true;
-}
-
 bool Client::requestResources(const std::string &id, const std::string &filenames, int throughput, int duration_sec) {
 
     if(!IsInputValid(id, filenames, duration_sec)) {
@@ -105,21 +89,6 @@ bool Client::trySendRequestAndReceiveReply(std::shared_ptr<rpc::Message> &reques
         return false;
     }
     return true;
-}
-
-rpc::Message Client::buildMessage() const {
-
-    rpc::Message msg;
-    msg.set_type(rpc::Message::REQUEST);
-    auto req = msg.mutable_request();
-    req->set_type(rpc::Request_Type_RESERVE);
-
-    req->mutable_resourcerequest()->set_throughputmb(100);
-    req->mutable_resourcerequest()->set_tstart(0);
-    req->mutable_resourcerequest()->set_durationsec(42);
-
-    req->mutable_resourcerequest()->add_files("foo");
-    return msg;
 }
 
 bool Client::sendAndReceiveRequest(std::string &raw_msg, std::string &reply) {
