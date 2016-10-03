@@ -4,13 +4,15 @@
 
 #include "Client.h"
 
+#include <spdlog/spdlog.h>
+
 Client::Client(std::string ipPort) {
     this->ipPort = ipPort;
 }
 
 bool Client::Init() {
     context = new zmq::context_t(1);
-    std::cout << "I: connecting to server…" << std::endl;
+    spdlog::get("console")->debug("connecting to server...");
 
     InitializeZMQSocket();
     return true;
@@ -30,13 +32,12 @@ void Client::InitializeZMQSocket() {
 bool Client::requestResources(std::string request) {
 
     rpc::Message msg = buildMessage();
+    spdlog::get("console")->debug("will send: {}", msg.DebugString());
 
-    std::cout << "will send: " << msg.DebugString() << std::endl;
     std::string reply;
-
     std::string raw_msg = msg.SerializeAsString();
     if (!sendAndReceiveRequest(raw_msg, reply)) {
-        std::cout << "getting the request the server failed" << std::endl;
+        spdlog::get("console")->error("getting the request the server failed");
         return false;
     }
 
@@ -63,10 +64,7 @@ bool Client::sendAndReceiveRequest(std::string &raw_msg, std::string &reply) {
     int retries_left = request_retries;
 
     while (retries_left) {
-        std::cout << "I: sending msg..." << std::endl;
-
         s_send (*client, raw_msg);
-        std::cout << "I: sent msg" << std::endl;
 
         while (1) {
             //  Poll socket for a reply, with timeout
@@ -76,13 +74,12 @@ bool Client::sendAndReceiveRequest(std::string &raw_msg, std::string &reply) {
             //  If we got a reply, process it
             if (items[0].revents & ZMQ_POLLIN) {
                 reply = s_recv (*client);
-                std::cout << "I: server replied OK (" << reply << ")" << std::endl;
                 return true;
             } else if (--retries_left == 0) {
-                std::cout << "E: server seems to be offline, abandoning" << std::endl;
+                spdlog::get("console")->error("server seems to be offline, abandoning");
                 return false;
             } else {
-                std::cout << "W: no response from server, retrying..." << std::endl;
+                spdlog::get("console")->warn("no response from server, retrying...");
                 //  Old socket will be confused; close it and open a new one
                 InitializeZMQSocket();
                 s_send (*client, raw_msg.data());
@@ -96,9 +93,9 @@ bool Client::sendAndReceiveRequest(std::string &raw_msg, std::string &reply) {
 void Client::ProcessReply(std::string &reply) {
 
     rpc::Message msg;
-    msg.ParseFromString(reply);
-
-    std::cout << "got answer from server:" << std::endl;
-    std::cout << msg.DebugString() << std::endl;
+    if (!msg.ParseFromString(reply))
+        spdlog::get("console")->error("got invalid answer");
+    else
+        spdlog::get("console")->debug("got answer: {}", msg.DebugString());
 }
 
