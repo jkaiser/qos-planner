@@ -4,6 +4,7 @@
 
 #include "Client.h"
 #include "ReserveRequestBuilder.h"
+#include "RemoveReservationRequestBuilder.h"
 
 #include <spdlog/spdlog.h>
 
@@ -46,17 +47,16 @@ bool Client::requestResources(std::string request) {
     return true;
 }
 
-bool Client::requestResources(const std::string &filenames, int throughput, int duration_sec) {
+bool Client::requestResources(const std::string &id, const std::string &filenames, int throughput, int duration_sec) {
 
     if(!IsInputValid(id, filenames, duration_sec)) {
         return false;
     }
 
     std::shared_ptr<rpc::Message> msg (new rpc::Message());
-    if (!TryBuildMessage(id, filenames, throughput, duration_sec, msg)) {
+    if (!TryBuildReserveMessage(id, filenames, throughput, duration_sec, msg)) {
         return false;
     };
-
 
     spdlog::get("console")->debug("will send: {}", msg->DebugString());
 
@@ -69,8 +69,8 @@ bool Client::requestResources(const std::string &filenames, int throughput, int 
     return true;
 }
 
-bool Client::TryBuildMessage(const std::string &id, const std::string &filenames, int throughput, int duration,
-                             std::shared_ptr<rpc::Message> &msg) const {
+bool Client::TryBuildReserveMessage(const std::string &id, const std::string &filenames, int throughput, int duration,
+                                    std::shared_ptr<rpc::Message> &msg) const {
     msg->set_type(rpc::Message::REQUEST);
 
     std::shared_ptr<rpc::Request> request(new rpc::Request);
@@ -163,6 +163,27 @@ void Client::ProcessReply(std::string &reply) {
 }
 
 bool Client::removeReservation(const std::string &reservation_id) {
-    return false;
+    std::shared_ptr<rpc::Message> msg (new rpc::Message());
+
+    if (reservation_id.empty()) {
+        return false;
+    }
+
+    rpc::Request request;
+    RemoveReservationRequestBuilder rb;
+    if (!rb.BuildRequest(reservation_id, request)) {
+        return false;
+    }
+
+    msg->mutable_request()->CopyFrom(request);
+
+    spdlog::get("console")->debug("will send: {}", msg->DebugString());
+
+    std::string reply;
+    if (!trySendRequestAndReceiveReply(msg, reply)){
+        return false;
+    }
+
+    return true;
 }
 

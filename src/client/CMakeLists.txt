@@ -19,7 +19,7 @@ include_directories(${PROTOBUF_INCLUDE_DIRS})
 include_directories(../common/communication)
 include_directories(../common)
 
-set(SOURCE_FILES ../common/communication/zhelpers.hpp ../common/communication/zmq.hpp Client.cpp Client.h ReserveRequestBuilder.cpp ReserveRequestBuilder.h)
+set(SOURCE_FILES ../common/communication/zhelpers.hpp ../common/communication/zmq.hpp Client.cpp Client.h ReserveRequestBuilder.cpp ReserveRequestBuilder.h RemoveReservationRequestBuilder.cpp RemoveReservationRequestBuilder.h)
 
 add_library(client_lib ${SOURCE_FILES})
 target_link_libraries(client_lib ${ZMQ_LIB} gflags communication rpcMessages ${PROTOBUF_LIBRARY})

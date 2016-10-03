@@ -37,8 +37,8 @@ private:
 
     bool IsInputValid(const std::string &id, const std::string &filenames, int duration) const;
 
-    bool TryBuildMessage(const std::string &id, const std::string &filenames, int throughput, int duration,
-                         std::shared_ptr<rpc::Message> &msg) const;
+    bool TryBuildReserveMessage(const std::string &id, const std::string &filenames, int throughput, int duration,
+                                std::shared_ptr<rpc::Message> &msg) const;
 
 public:
 
