@@ -3,6 +3,7 @@
 //
 
 #include "Client.h"
+#include "ReserveRequestBuilder.h"
 
 #include <spdlog/spdlog.h>
 
@@ -29,6 +30,36 @@ void Client::InitializeZMQSocket() {
 
 }
 
+bool Client::requestResources(const std::string &filenames, int throughput, const std::string &tStart) {
+
+    std::shared_ptr<rpc::Request> request(new rpc::Request);
+    ReserveRequestBuilder rrb;
+    if (!rrb.Parse(filenames, throughput, tStart, *request)) {
+        spdlog::get("console")->error("couldn't parse parameters: {}", request->DebugString());
+        return false;
+    }
+
+    spdlog::get("console")->debug("will send: {}", request->DebugString());
+
+    std::string reply;
+    if (!trySendRequestAndReceiveReply(request, reply)){
+        return false;
+    }
+
+    ProcessReply(reply);
+    return true;
+}
+
+bool
+Client::trySendRequestAndReceiveReply(const std::shared_ptr<rpc::Request> &request, std::string &reply) {
+    std::string raw_msg = request->SerializeAsString();
+    if (!sendAndReceiveRequest(raw_msg, reply)) {
+        spdlog::get("console")->error("getting the request the server failed");
+        return false;
+    }
+    return true;
+}
+
 bool Client::requestResources(std::string request) {
 
     rpc::Message msg = buildMessage();
@@ -46,16 +77,17 @@ bool Client::requestResources(std::string request) {
 }
 
 rpc::Message Client::buildMessage() const {
+
     rpc::Message msg;
     msg.set_type(rpc::Message::REQUEST);
     auto req = msg.mutable_request();
     req->set_type(rpc::Request_Type_RESERVE);
 
-    auto res1 = req->mutable_resourcerequest()->add_requestedresources();
-    res1->set_file("foo");
-    res1->set_throughputmb(100);
-    res1->set_tstart(0);
-    res1->set_tstop(42);
+    req->mutable_resourcerequest()->set_throughputmb(100);
+    req->mutable_resourcerequest()->set_tstart(0);
+    req->mutable_resourcerequest()->set_tstop(42);
+
+    req->mutable_resourcerequest()->add_files("foo");
     return msg;
 }
 

@@ -45,17 +45,17 @@ class Request;
 class Request_DeleteRequest;
 class Request_ListJobsRequest;
 class Request_ResourceRequest;
-class Request_ResourceRequest_ResourceDefinition;
 
 enum Request_Type {
-  Request_Type_RESERVE = 0,
-  Request_Type_DELETE = 1,
-  Request_Type_LISTJOBS = 2,
+  Request_Type_INVALID = 0,
+  Request_Type_RESERVE = 1,
+  Request_Type_DELETE = 2,
+  Request_Type_LISTJOBS = 3,
   Request_Type_Request_Type_INT_MIN_SENTINEL_DO_NOT_USE_ = ::google::protobuf::kint32min,
   Request_Type_Request_Type_INT_MAX_SENTINEL_DO_NOT_USE_ = ::google::protobuf::kint32max
 };
 bool Request_Type_IsValid(int value);
-const Request_Type Request_Type_Type_MIN = Request_Type_RESERVE;
+const Request_Type Request_Type_Type_MIN = Request_Type_INVALID;
 const Request_Type Request_Type_Type_MAX = Request_Type_LISTJOBS;
 const int Request_Type_Type_ARRAYSIZE = Request_Type_Type_MAX + 1;
 
@@ -216,118 +216,6 @@ extern ::google::protobuf::internal::ExplicitlyConstructed<Request_DeleteRequest
 
 // -------------------------------------------------------------------
 
-class Request_ResourceRequest_ResourceDefinition : public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:rpc.Request.ResourceRequest.ResourceDefinition) */ {
- public:
-  Request_ResourceRequest_ResourceDefinition();
-  virtual ~Request_ResourceRequest_ResourceDefinition();
-
-  Request_ResourceRequest_ResourceDefinition(const Request_ResourceRequest_ResourceDefinition& from);
-
-  inline Request_ResourceRequest_ResourceDefinition& operator=(const Request_ResourceRequest_ResourceDefinition& from) {
-    CopyFrom(from);
-    return *this;
-  }
-
-  static const ::google::protobuf::Descriptor* descriptor();
-  static const Request_ResourceRequest_ResourceDefinition& default_instance();
-
-  static const Request_ResourceRequest_ResourceDefinition* internal_default_instance();
-
-  void Swap(Request_ResourceRequest_ResourceDefinition* other);
-
-  // implements Message ----------------------------------------------
-
-  inline Request_ResourceRequest_ResourceDefinition* New() const { return New(NULL); }
-
-  Request_ResourceRequest_ResourceDefinition* New(::google::protobuf::Arena* arena) const;
-  void CopyFrom(const ::google::protobuf::Message& from);
-  void MergeFrom(const ::google::protobuf::Message& from);
-  void CopyFrom(const Request_ResourceRequest_ResourceDefinition& from);
-  void MergeFrom(const Request_ResourceRequest_ResourceDefinition& from);
-  void Clear();
-  bool IsInitialized() const;
-
-  size_t ByteSizeLong() const;
-  bool MergePartialFromCodedStream(
-      ::google::protobuf::io::CodedInputStream* input);
-  void SerializeWithCachedSizes(
-      ::google::protobuf::io::CodedOutputStream* output) const;
-  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
-      bool deterministic, ::google::protobuf::uint8* output) const;
-  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const {
-    return InternalSerializeWithCachedSizesToArray(false, output);
-  }
-  int GetCachedSize() const { return _cached_size_; }
-  private:
-  void SharedCtor();
-  void SharedDtor();
-  void SetCachedSize(int size) const;
-  void InternalSwap(Request_ResourceRequest_ResourceDefinition* other);
-  void UnsafeMergeFrom(const Request_ResourceRequest_ResourceDefinition& from);
-  private:
-  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
-    return _internal_metadata_.arena();
-  }
-  inline void* MaybeArenaPtr() const {
-    return _internal_metadata_.raw_arena_ptr();
-  }
-  public:
-
-  ::google::protobuf::Metadata GetMetadata() const;
-
-  // nested types ----------------------------------------------------
-
-  // accessors -------------------------------------------------------
-
-  // optional string file = 1;
-  void clear_file();
-  static const int kFileFieldNumber = 1;
-  const ::std::string& file() const;
-  void set_file(const ::std::string& value);
-  void set_file(const char* value);
-  void set_file(const char* value, size_t size);
-  ::std::string* mutable_file();
-  ::std::string* release_file();
-  void set_allocated_file(::std::string* file);
-
-  // optional int32 throughputMB = 2;
-  void clear_throughputmb();
-  static const int kThroughputMBFieldNumber = 2;
-  ::google::protobuf::int32 throughputmb() const;
-  void set_throughputmb(::google::protobuf::int32 value);
-
-  // optional int64 tstart = 3;
-  void clear_tstart();
-  static const int kTstartFieldNumber = 3;
-  ::google::protobuf::int64 tstart() const;
-  void set_tstart(::google::protobuf::int64 value);
-
-  // optional int64 tstop = 4;
-  void clear_tstop();
-  static const int kTstopFieldNumber = 4;
-  ::google::protobuf::int64 tstop() const;
-  void set_tstop(::google::protobuf::int64 value);
-
-  // @@protoc_insertion_point(class_scope:rpc.Request.ResourceRequest.ResourceDefinition)
- private:
-
-  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  ::google::protobuf::internal::ArenaStringPtr file_;
-  ::google::protobuf::int64 tstart_;
-  ::google::protobuf::int64 tstop_;
-  ::google::protobuf::int32 throughputmb_;
-  mutable int _cached_size_;
-  friend void  protobuf_InitDefaults_message_2eproto_impl();
-  friend void  protobuf_AddDesc_message_2eproto_impl();
-  friend void protobuf_AssignDesc_message_2eproto();
-  friend void protobuf_ShutdownFile_message_2eproto();
-
-  void InitAsDefaultInstance();
-};
-extern ::google::protobuf::internal::ExplicitlyConstructed<Request_ResourceRequest_ResourceDefinition> Request_ResourceRequest_ResourceDefinition_default_instance_;
-
-// -------------------------------------------------------------------
-
 class Request_ResourceRequest : public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:rpc.Request.ResourceRequest) */ {
  public:
   Request_ResourceRequest();
@@ -389,8 +277,6 @@ class Request_ResourceRequest : public ::google::protobuf::Message /* @@protoc_i
 
   // nested types ----------------------------------------------------
 
-  typedef Request_ResourceRequest_ResourceDefinition ResourceDefinition;
-
   // accessors -------------------------------------------------------
 
   // optional string ID = 1;
@@ -404,24 +290,49 @@ class Request_ResourceRequest : public ::google::protobuf::Message /* @@protoc_i
   ::std::string* release_id();
   void set_allocated_id(::std::string* id);
 
-  // repeated .rpc.Request.ResourceRequest.ResourceDefinition requestedResources = 2;
-  int requestedresources_size() const;
-  void clear_requestedresources();
-  static const int kRequestedResourcesFieldNumber = 2;
-  const ::rpc::Request_ResourceRequest_ResourceDefinition& requestedresources(int index) const;
-  ::rpc::Request_ResourceRequest_ResourceDefinition* mutable_requestedresources(int index);
-  ::rpc::Request_ResourceRequest_ResourceDefinition* add_requestedresources();
-  ::google::protobuf::RepeatedPtrField< ::rpc::Request_ResourceRequest_ResourceDefinition >*
-      mutable_requestedresources();
-  const ::google::protobuf::RepeatedPtrField< ::rpc::Request_ResourceRequest_ResourceDefinition >&
-      requestedresources() const;
+  // optional int32 throughputMB = 2;
+  void clear_throughputmb();
+  static const int kThroughputMBFieldNumber = 2;
+  ::google::protobuf::int32 throughputmb() const;
+  void set_throughputmb(::google::protobuf::int32 value);
+
+  // optional int64 tstart = 3;
+  void clear_tstart();
+  static const int kTstartFieldNumber = 3;
+  ::google::protobuf::int64 tstart() const;
+  void set_tstart(::google::protobuf::int64 value);
+
+  // optional int64 tstop = 4;
+  void clear_tstop();
+  static const int kTstopFieldNumber = 4;
+  ::google::protobuf::int64 tstop() const;
+  void set_tstop(::google::protobuf::int64 value);
+
+  // repeated string files = 5;
+  int files_size() const;
+  void clear_files();
+  static const int kFilesFieldNumber = 5;
+  const ::std::string& files(int index) const;
+  ::std::string* mutable_files(int index);
+  void set_files(int index, const ::std::string& value);
+  void set_files(int index, const char* value);
+  void set_files(int index, const char* value, size_t size);
+  ::std::string* add_files();
+  void add_files(const ::std::string& value);
+  void add_files(const char* value);
+  void add_files(const char* value, size_t size);
+  const ::google::protobuf::RepeatedPtrField< ::std::string>& files() const;
+  ::google::protobuf::RepeatedPtrField< ::std::string>* mutable_files();
 
   // @@protoc_insertion_point(class_scope:rpc.Request.ResourceRequest)
  private:
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  ::google::protobuf::RepeatedPtrField< ::rpc::Request_ResourceRequest_ResourceDefinition > requestedresources_;
+  ::google::protobuf::RepeatedPtrField< ::std::string> files_;
   ::google::protobuf::internal::ArenaStringPtr id_;
+  ::google::protobuf::int64 tstart_;
+  ::google::protobuf::int64 tstop_;
+  ::google::protobuf::int32 throughputmb_;
   mutable int _cached_size_;
   friend void  protobuf_InitDefaults_message_2eproto_impl();
   friend void  protobuf_AddDesc_message_2eproto_impl();
@@ -598,6 +509,8 @@ class Request : public ::google::protobuf::Message /* @@protoc_insertion_point(c
   typedef Request_ListJobsRequest ListJobsRequest;
 
   typedef Request_Type Type;
+  static const Type INVALID =
+    Request_Type_INVALID;
   static const Type RESERVE =
     Request_Type_RESERVE;
   static const Type DELETE =
@@ -1155,99 +1068,6 @@ inline const Request_DeleteRequest* Request_DeleteRequest::internal_default_inst
 }
 // -------------------------------------------------------------------
 
-// Request_ResourceRequest_ResourceDefinition
-
-// optional string file = 1;
-inline void Request_ResourceRequest_ResourceDefinition::clear_file() {
-  file_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline const ::std::string& Request_ResourceRequest_ResourceDefinition::file() const {
-  // @@protoc_insertion_point(field_get:rpc.Request.ResourceRequest.ResourceDefinition.file)
-  return file_.GetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline void Request_ResourceRequest_ResourceDefinition::set_file(const ::std::string& value) {
-  
-  file_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:rpc.Request.ResourceRequest.ResourceDefinition.file)
-}
-inline void Request_ResourceRequest_ResourceDefinition::set_file(const char* value) {
-  
-  file_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:rpc.Request.ResourceRequest.ResourceDefinition.file)
-}
-inline void Request_ResourceRequest_ResourceDefinition::set_file(const char* value, size_t size) {
-  
-  file_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:rpc.Request.ResourceRequest.ResourceDefinition.file)
-}
-inline ::std::string* Request_ResourceRequest_ResourceDefinition::mutable_file() {
-  
-  // @@protoc_insertion_point(field_mutable:rpc.Request.ResourceRequest.ResourceDefinition.file)
-  return file_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline ::std::string* Request_ResourceRequest_ResourceDefinition::release_file() {
-  // @@protoc_insertion_point(field_release:rpc.Request.ResourceRequest.ResourceDefinition.file)
-  
-  return file_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline void Request_ResourceRequest_ResourceDefinition::set_allocated_file(::std::string* file) {
-  if (file != NULL) {
-    
-  } else {
-    
-  }
-  file_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), file);
-  // @@protoc_insertion_point(field_set_allocated:rpc.Request.ResourceRequest.ResourceDefinition.file)
-}
-
-// optional int32 throughputMB = 2;
-inline void Request_ResourceRequest_ResourceDefinition::clear_throughputmb() {
-  throughputmb_ = 0;
-}
-inline ::google::protobuf::int32 Request_ResourceRequest_ResourceDefinition::throughputmb() const {
-  // @@protoc_insertion_point(field_get:rpc.Request.ResourceRequest.ResourceDefinition.throughputMB)
-  return throughputmb_;
-}
-inline void Request_ResourceRequest_ResourceDefinition::set_throughputmb(::google::protobuf::int32 value) {
-  
-  throughputmb_ = value;
-  // @@protoc_insertion_point(field_set:rpc.Request.ResourceRequest.ResourceDefinition.throughputMB)
-}
-
-// optional int64 tstart = 3;
-inline void Request_ResourceRequest_ResourceDefinition::clear_tstart() {
-  tstart_ = GOOGLE_LONGLONG(0);
-}
-inline ::google::protobuf::int64 Request_ResourceRequest_ResourceDefinition::tstart() const {
-  // @@protoc_insertion_point(field_get:rpc.Request.ResourceRequest.ResourceDefinition.tstart)
-  return tstart_;
-}
-inline void Request_ResourceRequest_ResourceDefinition::set_tstart(::google::protobuf::int64 value) {
-  
-  tstart_ = value;
-  // @@protoc_insertion_point(field_set:rpc.Request.ResourceRequest.ResourceDefinition.tstart)
-}
-
-// optional int64 tstop = 4;
-inline void Request_ResourceRequest_ResourceDefinition::clear_tstop() {
-  tstop_ = GOOGLE_LONGLONG(0);
-}
-inline ::google::protobuf::int64 Request_ResourceRequest_ResourceDefinition::tstop() const {
-  // @@protoc_insertion_point(field_get:rpc.Request.ResourceRequest.ResourceDefinition.tstop)
-  return tstop_;
-}
-inline void Request_ResourceRequest_ResourceDefinition::set_tstop(::google::protobuf::int64 value) {
-  
-  tstop_ = value;
-  // @@protoc_insertion_point(field_set:rpc.Request.ResourceRequest.ResourceDefinition.tstop)
-}
-
-inline const Request_ResourceRequest_ResourceDefinition* Request_ResourceRequest_ResourceDefinition::internal_default_instance() {
-  return &Request_ResourceRequest_ResourceDefinition_default_instance_.get();
-}
-// -------------------------------------------------------------------
-
 // Request_ResourceRequest
 
 // optional string ID = 1;
@@ -1294,34 +1114,101 @@ inline void Request_ResourceRequest::set_allocated_id(::std::string* id) {
   // @@protoc_insertion_point(field_set_allocated:rpc.Request.ResourceRequest.ID)
 }
 
-// repeated .rpc.Request.ResourceRequest.ResourceDefinition requestedResources = 2;
-inline int Request_ResourceRequest::requestedresources_size() const {
-  return requestedresources_.size();
+// optional int32 throughputMB = 2;
+inline void Request_ResourceRequest::clear_throughputmb() {
+  throughputmb_ = 0;
 }
-inline void Request_ResourceRequest::clear_requestedresources() {
-  requestedresources_.Clear();
+inline ::google::protobuf::int32 Request_ResourceRequest::throughputmb() const {
+  // @@protoc_insertion_point(field_get:rpc.Request.ResourceRequest.throughputMB)
+  return throughputmb_;
 }
-inline const ::rpc::Request_ResourceRequest_ResourceDefinition& Request_ResourceRequest::requestedresources(int index) const {
-  // @@protoc_insertion_point(field_get:rpc.Request.ResourceRequest.requestedResources)
-  return requestedresources_.Get(index);
+inline void Request_ResourceRequest::set_throughputmb(::google::protobuf::int32 value) {
+  
+  throughputmb_ = value;
+  // @@protoc_insertion_point(field_set:rpc.Request.ResourceRequest.throughputMB)
 }
-inline ::rpc::Request_ResourceRequest_ResourceDefinition* Request_ResourceRequest::mutable_requestedresources(int index) {
-  // @@protoc_insertion_point(field_mutable:rpc.Request.ResourceRequest.requestedResources)
-  return requestedresources_.Mutable(index);
+
+// optional int64 tstart = 3;
+inline void Request_ResourceRequest::clear_tstart() {
+  tstart_ = GOOGLE_LONGLONG(0);
 }
-inline ::rpc::Request_ResourceRequest_ResourceDefinition* Request_ResourceRequest::add_requestedresources() {
-  // @@protoc_insertion_point(field_add:rpc.Request.ResourceRequest.requestedResources)
-  return requestedresources_.Add();
+inline ::google::protobuf::int64 Request_ResourceRequest::tstart() const {
+  // @@protoc_insertion_point(field_get:rpc.Request.ResourceRequest.tstart)
+  return tstart_;
 }
-inline ::google::protobuf::RepeatedPtrField< ::rpc::Request_ResourceRequest_ResourceDefinition >*
-Request_ResourceRequest::mutable_requestedresources() {
-  // @@protoc_insertion_point(field_mutable_list:rpc.Request.ResourceRequest.requestedResources)
-  return &requestedresources_;
+inline void Request_ResourceRequest::set_tstart(::google::protobuf::int64 value) {
+  
+  tstart_ = value;
+  // @@protoc_insertion_point(field_set:rpc.Request.ResourceRequest.tstart)
 }
-inline const ::google::protobuf::RepeatedPtrField< ::rpc::Request_ResourceRequest_ResourceDefinition >&
-Request_ResourceRequest::requestedresources() const {
-  // @@protoc_insertion_point(field_list:rpc.Request.ResourceRequest.requestedResources)
-  return requestedresources_;
+
+// optional int64 tstop = 4;
+inline void Request_ResourceRequest::clear_tstop() {
+  tstop_ = GOOGLE_LONGLONG(0);
+}
+inline ::google::protobuf::int64 Request_ResourceRequest::tstop() const {
+  // @@protoc_insertion_point(field_get:rpc.Request.ResourceRequest.tstop)
+  return tstop_;
+}
+inline void Request_ResourceRequest::set_tstop(::google::protobuf::int64 value) {
+  
+  tstop_ = value;
+  // @@protoc_insertion_point(field_set:rpc.Request.ResourceRequest.tstop)
+}
+
+// repeated string files = 5;
+inline int Request_ResourceRequest::files_size() const {
+  return files_.size();
+}
+inline void Request_ResourceRequest::clear_files() {
+  files_.Clear();
+}
+inline const ::std::string& Request_ResourceRequest::files(int index) const {
+  // @@protoc_insertion_point(field_get:rpc.Request.ResourceRequest.files)
+  return files_.Get(index);
+}
+inline ::std::string* Request_ResourceRequest::mutable_files(int index) {
+  // @@protoc_insertion_point(field_mutable:rpc.Request.ResourceRequest.files)
+  return files_.Mutable(index);
+}
+inline void Request_ResourceRequest::set_files(int index, const ::std::string& value) {
+  // @@protoc_insertion_point(field_set:rpc.Request.ResourceRequest.files)
+  files_.Mutable(index)->assign(value);
+}
+inline void Request_ResourceRequest::set_files(int index, const char* value) {
+  files_.Mutable(index)->assign(value);
+  // @@protoc_insertion_point(field_set_char:rpc.Request.ResourceRequest.files)
+}
+inline void Request_ResourceRequest::set_files(int index, const char* value, size_t size) {
+  files_.Mutable(index)->assign(
+    reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_set_pointer:rpc.Request.ResourceRequest.files)
+}
+inline ::std::string* Request_ResourceRequest::add_files() {
+  // @@protoc_insertion_point(field_add_mutable:rpc.Request.ResourceRequest.files)
+  return files_.Add();
+}
+inline void Request_ResourceRequest::add_files(const ::std::string& value) {
+  files_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add:rpc.Request.ResourceRequest.files)
+}
+inline void Request_ResourceRequest::add_files(const char* value) {
+  files_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add_char:rpc.Request.ResourceRequest.files)
+}
+inline void Request_ResourceRequest::add_files(const char* value, size_t size) {
+  files_.Add()->assign(reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_add_pointer:rpc.Request.ResourceRequest.files)
+}
+inline const ::google::protobuf::RepeatedPtrField< ::std::string>&
+Request_ResourceRequest::files() const {
+  // @@protoc_insertion_point(field_list:rpc.Request.ResourceRequest.files)
+  return files_;
+}
+inline ::google::protobuf::RepeatedPtrField< ::std::string>*
+Request_ResourceRequest::mutable_files() {
+  // @@protoc_insertion_point(field_mutable_list:rpc.Request.ResourceRequest.files)
+  return &files_;
 }
 
 inline const Request_ResourceRequest* Request_ResourceRequest::internal_default_instance() {
@@ -1848,8 +1735,6 @@ inline const Message* Message::internal_default_instance() {
   return &Message_default_instance_.get();
 }
 #endif  // !PROTOBUF_INLINE_NOT_IN_HEADERS
-// -------------------------------------------------------------------
-
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

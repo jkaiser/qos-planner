@@ -8,14 +8,11 @@ message Request {
         bool all = 2;   // signals to delete every single resource reservation.
     }
     message ResourceRequest {   // reserve resources for a given ID
-        message ResourceDefinition {
-            string file = 1;
-            int32 throughputMB = 2;
-            int64 tstart = 3;
-            int64 tstop = 4;
-        }
         string ID = 1;
-        repeated ResourceDefinition requestedResources = 2;
+        int32 throughputMB = 2;
+        int64 tstart = 3;
+        int64 tstop = 4;
+        repeated string files = 5;
     }
 
     message ListJobsRequest {     // get a list of all jobs
@@ -23,9 +20,10 @@ message Request {
     }
 
     enum Type {
-        RESERVE = 0;
-        DELETE = 1;
-        LISTJOBS = 2;
+        INVALID = 0;
+        RESERVE = 1;
+        DELETE = 2;
+        LISTJOBS = 3;
     }
 
     Type type = 1;

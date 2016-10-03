@@ -35,9 +35,6 @@ const ::google::protobuf::internal::GeneratedMessageReflection*
 const ::google::protobuf::Descriptor* Request_ResourceRequest_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
   Request_ResourceRequest_reflection_ = NULL;
-const ::google::protobuf::Descriptor* Request_ResourceRequest_ResourceDefinition_descriptor_ = NULL;
-const ::google::protobuf::internal::GeneratedMessageReflection*
-  Request_ResourceRequest_ResourceDefinition_reflection_ = NULL;
 const ::google::protobuf::Descriptor* Request_ListJobsRequest_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
   Request_ListJobsRequest_reflection_ = NULL;
@@ -104,9 +101,12 @@ void protobuf_AssignDesc_message_2eproto() {
       sizeof(Request_DeleteRequest),
       GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Request_DeleteRequest, _internal_metadata_));
   Request_ResourceRequest_descriptor_ = Request_descriptor_->nested_type(1);
-  static const int Request_ResourceRequest_offsets_[2] = {
+  static const int Request_ResourceRequest_offsets_[5] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Request_ResourceRequest, id_),
-    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Request_ResourceRequest, requestedresources_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Request_ResourceRequest, throughputmb_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Request_ResourceRequest, tstart_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Request_ResourceRequest, tstop_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Request_ResourceRequest, files_),
   };
   Request_ResourceRequest_reflection_ =
     ::google::protobuf::internal::GeneratedMessageReflection::NewGeneratedMessageReflection(
@@ -118,23 +118,6 @@ void protobuf_AssignDesc_message_2eproto() {
       -1,
       sizeof(Request_ResourceRequest),
       GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Request_ResourceRequest, _internal_metadata_));
-  Request_ResourceRequest_ResourceDefinition_descriptor_ = Request_ResourceRequest_descriptor_->nested_type(0);
-  static const int Request_ResourceRequest_ResourceDefinition_offsets_[4] = {
-    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Request_ResourceRequest_ResourceDefinition, file_),
-    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Request_ResourceRequest_ResourceDefinition, throughputmb_),
-    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Request_ResourceRequest_ResourceDefinition, tstart_),
-    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Request_ResourceRequest_ResourceDefinition, tstop_),
-  };
-  Request_ResourceRequest_ResourceDefinition_reflection_ =
-    ::google::protobuf::internal::GeneratedMessageReflection::NewGeneratedMessageReflection(
-      Request_ResourceRequest_ResourceDefinition_descriptor_,
-      Request_ResourceRequest_ResourceDefinition::internal_default_instance(),
-      Request_ResourceRequest_ResourceDefinition_offsets_,
-      -1,
-      -1,
-      -1,
-      sizeof(Request_ResourceRequest_ResourceDefinition),
-      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Request_ResourceRequest_ResourceDefinition, _internal_metadata_));
   Request_ListJobsRequest_descriptor_ = Request_descriptor_->nested_type(2);
   static const int Request_ListJobsRequest_offsets_[1] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Request_ListJobsRequest, regex_),
@@ -222,8 +205,6 @@ void protobuf_RegisterTypes(const ::std::string&) {
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
       Request_ResourceRequest_descriptor_, Request_ResourceRequest::internal_default_instance());
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
-      Request_ResourceRequest_ResourceDefinition_descriptor_, Request_ResourceRequest_ResourceDefinition::internal_default_instance());
-  ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
       Request_ListJobsRequest_descriptor_, Request_ListJobsRequest::internal_default_instance());
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
       Error_descriptor_, Error::internal_default_instance());
@@ -243,8 +224,6 @@ void protobuf_ShutdownFile_message_2eproto() {
   delete Request_DeleteRequest_reflection_;
   Request_ResourceRequest_default_instance_.Shutdown();
   delete Request_ResourceRequest_reflection_;
-  Request_ResourceRequest_ResourceDefinition_default_instance_.Shutdown();
-  delete Request_ResourceRequest_ResourceDefinition_reflection_;
   Request_ListJobsRequest_default_instance_.Shutdown();
   delete Request_ListJobsRequest_reflection_;
   Error_default_instance_.Shutdown();
@@ -266,8 +245,6 @@ void protobuf_InitDefaults_message_2eproto_impl() {
   ::google::protobuf::internal::GetEmptyString();
   Request_ResourceRequest_default_instance_.DefaultConstruct();
   ::google::protobuf::internal::GetEmptyString();
-  Request_ResourceRequest_ResourceDefinition_default_instance_.DefaultConstruct();
-  ::google::protobuf::internal::GetEmptyString();
   Request_ListJobsRequest_default_instance_.DefaultConstruct();
   ::google::protobuf::internal::GetEmptyString();
   Error_default_instance_.DefaultConstruct();
@@ -278,7 +255,6 @@ void protobuf_InitDefaults_message_2eproto_impl() {
   Request_default_instance_.get_mutable()->InitAsDefaultInstance();
   Request_DeleteRequest_default_instance_.get_mutable()->InitAsDefaultInstance();
   Request_ResourceRequest_default_instance_.get_mutable()->InitAsDefaultInstance();
-  Request_ResourceRequest_ResourceDefinition_default_instance_.get_mutable()->InitAsDefaultInstance();
   Request_ListJobsRequest_default_instance_.get_mutable()->InitAsDefaultInstance();
   Error_default_instance_.get_mutable()->InitAsDefaultInstance();
   Reply_default_instance_.get_mutable()->InitAsDefaultInstance();
@@ -295,28 +271,26 @@ void protobuf_AddDesc_message_2eproto_impl() {
 
   protobuf_InitDefaults_message_2eproto();
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
-    "\n\rmessage.proto\022\003rpc\"\230\004\n\007Request\022\037\n\004type"
+    "\n\rmessage.proto\022\003rpc\"\302\003\n\007Request\022\037\n\004type"
     "\030\001 \001(\0162\021.rpc.Request.Type\0227\n\017resourceReq"
     "uest\030\002 \001(\0132\034.rpc.Request.ResourceRequest"
     "H\000\0223\n\rdeleteRequest\030\003 \001(\0132\032.rpc.Request."
     "DeleteRequestH\000\0227\n\017listJobsRequest\030\004 \001(\013"
     "2\034.rpc.Request.ListJobsRequestH\000\032(\n\rDele"
-    "teRequest\022\n\n\002ID\030\001 \003(\t\022\013\n\003all\030\002 \001(\010\032\303\001\n\017R"
-    "esourceRequest\022\n\n\002ID\030\001 \001(\t\022K\n\022requestedR"
-    "esources\030\002 \003(\0132/.rpc.Request.ResourceReq"
-    "uest.ResourceDefinition\032W\n\022ResourceDefin"
-    "ition\022\014\n\004file\030\001 \001(\t\022\024\n\014throughputMB\030\002 \001("
-    "\005\022\016\n\006tstart\030\003 \001(\003\022\r\n\005tstop\030\004 \001(\003\032 \n\017List"
-    "JobsRequest\022\r\n\005regex\030\001 \001(\t\"-\n\004Type\022\013\n\007RE"
-    "SERVE\020\000\022\n\n\006DELETE\020\001\022\014\n\010LISTJOBS\020\002B\004\n\002rt\""
-    "_\n\005Error\022#\n\005error\030\001 \001(\0162\024.rpc.Error.erro"
-    "rType\022\013\n\003msg\030\002 \001(\t\"$\n\terrorType\022\t\n\005EARGS"
-    "\020\000\022\014\n\010EUNKNOWN\020\001\"B\n\005Reply\022\n\n\002rc\030\001 \001(\005\022\031\n"
-    "\005error\030\002 \001(\0132\n.rpc.Error\022\022\n\nreturn_msg\030\003"
-    " \001(\t\"\216\001\n\007Message\022\037\n\004type\030\001 \001(\0162\021.rpc.Mes"
-    "sage.Type\022\037\n\007request\030\002 \001(\0132\014.rpc.Request"
-    "H\000\022\033\n\005reply\030\003 \001(\0132\n.rpc.ReplyH\000\"\036\n\004Type\022"
-    "\013\n\007REQUEST\020\000\022\t\n\005REPLY\020\001B\004\n\002rqb\006proto3", 877);
+    "teRequest\022\n\n\002ID\030\001 \003(\t\022\013\n\003all\030\002 \001(\010\032a\n\017Re"
+    "sourceRequest\022\n\n\002ID\030\001 \001(\t\022\024\n\014throughputM"
+    "B\030\002 \001(\005\022\016\n\006tstart\030\003 \001(\003\022\r\n\005tstop\030\004 \001(\003\022\r"
+    "\n\005files\030\005 \003(\t\032 \n\017ListJobsRequest\022\r\n\005rege"
+    "x\030\001 \001(\t\":\n\004Type\022\013\n\007INVALID\020\000\022\013\n\007RESERVE\020"
+    "\001\022\n\n\006DELETE\020\002\022\014\n\010LISTJOBS\020\003B\004\n\002rt\"_\n\005Err"
+    "or\022#\n\005error\030\001 \001(\0162\024.rpc.Error.errorType\022"
+    "\013\n\003msg\030\002 \001(\t\"$\n\terrorType\022\t\n\005EARGS\020\000\022\014\n\010"
+    "EUNKNOWN\020\001\"B\n\005Reply\022\n\n\002rc\030\001 \001(\005\022\031\n\005error"
+    "\030\002 \001(\0132\n.rpc.Error\022\022\n\nreturn_msg\030\003 \001(\t\"\216"
+    "\001\n\007Message\022\037\n\004type\030\001 \001(\0162\021.rpc.Message.T"
+    "ype\022\037\n\007request\030\002 \001(\0132\014.rpc.RequestH\000\022\033\n\005"
+    "reply\030\003 \001(\0132\n.rpc.ReplyH\000\"\036\n\004Type\022\013\n\007REQ"
+    "UEST\020\000\022\t\n\005REPLY\020\001B\004\n\002rqb\006proto3", 791);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "message.proto", &protobuf_RegisterTypes);
   ::google::protobuf::internal::OnShutdown(&protobuf_ShutdownFile_message_2eproto);
@@ -355,6 +329,7 @@ bool Request_Type_IsValid(int value) {
     case 0:
     case 1:
     case 2:
+    case 3:
       return true;
     default:
       return false;
@@ -362,6 +337,7 @@ bool Request_Type_IsValid(int value) {
 }
 
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
+const Request_Type Request::INVALID;
 const Request_Type Request::RESERVE;
 const Request_Type Request::DELETE;
 const Request_Type Request::LISTJOBS;
@@ -643,82 +619,83 @@ void Request_DeleteRequest::InternalSwap(Request_DeleteRequest* other) {
 // -------------------------------------------------------------------
 
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
-const int Request_ResourceRequest_ResourceDefinition::kFileFieldNumber;
-const int Request_ResourceRequest_ResourceDefinition::kThroughputMBFieldNumber;
-const int Request_ResourceRequest_ResourceDefinition::kTstartFieldNumber;
-const int Request_ResourceRequest_ResourceDefinition::kTstopFieldNumber;
+const int Request_ResourceRequest::kIDFieldNumber;
+const int Request_ResourceRequest::kThroughputMBFieldNumber;
+const int Request_ResourceRequest::kTstartFieldNumber;
+const int Request_ResourceRequest::kTstopFieldNumber;
+const int Request_ResourceRequest::kFilesFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
-Request_ResourceRequest_ResourceDefinition::Request_ResourceRequest_ResourceDefinition()
+Request_ResourceRequest::Request_ResourceRequest()
   : ::google::protobuf::Message(), _internal_metadata_(NULL) {
   if (this != internal_default_instance()) protobuf_InitDefaults_message_2eproto();
   SharedCtor();
-  // @@protoc_insertion_point(constructor:rpc.Request.ResourceRequest.ResourceDefinition)
+  // @@protoc_insertion_point(constructor:rpc.Request.ResourceRequest)
 }
 
-void Request_ResourceRequest_ResourceDefinition::InitAsDefaultInstance() {
+void Request_ResourceRequest::InitAsDefaultInstance() {
 }
 
-Request_ResourceRequest_ResourceDefinition::Request_ResourceRequest_ResourceDefinition(const Request_ResourceRequest_ResourceDefinition& from)
+Request_ResourceRequest::Request_ResourceRequest(const Request_ResourceRequest& from)
   : ::google::protobuf::Message(),
     _internal_metadata_(NULL) {
   SharedCtor();
   UnsafeMergeFrom(from);
-  // @@protoc_insertion_point(copy_constructor:rpc.Request.ResourceRequest.ResourceDefinition)
+  // @@protoc_insertion_point(copy_constructor:rpc.Request.ResourceRequest)
 }
 
-void Request_ResourceRequest_ResourceDefinition::SharedCtor() {
-  file_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+void Request_ResourceRequest::SharedCtor() {
+  id_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   ::memset(&tstart_, 0, reinterpret_cast<char*>(&throughputmb_) -
     reinterpret_cast<char*>(&tstart_) + sizeof(throughputmb_));
   _cached_size_ = 0;
 }
 
-Request_ResourceRequest_ResourceDefinition::~Request_ResourceRequest_ResourceDefinition() {
-  // @@protoc_insertion_point(destructor:rpc.Request.ResourceRequest.ResourceDefinition)
+Request_ResourceRequest::~Request_ResourceRequest() {
+  // @@protoc_insertion_point(destructor:rpc.Request.ResourceRequest)
   SharedDtor();
 }
 
-void Request_ResourceRequest_ResourceDefinition::SharedDtor() {
-  file_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+void Request_ResourceRequest::SharedDtor() {
+  id_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 
-void Request_ResourceRequest_ResourceDefinition::SetCachedSize(int size) const {
+void Request_ResourceRequest::SetCachedSize(int size) const {
   GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
   _cached_size_ = size;
   GOOGLE_SAFE_CONCURRENT_WRITES_END();
 }
-const ::google::protobuf::Descriptor* Request_ResourceRequest_ResourceDefinition::descriptor() {
+const ::google::protobuf::Descriptor* Request_ResourceRequest::descriptor() {
   protobuf_AssignDescriptorsOnce();
-  return Request_ResourceRequest_ResourceDefinition_descriptor_;
+  return Request_ResourceRequest_descriptor_;
 }
 
-const Request_ResourceRequest_ResourceDefinition& Request_ResourceRequest_ResourceDefinition::default_instance() {
+const Request_ResourceRequest& Request_ResourceRequest::default_instance() {
   protobuf_InitDefaults_message_2eproto();
   return *internal_default_instance();
 }
 
-::google::protobuf::internal::ExplicitlyConstructed<Request_ResourceRequest_ResourceDefinition> Request_ResourceRequest_ResourceDefinition_default_instance_;
+::google::protobuf::internal::ExplicitlyConstructed<Request_ResourceRequest> Request_ResourceRequest_default_instance_;
 
-Request_ResourceRequest_ResourceDefinition* Request_ResourceRequest_ResourceDefinition::New(::google::protobuf::Arena* arena) const {
-  Request_ResourceRequest_ResourceDefinition* n = new Request_ResourceRequest_ResourceDefinition;
+Request_ResourceRequest* Request_ResourceRequest::New(::google::protobuf::Arena* arena) const {
+  Request_ResourceRequest* n = new Request_ResourceRequest;
   if (arena != NULL) {
     arena->Own(n);
   }
   return n;
 }
 
-void Request_ResourceRequest_ResourceDefinition::Clear() {
-// @@protoc_insertion_point(message_clear_start:rpc.Request.ResourceRequest.ResourceDefinition)
+void Request_ResourceRequest::Clear() {
+// @@protoc_insertion_point(message_clear_start:rpc.Request.ResourceRequest)
 #if defined(__clang__)
 #define ZR_HELPER_(f) \
   _Pragma("clang diagnostic push") \
   _Pragma("clang diagnostic ignored \"-Winvalid-offsetof\"") \
-  __builtin_offsetof(Request_ResourceRequest_ResourceDefinition, f) \
+  __builtin_offsetof(Request_ResourceRequest, f) \
   _Pragma("clang diagnostic pop")
 #else
 #define ZR_HELPER_(f) reinterpret_cast<char*>(\
-  &reinterpret_cast<Request_ResourceRequest_ResourceDefinition*>(16)->f)
+  &reinterpret_cast<Request_ResourceRequest*>(16)->f)
 #endif
 
 #define ZR_(first, last) do {\
@@ -727,32 +704,33 @@ void Request_ResourceRequest_ResourceDefinition::Clear() {
 } while (0)
 
   ZR_(tstart_, throughputmb_);
-  file_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  id_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 
 #undef ZR_HELPER_
 #undef ZR_
 
+  files_.Clear();
 }
 
-bool Request_ResourceRequest_ResourceDefinition::MergePartialFromCodedStream(
+bool Request_ResourceRequest::MergePartialFromCodedStream(
     ::google::protobuf::io::CodedInputStream* input) {
 #define DO_(EXPRESSION) if (!GOOGLE_PREDICT_TRUE(EXPRESSION)) goto failure
   ::google::protobuf::uint32 tag;
-  // @@protoc_insertion_point(parse_start:rpc.Request.ResourceRequest.ResourceDefinition)
+  // @@protoc_insertion_point(parse_start:rpc.Request.ResourceRequest)
   for (;;) {
     ::std::pair< ::google::protobuf::uint32, bool> p = input->ReadTagWithCutoff(127);
     tag = p.first;
     if (!p.second) goto handle_unusual;
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // optional string file = 1;
+      // optional string ID = 1;
       case 1: {
         if (tag == 10) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadString(
-                input, this->mutable_file()));
+                input, this->mutable_id()));
           DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-            this->file().data(), this->file().length(),
+            this->id().data(), this->id().length(),
             ::google::protobuf::internal::WireFormatLite::PARSE,
-            "rpc.Request.ResourceRequest.ResourceDefinition.file"));
+            "rpc.Request.ResourceRequest.ID"));
         } else {
           goto handle_unusual;
         }
@@ -801,326 +779,25 @@ bool Request_ResourceRequest_ResourceDefinition::MergePartialFromCodedStream(
         } else {
           goto handle_unusual;
         }
-        if (input->ExpectAtEnd()) goto success;
+        if (input->ExpectTag(42)) goto parse_files;
         break;
       }
 
-      default: {
-      handle_unusual:
-        if (tag == 0 ||
-            ::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
-            ::google::protobuf::internal::WireFormatLite::WIRETYPE_END_GROUP) {
-          goto success;
-        }
-        DO_(::google::protobuf::internal::WireFormatLite::SkipField(input, tag));
-        break;
-      }
-    }
-  }
-success:
-  // @@protoc_insertion_point(parse_success:rpc.Request.ResourceRequest.ResourceDefinition)
-  return true;
-failure:
-  // @@protoc_insertion_point(parse_failure:rpc.Request.ResourceRequest.ResourceDefinition)
-  return false;
-#undef DO_
-}
-
-void Request_ResourceRequest_ResourceDefinition::SerializeWithCachedSizes(
-    ::google::protobuf::io::CodedOutputStream* output) const {
-  // @@protoc_insertion_point(serialize_start:rpc.Request.ResourceRequest.ResourceDefinition)
-  // optional string file = 1;
-  if (this->file().size() > 0) {
-    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->file().data(), this->file().length(),
-      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "rpc.Request.ResourceRequest.ResourceDefinition.file");
-    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
-      1, this->file(), output);
-  }
-
-  // optional int32 throughputMB = 2;
-  if (this->throughputmb() != 0) {
-    ::google::protobuf::internal::WireFormatLite::WriteInt32(2, this->throughputmb(), output);
-  }
-
-  // optional int64 tstart = 3;
-  if (this->tstart() != 0) {
-    ::google::protobuf::internal::WireFormatLite::WriteInt64(3, this->tstart(), output);
-  }
-
-  // optional int64 tstop = 4;
-  if (this->tstop() != 0) {
-    ::google::protobuf::internal::WireFormatLite::WriteInt64(4, this->tstop(), output);
-  }
-
-  // @@protoc_insertion_point(serialize_end:rpc.Request.ResourceRequest.ResourceDefinition)
-}
-
-::google::protobuf::uint8* Request_ResourceRequest_ResourceDefinition::InternalSerializeWithCachedSizesToArray(
-    bool deterministic, ::google::protobuf::uint8* target) const {
-  (void)deterministic; // Unused
-  // @@protoc_insertion_point(serialize_to_array_start:rpc.Request.ResourceRequest.ResourceDefinition)
-  // optional string file = 1;
-  if (this->file().size() > 0) {
-    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->file().data(), this->file().length(),
-      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "rpc.Request.ResourceRequest.ResourceDefinition.file");
-    target =
-      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
-        1, this->file(), target);
-  }
-
-  // optional int32 throughputMB = 2;
-  if (this->throughputmb() != 0) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(2, this->throughputmb(), target);
-  }
-
-  // optional int64 tstart = 3;
-  if (this->tstart() != 0) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteInt64ToArray(3, this->tstart(), target);
-  }
-
-  // optional int64 tstop = 4;
-  if (this->tstop() != 0) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteInt64ToArray(4, this->tstop(), target);
-  }
-
-  // @@protoc_insertion_point(serialize_to_array_end:rpc.Request.ResourceRequest.ResourceDefinition)
-  return target;
-}
-
-size_t Request_ResourceRequest_ResourceDefinition::ByteSizeLong() const {
-// @@protoc_insertion_point(message_byte_size_start:rpc.Request.ResourceRequest.ResourceDefinition)
-  size_t total_size = 0;
-
-  // optional string file = 1;
-  if (this->file().size() > 0) {
-    total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::StringSize(
-        this->file());
-  }
-
-  // optional int32 throughputMB = 2;
-  if (this->throughputmb() != 0) {
-    total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::Int32Size(
-        this->throughputmb());
-  }
-
-  // optional int64 tstart = 3;
-  if (this->tstart() != 0) {
-    total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::Int64Size(
-        this->tstart());
-  }
-
-  // optional int64 tstop = 4;
-  if (this->tstop() != 0) {
-    total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::Int64Size(
-        this->tstop());
-  }
-
-  int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
-  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
-  _cached_size_ = cached_size;
-  GOOGLE_SAFE_CONCURRENT_WRITES_END();
-  return total_size;
-}
-
-void Request_ResourceRequest_ResourceDefinition::MergeFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_merge_from_start:rpc.Request.ResourceRequest.ResourceDefinition)
-  if (GOOGLE_PREDICT_FALSE(&from == this)) MergeFromFail(__LINE__);
-  const Request_ResourceRequest_ResourceDefinition* source =
-      ::google::protobuf::internal::DynamicCastToGenerated<const Request_ResourceRequest_ResourceDefinition>(
-          &from);
-  if (source == NULL) {
-  // @@protoc_insertion_point(generalized_merge_from_cast_fail:rpc.Request.ResourceRequest.ResourceDefinition)
-    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
-  } else {
-  // @@protoc_insertion_point(generalized_merge_from_cast_success:rpc.Request.ResourceRequest.ResourceDefinition)
-    UnsafeMergeFrom(*source);
-  }
-}
-
-void Request_ResourceRequest_ResourceDefinition::MergeFrom(const Request_ResourceRequest_ResourceDefinition& from) {
-// @@protoc_insertion_point(class_specific_merge_from_start:rpc.Request.ResourceRequest.ResourceDefinition)
-  if (GOOGLE_PREDICT_TRUE(&from != this)) {
-    UnsafeMergeFrom(from);
-  } else {
-    MergeFromFail(__LINE__);
-  }
-}
-
-void Request_ResourceRequest_ResourceDefinition::UnsafeMergeFrom(const Request_ResourceRequest_ResourceDefinition& from) {
-  GOOGLE_DCHECK(&from != this);
-  if (from.file().size() > 0) {
-
-    file_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.file_);
-  }
-  if (from.throughputmb() != 0) {
-    set_throughputmb(from.throughputmb());
-  }
-  if (from.tstart() != 0) {
-    set_tstart(from.tstart());
-  }
-  if (from.tstop() != 0) {
-    set_tstop(from.tstop());
-  }
-}
-
-void Request_ResourceRequest_ResourceDefinition::CopyFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_copy_from_start:rpc.Request.ResourceRequest.ResourceDefinition)
-  if (&from == this) return;
-  Clear();
-  MergeFrom(from);
-}
-
-void Request_ResourceRequest_ResourceDefinition::CopyFrom(const Request_ResourceRequest_ResourceDefinition& from) {
-// @@protoc_insertion_point(class_specific_copy_from_start:rpc.Request.ResourceRequest.ResourceDefinition)
-  if (&from == this) return;
-  Clear();
-  UnsafeMergeFrom(from);
-}
-
-bool Request_ResourceRequest_ResourceDefinition::IsInitialized() const {
-
-  return true;
-}
-
-void Request_ResourceRequest_ResourceDefinition::Swap(Request_ResourceRequest_ResourceDefinition* other) {
-  if (other == this) return;
-  InternalSwap(other);
-}
-void Request_ResourceRequest_ResourceDefinition::InternalSwap(Request_ResourceRequest_ResourceDefinition* other) {
-  file_.Swap(&other->file_);
-  std::swap(throughputmb_, other->throughputmb_);
-  std::swap(tstart_, other->tstart_);
-  std::swap(tstop_, other->tstop_);
-  _internal_metadata_.Swap(&other->_internal_metadata_);
-  std::swap(_cached_size_, other->_cached_size_);
-}
-
-::google::protobuf::Metadata Request_ResourceRequest_ResourceDefinition::GetMetadata() const {
-  protobuf_AssignDescriptorsOnce();
-  ::google::protobuf::Metadata metadata;
-  metadata.descriptor = Request_ResourceRequest_ResourceDefinition_descriptor_;
-  metadata.reflection = Request_ResourceRequest_ResourceDefinition_reflection_;
-  return metadata;
-}
-
-
-// -------------------------------------------------------------------
-
-#if !defined(_MSC_VER) || _MSC_VER >= 1900
-const int Request_ResourceRequest::kIDFieldNumber;
-const int Request_ResourceRequest::kRequestedResourcesFieldNumber;
-#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
-
-Request_ResourceRequest::Request_ResourceRequest()
-  : ::google::protobuf::Message(), _internal_metadata_(NULL) {
-  if (this != internal_default_instance()) protobuf_InitDefaults_message_2eproto();
-  SharedCtor();
-  // @@protoc_insertion_point(constructor:rpc.Request.ResourceRequest)
-}
-
-void Request_ResourceRequest::InitAsDefaultInstance() {
-}
-
-Request_ResourceRequest::Request_ResourceRequest(const Request_ResourceRequest& from)
-  : ::google::protobuf::Message(),
-    _internal_metadata_(NULL) {
-  SharedCtor();
-  UnsafeMergeFrom(from);
-  // @@protoc_insertion_point(copy_constructor:rpc.Request.ResourceRequest)
-}
-
-void Request_ResourceRequest::SharedCtor() {
-  id_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  _cached_size_ = 0;
-}
-
-Request_ResourceRequest::~Request_ResourceRequest() {
-  // @@protoc_insertion_point(destructor:rpc.Request.ResourceRequest)
-  SharedDtor();
-}
-
-void Request_ResourceRequest::SharedDtor() {
-  id_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-
-void Request_ResourceRequest::SetCachedSize(int size) const {
-  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
-  _cached_size_ = size;
-  GOOGLE_SAFE_CONCURRENT_WRITES_END();
-}
-const ::google::protobuf::Descriptor* Request_ResourceRequest::descriptor() {
-  protobuf_AssignDescriptorsOnce();
-  return Request_ResourceRequest_descriptor_;
-}
-
-const Request_ResourceRequest& Request_ResourceRequest::default_instance() {
-  protobuf_InitDefaults_message_2eproto();
-  return *internal_default_instance();
-}
-
-::google::protobuf::internal::ExplicitlyConstructed<Request_ResourceRequest> Request_ResourceRequest_default_instance_;
-
-Request_ResourceRequest* Request_ResourceRequest::New(::google::protobuf::Arena* arena) const {
-  Request_ResourceRequest* n = new Request_ResourceRequest;
-  if (arena != NULL) {
-    arena->Own(n);
-  }
-  return n;
-}
-
-void Request_ResourceRequest::Clear() {
-// @@protoc_insertion_point(message_clear_start:rpc.Request.ResourceRequest)
-  id_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  requestedresources_.Clear();
-}
-
-bool Request_ResourceRequest::MergePartialFromCodedStream(
-    ::google::protobuf::io::CodedInputStream* input) {
-#define DO_(EXPRESSION) if (!GOOGLE_PREDICT_TRUE(EXPRESSION)) goto failure
-  ::google::protobuf::uint32 tag;
-  // @@protoc_insertion_point(parse_start:rpc.Request.ResourceRequest)
-  for (;;) {
-    ::std::pair< ::google::protobuf::uint32, bool> p = input->ReadTagWithCutoff(127);
-    tag = p.first;
-    if (!p.second) goto handle_unusual;
-    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // optional string ID = 1;
-      case 1: {
-        if (tag == 10) {
+      // repeated string files = 5;
+      case 5: {
+        if (tag == 42) {
+         parse_files:
           DO_(::google::protobuf::internal::WireFormatLite::ReadString(
-                input, this->mutable_id()));
+                input, this->add_files()));
           DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-            this->id().data(), this->id().length(),
+            this->files(this->files_size() - 1).data(),
+            this->files(this->files_size() - 1).length(),
             ::google::protobuf::internal::WireFormatLite::PARSE,
-            "rpc.Request.ResourceRequest.ID"));
+            "rpc.Request.ResourceRequest.files"));
         } else {
           goto handle_unusual;
         }
-        if (input->ExpectTag(18)) goto parse_requestedResources;
-        break;
-      }
-
-      // repeated .rpc.Request.ResourceRequest.ResourceDefinition requestedResources = 2;
-      case 2: {
-        if (tag == 18) {
-         parse_requestedResources:
-          DO_(input->IncrementRecursionDepth());
-         parse_loop_requestedResources:
-          DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtualNoRecursionDepth(
-                input, add_requestedresources()));
-        } else {
-          goto handle_unusual;
-        }
-        if (input->ExpectTag(18)) goto parse_loop_requestedResources;
-        input->UnsafeDecrementRecursionDepth();
+        if (input->ExpectTag(42)) goto parse_files;
         if (input->ExpectAtEnd()) goto success;
         break;
       }
@@ -1159,10 +836,29 @@ void Request_ResourceRequest::SerializeWithCachedSizes(
       1, this->id(), output);
   }
 
-  // repeated .rpc.Request.ResourceRequest.ResourceDefinition requestedResources = 2;
-  for (unsigned int i = 0, n = this->requestedresources_size(); i < n; i++) {
-    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      2, this->requestedresources(i), output);
+  // optional int32 throughputMB = 2;
+  if (this->throughputmb() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt32(2, this->throughputmb(), output);
+  }
+
+  // optional int64 tstart = 3;
+  if (this->tstart() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt64(3, this->tstart(), output);
+  }
+
+  // optional int64 tstop = 4;
+  if (this->tstop() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt64(4, this->tstop(), output);
+  }
+
+  // repeated string files = 5;
+  for (int i = 0; i < this->files_size(); i++) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->files(i).data(), this->files(i).length(),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "rpc.Request.ResourceRequest.files");
+    ::google::protobuf::internal::WireFormatLite::WriteString(
+      5, this->files(i), output);
   }
 
   // @@protoc_insertion_point(serialize_end:rpc.Request.ResourceRequest)
@@ -1183,11 +879,29 @@ void Request_ResourceRequest::SerializeWithCachedSizes(
         1, this->id(), target);
   }
 
-  // repeated .rpc.Request.ResourceRequest.ResourceDefinition requestedResources = 2;
-  for (unsigned int i = 0, n = this->requestedresources_size(); i < n; i++) {
+  // optional int32 throughputMB = 2;
+  if (this->throughputmb() != 0) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(2, this->throughputmb(), target);
+  }
+
+  // optional int64 tstart = 3;
+  if (this->tstart() != 0) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt64ToArray(3, this->tstart(), target);
+  }
+
+  // optional int64 tstop = 4;
+  if (this->tstop() != 0) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt64ToArray(4, this->tstop(), target);
+  }
+
+  // repeated string files = 5;
+  for (int i = 0; i < this->files_size(); i++) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->files(i).data(), this->files(i).length(),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "rpc.Request.ResourceRequest.files");
     target = ::google::protobuf::internal::WireFormatLite::
-      InternalWriteMessageNoVirtualToArray(
-        2, this->requestedresources(i), false, target);
+      WriteStringToArray(5, this->files(i), target);
   }
 
   // @@protoc_insertion_point(serialize_to_array_end:rpc.Request.ResourceRequest)
@@ -1205,15 +919,33 @@ size_t Request_ResourceRequest::ByteSizeLong() const {
         this->id());
   }
 
-  // repeated .rpc.Request.ResourceRequest.ResourceDefinition requestedResources = 2;
-  {
-    unsigned int count = this->requestedresources_size();
-    total_size += 1UL * count;
-    for (unsigned int i = 0; i < count; i++) {
-      total_size +=
-        ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
-          this->requestedresources(i));
-    }
+  // optional int32 throughputMB = 2;
+  if (this->throughputmb() != 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::Int32Size(
+        this->throughputmb());
+  }
+
+  // optional int64 tstart = 3;
+  if (this->tstart() != 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::Int64Size(
+        this->tstart());
+  }
+
+  // optional int64 tstop = 4;
+  if (this->tstop() != 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::Int64Size(
+        this->tstop());
+  }
+
+  // repeated string files = 5;
+  total_size += 1 *
+      ::google::protobuf::internal::FromIntSize(this->files_size());
+  for (int i = 0; i < this->files_size(); i++) {
+    total_size += ::google::protobuf::internal::WireFormatLite::StringSize(
+      this->files(i));
   }
 
   int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
@@ -1249,10 +981,19 @@ void Request_ResourceRequest::MergeFrom(const Request_ResourceRequest& from) {
 
 void Request_ResourceRequest::UnsafeMergeFrom(const Request_ResourceRequest& from) {
   GOOGLE_DCHECK(&from != this);
-  requestedresources_.MergeFrom(from.requestedresources_);
+  files_.UnsafeMergeFrom(from.files_);
   if (from.id().size() > 0) {
 
     id_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.id_);
+  }
+  if (from.throughputmb() != 0) {
+    set_throughputmb(from.throughputmb());
+  }
+  if (from.tstart() != 0) {
+    set_tstart(from.tstart());
+  }
+  if (from.tstop() != 0) {
+    set_tstop(from.tstop());
   }
 }
 
@@ -1281,7 +1022,10 @@ void Request_ResourceRequest::Swap(Request_ResourceRequest* other) {
 }
 void Request_ResourceRequest::InternalSwap(Request_ResourceRequest* other) {
   id_.Swap(&other->id_);
-  requestedresources_.UnsafeArenaSwap(&other->requestedresources_);
+  std::swap(throughputmb_, other->throughputmb_);
+  std::swap(tstart_, other->tstart_);
+  std::swap(tstop_, other->tstop_);
+  files_.UnsafeArenaSwap(&other->files_);
   _internal_metadata_.Swap(&other->_internal_metadata_);
   std::swap(_cached_size_, other->_cached_size_);
 }
@@ -1994,99 +1738,6 @@ inline const Request_DeleteRequest* Request_DeleteRequest::internal_default_inst
 }
 // -------------------------------------------------------------------
 
-// Request_ResourceRequest_ResourceDefinition
-
-// optional string file = 1;
-void Request_ResourceRequest_ResourceDefinition::clear_file() {
-  file_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-const ::std::string& Request_ResourceRequest_ResourceDefinition::file() const {
-  // @@protoc_insertion_point(field_get:rpc.Request.ResourceRequest.ResourceDefinition.file)
-  return file_.GetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-void Request_ResourceRequest_ResourceDefinition::set_file(const ::std::string& value) {
-  
-  file_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:rpc.Request.ResourceRequest.ResourceDefinition.file)
-}
-void Request_ResourceRequest_ResourceDefinition::set_file(const char* value) {
-  
-  file_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:rpc.Request.ResourceRequest.ResourceDefinition.file)
-}
-void Request_ResourceRequest_ResourceDefinition::set_file(const char* value, size_t size) {
-  
-  file_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:rpc.Request.ResourceRequest.ResourceDefinition.file)
-}
-::std::string* Request_ResourceRequest_ResourceDefinition::mutable_file() {
-  
-  // @@protoc_insertion_point(field_mutable:rpc.Request.ResourceRequest.ResourceDefinition.file)
-  return file_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-::std::string* Request_ResourceRequest_ResourceDefinition::release_file() {
-  // @@protoc_insertion_point(field_release:rpc.Request.ResourceRequest.ResourceDefinition.file)
-  
-  return file_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-void Request_ResourceRequest_ResourceDefinition::set_allocated_file(::std::string* file) {
-  if (file != NULL) {
-    
-  } else {
-    
-  }
-  file_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), file);
-  // @@protoc_insertion_point(field_set_allocated:rpc.Request.ResourceRequest.ResourceDefinition.file)
-}
-
-// optional int32 throughputMB = 2;
-void Request_ResourceRequest_ResourceDefinition::clear_throughputmb() {
-  throughputmb_ = 0;
-}
-::google::protobuf::int32 Request_ResourceRequest_ResourceDefinition::throughputmb() const {
-  // @@protoc_insertion_point(field_get:rpc.Request.ResourceRequest.ResourceDefinition.throughputMB)
-  return throughputmb_;
-}
-void Request_ResourceRequest_ResourceDefinition::set_throughputmb(::google::protobuf::int32 value) {
-  
-  throughputmb_ = value;
-  // @@protoc_insertion_point(field_set:rpc.Request.ResourceRequest.ResourceDefinition.throughputMB)
-}
-
-// optional int64 tstart = 3;
-void Request_ResourceRequest_ResourceDefinition::clear_tstart() {
-  tstart_ = GOOGLE_LONGLONG(0);
-}
-::google::protobuf::int64 Request_ResourceRequest_ResourceDefinition::tstart() const {
-  // @@protoc_insertion_point(field_get:rpc.Request.ResourceRequest.ResourceDefinition.tstart)
-  return tstart_;
-}
-void Request_ResourceRequest_ResourceDefinition::set_tstart(::google::protobuf::int64 value) {
-  
-  tstart_ = value;
-  // @@protoc_insertion_point(field_set:rpc.Request.ResourceRequest.ResourceDefinition.tstart)
-}
-
-// optional int64 tstop = 4;
-void Request_ResourceRequest_ResourceDefinition::clear_tstop() {
-  tstop_ = GOOGLE_LONGLONG(0);
-}
-::google::protobuf::int64 Request_ResourceRequest_ResourceDefinition::tstop() const {
-  // @@protoc_insertion_point(field_get:rpc.Request.ResourceRequest.ResourceDefinition.tstop)
-  return tstop_;
-}
-void Request_ResourceRequest_ResourceDefinition::set_tstop(::google::protobuf::int64 value) {
-  
-  tstop_ = value;
-  // @@protoc_insertion_point(field_set:rpc.Request.ResourceRequest.ResourceDefinition.tstop)
-}
-
-inline const Request_ResourceRequest_ResourceDefinition* Request_ResourceRequest_ResourceDefinition::internal_default_instance() {
-  return &Request_ResourceRequest_ResourceDefinition_default_instance_.get();
-}
-// -------------------------------------------------------------------
-
 // Request_ResourceRequest
 
 // optional string ID = 1;
@@ -2133,34 +1784,101 @@ void Request_ResourceRequest::set_allocated_id(::std::string* id) {
   // @@protoc_insertion_point(field_set_allocated:rpc.Request.ResourceRequest.ID)
 }
 
-// repeated .rpc.Request.ResourceRequest.ResourceDefinition requestedResources = 2;
-int Request_ResourceRequest::requestedresources_size() const {
-  return requestedresources_.size();
+// optional int32 throughputMB = 2;
+void Request_ResourceRequest::clear_throughputmb() {
+  throughputmb_ = 0;
 }
-void Request_ResourceRequest::clear_requestedresources() {
-  requestedresources_.Clear();
+::google::protobuf::int32 Request_ResourceRequest::throughputmb() const {
+  // @@protoc_insertion_point(field_get:rpc.Request.ResourceRequest.throughputMB)
+  return throughputmb_;
 }
-const ::rpc::Request_ResourceRequest_ResourceDefinition& Request_ResourceRequest::requestedresources(int index) const {
-  // @@protoc_insertion_point(field_get:rpc.Request.ResourceRequest.requestedResources)
-  return requestedresources_.Get(index);
+void Request_ResourceRequest::set_throughputmb(::google::protobuf::int32 value) {
+  
+  throughputmb_ = value;
+  // @@protoc_insertion_point(field_set:rpc.Request.ResourceRequest.throughputMB)
 }
-::rpc::Request_ResourceRequest_ResourceDefinition* Request_ResourceRequest::mutable_requestedresources(int index) {
-  // @@protoc_insertion_point(field_mutable:rpc.Request.ResourceRequest.requestedResources)
-  return requestedresources_.Mutable(index);
+
+// optional int64 tstart = 3;
+void Request_ResourceRequest::clear_tstart() {
+  tstart_ = GOOGLE_LONGLONG(0);
 }
-::rpc::Request_ResourceRequest_ResourceDefinition* Request_ResourceRequest::add_requestedresources() {
-  // @@protoc_insertion_point(field_add:rpc.Request.ResourceRequest.requestedResources)
-  return requestedresources_.Add();
+::google::protobuf::int64 Request_ResourceRequest::tstart() const {
+  // @@protoc_insertion_point(field_get:rpc.Request.ResourceRequest.tstart)
+  return tstart_;
 }
-::google::protobuf::RepeatedPtrField< ::rpc::Request_ResourceRequest_ResourceDefinition >*
-Request_ResourceRequest::mutable_requestedresources() {
-  // @@protoc_insertion_point(field_mutable_list:rpc.Request.ResourceRequest.requestedResources)
-  return &requestedresources_;
+void Request_ResourceRequest::set_tstart(::google::protobuf::int64 value) {
+  
+  tstart_ = value;
+  // @@protoc_insertion_point(field_set:rpc.Request.ResourceRequest.tstart)
 }
-const ::google::protobuf::RepeatedPtrField< ::rpc::Request_ResourceRequest_ResourceDefinition >&
-Request_ResourceRequest::requestedresources() const {
-  // @@protoc_insertion_point(field_list:rpc.Request.ResourceRequest.requestedResources)
-  return requestedresources_;
+
+// optional int64 tstop = 4;
+void Request_ResourceRequest::clear_tstop() {
+  tstop_ = GOOGLE_LONGLONG(0);
+}
+::google::protobuf::int64 Request_ResourceRequest::tstop() const {
+  // @@protoc_insertion_point(field_get:rpc.Request.ResourceRequest.tstop)
+  return tstop_;
+}
+void Request_ResourceRequest::set_tstop(::google::protobuf::int64 value) {
+  
+  tstop_ = value;
+  // @@protoc_insertion_point(field_set:rpc.Request.ResourceRequest.tstop)
+}
+
+// repeated string files = 5;
+int Request_ResourceRequest::files_size() const {
+  return files_.size();
+}
+void Request_ResourceRequest::clear_files() {
+  files_.Clear();
+}
+const ::std::string& Request_ResourceRequest::files(int index) const {
+  // @@protoc_insertion_point(field_get:rpc.Request.ResourceRequest.files)
+  return files_.Get(index);
+}
+::std::string* Request_ResourceRequest::mutable_files(int index) {
+  // @@protoc_insertion_point(field_mutable:rpc.Request.ResourceRequest.files)
+  return files_.Mutable(index);
+}
+void Request_ResourceRequest::set_files(int index, const ::std::string& value) {
+  // @@protoc_insertion_point(field_set:rpc.Request.ResourceRequest.files)
+  files_.Mutable(index)->assign(value);
+}
+void Request_ResourceRequest::set_files(int index, const char* value) {
+  files_.Mutable(index)->assign(value);
+  // @@protoc_insertion_point(field_set_char:rpc.Request.ResourceRequest.files)
+}
+void Request_ResourceRequest::set_files(int index, const char* value, size_t size) {
+  files_.Mutable(index)->assign(
+    reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_set_pointer:rpc.Request.ResourceRequest.files)
+}
+::std::string* Request_ResourceRequest::add_files() {
+  // @@protoc_insertion_point(field_add_mutable:rpc.Request.ResourceRequest.files)
+  return files_.Add();
+}
+void Request_ResourceRequest::add_files(const ::std::string& value) {
+  files_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add:rpc.Request.ResourceRequest.files)
+}
+void Request_ResourceRequest::add_files(const char* value) {
+  files_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add_char:rpc.Request.ResourceRequest.files)
+}
+void Request_ResourceRequest::add_files(const char* value, size_t size) {
+  files_.Add()->assign(reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_add_pointer:rpc.Request.ResourceRequest.files)
+}
+const ::google::protobuf::RepeatedPtrField< ::std::string>&
+Request_ResourceRequest::files() const {
+  // @@protoc_insertion_point(field_list:rpc.Request.ResourceRequest.files)
+  return files_;
+}
+::google::protobuf::RepeatedPtrField< ::std::string>*
+Request_ResourceRequest::mutable_files() {
+  // @@protoc_insertion_point(field_mutable_list:rpc.Request.ResourceRequest.files)
+  return &files_;
 }
 
 inline const Request_ResourceRequest* Request_ResourceRequest::internal_default_instance() {

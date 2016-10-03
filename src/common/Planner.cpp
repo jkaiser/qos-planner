@@ -55,26 +55,25 @@ bool Planner::TearDown() {
 
 
 bool Planner::ServeJobSubmission(const rpc::Request_ResourceRequest &request) {
-    if (request.requestedresources().size() == 0) {    // noop
+    if (request.files_size() == 0) {    // noop
         return true;
     }
 
-    auto tstart = std::chrono::system_clock::from_time_t(request.requestedresources(0).tstart());
-    auto tend = std::chrono::system_clock::from_time_t(request.requestedresources(0).tstop());
+    auto tstart = std::chrono::system_clock::now();
+    auto tend = std::chrono::system_clock::from_time_t(request.tstop());
 
     int min_read_throughput = 0;
     std::unordered_set<std::string> osts_set;
 
-    for (auto it = request.requestedresources().begin(); it != request.requestedresources().end(); it++) {
+    if (min_read_throughput < request.throughputmb()) {
+        min_read_throughput = request.throughputmb();
+    }
 
-        // update min_read_throughput
-        if (min_read_throughput < it->throughputmb()) {
-            min_read_throughput = it->throughputmb();
-        }
+    for (auto it = request.files().begin(); it != request.files().end(); it++) {
 
         // get the osts for this file
         std::shared_ptr<std::vector<std::string>> osts(new std::vector<std::string>);
-        if (!lustre->GetOstsForFile(it->file(), std::shared_ptr<std::vector<std::string>>(osts))) {
+        if (!lustre->GetOstsForFile(*it, std::shared_ptr<std::vector<std::string>>(osts))) {
             return false;
         }
 
@@ -82,7 +81,6 @@ bool Planner::ServeJobSubmission(const rpc::Request_ResourceRequest &request) {
             osts_set.insert(ost);
         }
     }
-
 
     auto osts = std::vector<std::string>(osts_set.begin(), osts_set.end());
     common::Job job(request.id(), tstart, tend, min_read_throughput);

@@ -41,7 +41,10 @@ public:
 
     bool Init();
 
+    bool requestResources(const std::string &filenames, int throughput, const std::string &Tstart);
     bool requestResources(std::string request);
+
+    bool trySendRequestAndReceiveReply(const std::shared_ptr<rpc::Request> &request, std::string &reply);
 };
 
 
