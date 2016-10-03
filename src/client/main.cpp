@@ -37,10 +37,9 @@ int main(int argc, char *argv[]) {
     string ipPort = FLAGS_ip + ":" + FLAGS_port;
     Client c(ipPort);
     if (!c.Init()) {
-        std::cout << "Client initalization failed." << std::endl;
+        spdlog::get("console")->critical("initialization failed");
     }
 
-    // Parse rest of commandline
     c.requestResources(FLAGS_filenames, FLAGS_throughput, FLAGS_Tstart);
 
     return 0;
