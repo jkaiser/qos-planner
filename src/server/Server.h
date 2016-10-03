@@ -30,6 +30,7 @@ private:
     std::shared_ptr<common::Planner> planner;
     std::shared_ptr<zmq::socket_t> server;
 
+    zmq::context_t *context;
     void initZMQ();
 
 public:
@@ -50,6 +51,8 @@ public:
     void Serve();
 
     void ProcessUnparsableMsg(rpc::Message &msg) const;
+
+    bool ProcessMessage(rpc::Message &msg) const;
 };
 
 #endif //QOS_PLANNER_SERVER_H
