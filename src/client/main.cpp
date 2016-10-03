@@ -47,6 +47,8 @@ int execute(Client &client, const std::string &cmd) {
         success = client.requestResources(FLAGS_id, FLAGS_filenames, FLAGS_throughput, FLAGS_duration);
     } else if (cmd.compare("remove") == 0) {
         success = client.removeReservation(FLAGS_id);
+    } else if (cmd.compare("ls") == 0) {
+        success = client.listReservations();
     } else {
         spdlog::get("console")->critical("unknown command: {}", cmd);
     }

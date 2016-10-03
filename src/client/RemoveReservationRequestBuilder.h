@@ -11,7 +11,6 @@
 class RemoveReservationRequestBuilder {
 
 public:
-public:
     bool BuildRequest(const std::string &id, rpc::Request &request) const;
 };
 

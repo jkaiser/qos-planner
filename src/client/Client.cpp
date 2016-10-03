@@ -3,8 +3,12 @@
 //
 
 #include "Client.h"
+
+#include <iostream>
+
 #include "ReserveRequestBuilder.h"
 #include "RemoveReservationRequestBuilder.h"
+#include "ListReservationsRequestBuilder.h"
 
 #include <spdlog/spdlog.h>
 
@@ -153,6 +157,49 @@ bool Client::removeReservation(const std::string &reservation_id) {
         return false;
     }
 
+    return true;
+}
+
+bool Client::listReservations() {
+    std::shared_ptr<rpc::Message> msg (new rpc::Message());
+
+    rpc::Request request;
+    ListReservationsRequestBuilder rb;
+    if (!rb.BuildRequest(request)) {
+        return false;
+    }
+
+    msg->mutable_request()->CopyFrom(request);
+
+    spdlog::get("console")->debug("will send: {}", msg->DebugString());
+
+    std::string reply;
+    if (!trySendRequestAndReceiveReply(msg, reply)){
+        return false;
+    }
+
+    return ProcessListReply(reply);
+
+}
+
+bool Client::ProcessListReply(const std::string &reply) const {
+    std::shared_ptr<rpc::Message> msg (new rpc::Message());
+    if (!msg->ParseFromString(reply)) {
+        spdlog::get("console")->error("couldn't parse reply from server");
+        return false;
+    }
+
+    if (!msg->has_reply()) {
+        spdlog::get("console")->error("reply doesn't have any content!");
+        return false;
+    }
+
+    if (msg->reply().rc() != 0) {
+        spdlog::get("console")->error("server returned error: {}", rpc::Error::errorType_Name(msg->reply().error().error()));
+        return false;
+    }
+
+    std::cout << msg->reply().return_msg() << std::endl;
     return true;
 }
 

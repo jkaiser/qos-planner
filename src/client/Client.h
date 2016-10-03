@@ -38,12 +38,15 @@ private:
     bool TryBuildReserveMessage(const std::string &id, const std::string &filenames, int throughput, int duration,
                                 std::shared_ptr<rpc::Message> &msg) const;
 
-public:
+    bool ProcessListReply(const std::string &reply) const;
 
+public:
     Client(std::string ipPort);
     bool Init();
     bool requestResources(const std::string &id, const std::string &filenames, int throughput, int duration_sec);
     bool removeReservation(const std::string &reservation_id);
+
+    bool listReservations();
 };
 
 
