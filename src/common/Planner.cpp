@@ -73,12 +73,12 @@ bool Planner::ServeJobSubmission(const rpc::Request_ResourceRequest &request) {
         }
 
         // get the osts for this file
-        std::vector<std::string> osts;
-        if (!lustre->GetOstsForFile(it->file(), std::shared_ptr<std::vector<std::string>>(&osts))) {
+        std::shared_ptr<std::vector<std::string>> osts(new std::vector<std::string>);
+        if (!lustre->GetOstsForFile(it->file(), std::shared_ptr<std::vector<std::string>>(osts))) {
             return false;
         }
 
-        for (auto ost : osts) {
+        for (auto ost : *osts) {
             osts_set.insert(ost);
         }
     }
