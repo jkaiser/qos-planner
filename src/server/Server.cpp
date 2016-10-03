@@ -45,14 +45,14 @@ void Server::Serve() {
     while (1) {
         std::string request = s_recv(*server);
 
-        std::cout << "I: normal request (" << request << ")" << std::endl;
-
         rpc::Message msg;
         if (!msg.ParseFromString(request)) {    // is it a valid parseable msg?
             spdlog::get("console")->error("got unparsable message");
             ProcessUnparsableMsg(msg);
             continue;
         }
+
+        spdlog::get("console")->debug("got message {}", msg.DebugString());
 
         if (msg.type() == rpc::Message::REPLY) {
             spdlog::get("console")->error("got an invalid reply");
