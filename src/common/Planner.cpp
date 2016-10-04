@@ -4,8 +4,6 @@
 
 #include "Planner.h"
 #include "JobSchedulerStaticWorkloads.h"
-#include <unordered_set>
-#include <regex>
 
 #include <spdlog/spdlog.h>
 #include "ListJobsFormatter.h"
@@ -59,21 +57,33 @@ bool Planner::ServeJobSubmission(const rpc::Request_ResourceRequest &request) {
         return true;
     }
 
-    auto tstart = std::chrono::system_clock::now();
-    auto tend = tstart + std::chrono::seconds(request.durationsec());;
-
-    int min_read_throughput = 0;
     std::unordered_set<std::string> osts_set;
-
-    if (min_read_throughput < request.throughputmb()) {
-        min_read_throughput = request.throughputmb();
+    if (!tryComputeOstSetOfRequest(request, osts_set)) {
+        return false;
     }
 
-    for (auto it = request.files().begin(); it != request.files().end(); it++) {
+    auto tstart = std::chrono::system_clock::now();
+    auto tend = tstart + std::chrono::seconds(request.durationsec());;
+    auto job = BuildJob(request, tstart, tend, osts_set);
+    return scheduler->ScheduleJob(*job);
+}
 
-        // get the osts for this file
-        std::shared_ptr<std::vector<std::string>> osts(new std::vector<std::string>);
-        if (!lustre->GetOstsForFile(*it, std::shared_ptr<std::vector<std::string>>(osts))) {
+std::shared_ptr<Job> Planner::BuildJob(const rpc::Request_ResourceRequest &request,
+                                       const std::chrono::time_point<std::chrono::system_clock> &tstart,
+                                       const std::chrono::time_point<std::chrono::system_clock> &tend,
+                                       std::unordered_set<std::string> &osts_set) const {
+    std::shared_ptr<Job> job(new Job(request.id(), tstart, tend, request.throughputmb()));
+    job->setState(Job::INITIALIZED);
+    auto osts = std::vector<std::string>(osts_set.begin(), osts_set.end());
+    job->setOsts(osts);
+    return job;
+}
+
+bool Planner::tryComputeOstSetOfRequest(const rpc::Request_ResourceRequest &request,
+                                        std::unordered_set<std::string> &osts_set) const {
+    for (auto it = request.files().begin(); it != request.files().end(); it++) {
+        std::shared_ptr<std::vector<std::string>> osts(new std::vector<std::string>());
+        if (!lustre->GetOstsForFile(*it, osts)) {
             return false;
         }
 
@@ -81,20 +91,14 @@ bool Planner::ServeJobSubmission(const rpc::Request_ResourceRequest &request) {
             osts_set.insert(ost);
         }
     }
-
-    auto osts = std::vector<std::string>(osts_set.begin(), osts_set.end());
-    common::Job job(request.id(), tstart, tend, min_read_throughput);
-    job.setState(common::Job::JobState::INITIALIZED);
-    job.setOsts(osts);
-
-    return scheduler->ScheduleJob(job);
+    return true;
 }
 
 
 bool Planner::ServeJobRemove(const rpc::Request_DeleteRequest &msg) {
     for (int i = 0; i < msg.id_size(); i++) {
         if (!schedule->RemoveJob(msg.id(i))) {
-            // TODO: add error logging
+            spdlog::get("console")->warn("removing of job {} failed", msg.id(i));
         }
     }
     return true;    // we guarantee that it is deleted -> always true

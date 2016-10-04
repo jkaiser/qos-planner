@@ -17,7 +17,6 @@ namespace common {
  */
 class Job {
 
-private:
 public:
     enum JobEvent {
         JOBSTART = 1,

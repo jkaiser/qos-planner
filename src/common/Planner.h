@@ -8,6 +8,7 @@
 #include <string>
 #include <memory>
 #include <regex>
+#include <unordered_set>
 #include "Lustre.h"
 #include "JobScheduler.h"
 #include "JobMonitor.h"
@@ -51,6 +52,13 @@ private:
 
     void AddJobsToReply(std::shared_ptr<rpc::Reply> &reply_msg, const std::map<std::string, Job *> *jobs,
                         std::vector<Job *> &job_list) const;
+
+    bool tryComputeOstSetOfRequest(const rpc::Request_ResourceRequest &request, std::unordered_set<std::string> &osts_set) const;
+
+    std::shared_ptr<Job> BuildJob(const rpc::Request_ResourceRequest &request,
+                                  const std::chrono::time_point<std::chrono::system_clock> &tstart,
+                                  const std::chrono::time_point<std::chrono::system_clock> &tend,
+                                  std::unordered_set<std::string> &osts_set) const;
 };
 
 }
