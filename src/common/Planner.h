@@ -35,9 +35,9 @@ public:
     /**
      * Processes the given resource request.
      */
-    bool ServeJobSubmission(const rpc::Request_ResourceRequest &msg);
-    bool ServeJobRemove(const rpc::Request_DeleteRequest &msg);
-    bool ServeListJobs(const rpc::Request_ListJobsRequest &msg, std::shared_ptr<rpc::Reply> reply_msg);
+    bool ServeJobSubmission(rpc::Message &msg);
+    bool ServeJobRemove(rpc::Message &msg);
+    bool ServeListJobs(rpc::Message &msg);
 
 private:
     const std::string root_path;

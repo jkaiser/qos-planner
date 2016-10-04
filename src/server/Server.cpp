@@ -60,17 +60,10 @@ void Server::Serve() {
             continue;
         }
 
-        bool success;
-        success = ProcessMessage(msg);
+        ProcessMessage(msg);
 
         msg.release_request();
         msg.set_type(rpc::Message::REPLY);
-        if (success) {
-            msg.mutable_reply()->set_rc(0);
-        } else {
-            msg.mutable_reply()->set_rc(1);
-        }
-
         s_send (*server, msg.SerializeAsString());
     }
 }
@@ -78,12 +71,11 @@ void Server::Serve() {
 bool Server::ProcessMessage(rpc::Message &msg) const {
     switch (msg.request().type()) {
             case rpc::Request::RESERVE:
-                return planner->ServeJobSubmission(msg.request().resourcerequest());
+                return planner->ServeJobSubmission(msg);
             case rpc::Request::DELETE:
-                return planner->ServeJobRemove(msg.request().deleterequest());
+                return planner->ServeJobRemove(msg);
             case rpc::Request::LISTJOBS:
-                return planner->ServeListJobs(msg.request().listjobsrequest(),
-                                                 std::shared_ptr<rpc::Reply>(msg.mutable_reply()));
+                return planner->ServeListJobs(msg);
             default :
                 return false;
         }

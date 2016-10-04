@@ -52,7 +52,8 @@ bool Planner::TearDown() {
 }
 
 
-bool Planner::ServeJobSubmission(const rpc::Request_ResourceRequest &request) {
+bool Planner::ServeJobSubmission(rpc::Message &msg) {
+    const rpc::Request_ResourceRequest &request = msg.request().resourcerequest();
     if (request.files_size() == 0) {    // noop
         return true;
     }
@@ -65,7 +66,13 @@ bool Planner::ServeJobSubmission(const rpc::Request_ResourceRequest &request) {
     auto tstart = std::chrono::system_clock::now();
     auto tend = tstart + std::chrono::seconds(request.durationsec());;
     auto job = BuildJob(request, tstart, tend, osts_set);
-    return scheduler->ScheduleJob(*job);
+    if (scheduler->ScheduleJob(*job)) {
+        msg.mutable_reply()->set_rc(0);
+        return true;
+    } else {
+        msg.mutable_reply()->set_rc(-1);
+        return false;
+    }
 }
 
 std::shared_ptr<Job> Planner::BuildJob(const rpc::Request_ResourceRequest &request,
@@ -95,31 +102,36 @@ bool Planner::tryComputeOstSetOfRequest(const rpc::Request_ResourceRequest &requ
 }
 
 
-bool Planner::ServeJobRemove(const rpc::Request_DeleteRequest &msg) {
-    for (int i = 0; i < msg.id_size(); i++) {
-        if (!schedule->RemoveJob(msg.id(i))) {
-            spdlog::get("console")->warn("removing of job {} failed", msg.id(i));
+bool Planner::ServeJobRemove(rpc::Message &msg) {
+    const rpc::Request_DeleteRequest &request = msg.request().deleterequest();
+
+    for (int i = 0; i < request.id_size(); i++) {
+        if (!schedule->RemoveJob(request.id(i))) {
+            spdlog::get("console")->warn("removing of job {} failed", request.id(i));
         }
     }
+
+    msg.mutable_reply()->set_rc(0);
     return true;    // we guarantee that it is deleted -> always true
 }
 
 
 
-bool Planner::ServeListJobs(const rpc::Request_ListJobsRequest &msg, std::shared_ptr<rpc::Reply> reply_msg) {
-
-    if (msg.regex().empty()) {
+bool Planner::ServeListJobs(rpc::Message &m) {
+    const rpc::Request_ListJobsRequest &request = m.request().listjobsrequest();
+    if (request.regex().empty()) {
         return false;
     }
 
-    std::regex r(msg.regex(), std::regex::grep);
-
     auto jobs = schedule->GetAllJobs();
+    std::regex r(request.regex(), std::regex::grep);
     std::vector<Job *> job_list = FilterJobs(r, jobs);
 
+    std::shared_ptr<rpc::Reply> reply_msg(new (rpc::Reply));
     AddJobsToReply(reply_msg, jobs, job_list);
 
     reply_msg->set_rc(0);
+    m.mutable_reply()->CopyFrom(*reply_msg);
     return true;
 }
 
