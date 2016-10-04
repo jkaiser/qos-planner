@@ -40,7 +40,6 @@ int main(int argc, char* argv[]) {
     std::string root_path = "";
     std::shared_ptr<common::Planner> planner(new common::Planner(root_path, FLAGS_ost_limits));
     if (!planner->Init()) {
-        spdlog::get("console")->info("Initializing failed");
         return -1;
     }
 
