@@ -40,11 +40,11 @@ int main(int argc, char* argv[]) {
     std::string root_path = "";
     std::shared_ptr<common::Planner> planner(new common::Planner(root_path, FLAGS_ost_limits));
     if (!planner->Init()) {
-        spdlog::get("console")->info("Initializing planner failed");
+        spdlog::get("console")->info("Initializing failed");
         return -1;
     }
 
-    Server s(ip_port,"", planner);
+    Server s(ip_port, "", planner);
     s.Init();
     s.Serve();
 
