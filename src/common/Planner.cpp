@@ -8,7 +8,7 @@
 #include <regex>
 
 #include <spdlog/spdlog.h>
-
+#include "ListJobsFormatter.h"
 
 namespace common {
 
@@ -102,7 +102,7 @@ bool Planner::ServeJobRemove(const rpc::Request_DeleteRequest &msg) {
 
 
 
-bool Planner::ServeListJobs(const rpc::Request_ListJobsRequest &msg, std::shared_ptr<rpc::Reply> reply_msg){
+bool Planner::ServeListJobs(const rpc::Request_ListJobsRequest &msg, std::shared_ptr<rpc::Reply> reply_msg) {
 
     if (msg.regex().empty()) {
         return false;
@@ -110,28 +110,34 @@ bool Planner::ServeListJobs(const rpc::Request_ListJobsRequest &msg, std::shared
 
     std::regex r(msg.regex(), std::regex::grep);
 
-
     auto jobs = schedule->GetAllJobs();
+    std::vector<Job *> job_list = FilterJobs(r, jobs);
 
-    std::string reply;
+    AddJobsToReply(reply_msg, jobs, job_list);
 
-    for (auto& kv : *jobs) {
-        // if k.first matches regex
-        if (std::regex_search(kv.first, r)) {
-            reply += kv.first + "\t" + Job::JobStateToString(kv.second->getState()) + "\n";
+    reply_msg->set_rc(0);
+    return true;
+}
+
+void Planner::AddJobsToReply(std::shared_ptr<rpc::Reply> &reply_msg, const std::map<std::string, Job *> *jobs,
+                             std::vector<Job *> &job_list) const {
+    if (jobs->size() > 0) {
+        ListJobsFormatter formatter;
+        reply_msg->set_return_msg(*formatter.Format(job_list));
+    } else {
+        reply_msg->set_return_msg("no matches found\n");
+    }
+}
+
+std::vector<Job *> Planner::FilterJobs(const std::regex &r, const std::map<std::string, Job *> *jobs) const {
+    std::vector<Job*> job_list;
+    job_list.reserve(jobs->size());
+    for (auto &kv : *jobs) {
+        if (regex_search(kv.first, r)) {
+            job_list.push_back(kv.second);
         }
     }
-
-    if (reply.empty()) {
-        reply = "no matches found\n";
-        reply_msg->set_rc(-1);
-    } else {
-        reply_msg->set_rc(0);
-    }
-
-    reply_msg->set_return_msg(reply);
-
-    return true;
+    return job_list;
 }
 
 

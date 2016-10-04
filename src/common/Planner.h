@@ -7,6 +7,7 @@
 
 #include <string>
 #include <memory>
+#include <regex>
 #include "Lustre.h"
 #include "JobScheduler.h"
 #include "JobMonitor.h"
@@ -45,6 +46,11 @@ private:
     std::shared_ptr<ScheduleState> schedule;
     std::shared_ptr<JobMonitor> jobMonitor;
 
+    std::vector<Job *> FilterJobs(const std::__1::basic_regex<char, std::__1::regex_traits<char>> &r,
+                                  const std::map<std::string, Job *> *jobs) const;
+
+    void AddJobsToReply(std::shared_ptr<rpc::Reply> &reply_msg, const std::map<std::string, Job *> *jobs,
+                        std::vector<Job *> &job_list) const;
 };
 
 }
