@@ -47,9 +47,6 @@ private:
     std::shared_ptr<ScheduleState> schedule;
     std::shared_ptr<JobMonitor> jobMonitor;
 
-    std::vector<Job *> FilterJobs(const std::__1::basic_regex<char, std::__1::regex_traits<char>> &r,
-                                  const std::map<std::string, Job *> *jobs) const;
-
     void AddJobsToReply(std::shared_ptr<rpc::Reply> &reply_msg, const std::map<std::string, Job *> *jobs,
                         std::vector<Job *> &job_list) const;
 
@@ -59,6 +56,10 @@ private:
                                   const std::chrono::time_point<std::chrono::system_clock> &tstart,
                                   const std::chrono::time_point<std::chrono::system_clock> &tend,
                                   std::unordered_set<std::string> &osts_set) const;
+
+    void AddDefaultRegexIfEmpty(rpc::Message &msg) const;
+
+    std::vector<Job *> FilterJobs(const rpc::Request_ListJobsRequest &request, const std::map<std::string, Job *> *jobs) const;
 };
 
 }

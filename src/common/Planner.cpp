@@ -11,7 +11,8 @@
 namespace common {
 
 
-Planner::Planner(std::string &root_path, std::string &ost_limits_file) : root_path(root_path), ost_limits_file(ost_limits_file) {
+Planner::Planner(std::string &root_path, std::string &ost_limits_file) : root_path(root_path),
+                                                                         ost_limits_file(ost_limits_file) {
     lustre.reset(new LocalLustre());
     schedule.reset(new MemoryScheduleState());
     jobMonitor.reset(new JobMonitor(schedule, lustre, 10));
@@ -66,13 +67,9 @@ bool Planner::ServeJobSubmission(rpc::Message &msg) {
     auto tstart = std::chrono::system_clock::now();
     auto tend = tstart + std::chrono::seconds(request.durationsec());;
     auto job = BuildJob(request, tstart, tend, osts_set);
-    if (scheduler->ScheduleJob(*job)) {
-        msg.mutable_reply()->set_rc(0);
-        return true;
-    } else {
-        msg.mutable_reply()->set_rc(-1);
-        return false;
-    }
+    bool success = scheduler->ScheduleJob(*job);
+    msg.mutable_reply()->set_rc((success) ? 0 : -1);
+    return success;
 }
 
 std::shared_ptr<Job> Planner::BuildJob(const rpc::Request_ResourceRequest &request,
@@ -116,23 +113,38 @@ bool Planner::ServeJobRemove(rpc::Message &msg) {
 }
 
 
+bool Planner::ServeListJobs(rpc::Message &msg) {
+    AddDefaultRegexIfEmpty(msg);
 
-bool Planner::ServeListJobs(rpc::Message &m) {
-    const rpc::Request_ListJobsRequest &request = m.request().listjobsrequest();
-    if (request.regex().empty()) {
-        return false;
-    }
-
+    const rpc::Request_ListJobsRequest &request = msg.request().listjobsrequest();
     auto jobs = schedule->GetAllJobs();
-    std::regex r(request.regex(), std::regex::grep);
-    std::vector<Job *> job_list = FilterJobs(r, jobs);
+    std::vector<Job *> job_list = FilterJobs(request, jobs);
 
     std::shared_ptr<rpc::Reply> reply_msg(new (rpc::Reply));
     AddJobsToReply(reply_msg, jobs, job_list);
 
     reply_msg->set_rc(0);
-    m.mutable_reply()->CopyFrom(*reply_msg);
+    msg.mutable_reply()->CopyFrom(*reply_msg);
     return true;
+}
+
+std::vector<Job *>
+Planner::FilterJobs(const rpc::Request_ListJobsRequest &request, const std::map<std::string, Job *> *jobs) const {
+    std::regex r(request.regex(), std::regex::grep);
+    std::vector<Job *> job_list;
+    job_list.reserve(jobs->size());
+    for (auto &kv : *jobs) {
+        if (regex_search(kv.first, r)) {
+            job_list.push_back(kv.second);
+        }
+    }
+    return job_list;
+}
+
+void Planner::AddDefaultRegexIfEmpty(rpc::Message &msg) const {
+    if (msg.request().listjobsrequest().regex().empty()) {
+        msg.mutable_request()->mutable_listjobsrequest()->set_regex(".*");
+    }
 }
 
 void Planner::AddJobsToReply(std::shared_ptr<rpc::Reply> &reply_msg, const std::map<std::string, Job *> *jobs,
@@ -143,17 +155,6 @@ void Planner::AddJobsToReply(std::shared_ptr<rpc::Reply> &reply_msg, const std::
     } else {
         reply_msg->set_return_msg("no matches found\n");
     }
-}
-
-std::vector<Job *> Planner::FilterJobs(const std::regex &r, const std::map<std::string, Job *> *jobs) const {
-    std::vector<Job*> job_list;
-    job_list.reserve(jobs->size());
-    for (auto &kv : *jobs) {
-        if (regex_search(kv.first, r)) {
-            job_list.push_back(kv.second);
-        }
-    }
-    return job_list;
 }
 
 
