@@ -37,6 +37,13 @@ bool Planner::Init() {
         return false;
     }
 
+    if (!scheduler->Init()) {
+        spdlog::get("console")->critical("Initializing scheduler failed");
+        jobMonitor->TearDown();
+        schedule->TearDown();
+        return false;
+    }
+
     return true;
 }
 
