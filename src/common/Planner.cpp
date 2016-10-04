@@ -102,14 +102,16 @@ bool Planner::tryComputeOstSetOfRequest(const rpc::Request_ResourceRequest &requ
 bool Planner::ServeJobRemove(rpc::Message &msg) {
     const rpc::Request_DeleteRequest &request = msg.request().deleterequest();
 
+    bool success = true;
     for (int i = 0; i < request.id_size(); i++) {
         if (!schedule->RemoveJob(request.id(i))) {
             spdlog::get("console")->warn("removing of job {} failed", request.id(i));
+            success = false;
         }
     }
 
-    msg.mutable_reply()->set_rc(0);
-    return true;    // we guarantee that it is deleted -> always true
+    msg.mutable_reply()->set_rc((success) ? 0 : 1);
+    return success;    // we guarantee that it is deleted -> always true
 }
 
 
