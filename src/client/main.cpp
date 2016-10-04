@@ -44,11 +44,11 @@ int execute(Client &client, const std::string &cmd) {
 
     bool success = false;
     if (cmd.compare("reserve") == 0) {
-        success = client.requestResources(FLAGS_id, FLAGS_filenames, FLAGS_throughput, FLAGS_duration);
+        success = client.TryReserveResources(FLAGS_id, FLAGS_filenames, FLAGS_throughput, FLAGS_duration);
     } else if (cmd.compare("remove") == 0) {
-        success = client.removeReservation(FLAGS_id);
+        success = client.RemoveReservation(FLAGS_id);
     } else if (cmd.compare("ls") == 0) {
-        success = client.listReservations();
+        success = client.ListReservations();
     } else {
         spdlog::get("console")->critical("unknown command: {}", cmd);
     }

@@ -43,10 +43,9 @@ private:
 public:
     Client(std::string ipPort);
     bool Init();
-    bool requestResources(const std::string &id, const std::string &filenames, int throughput, int duration_sec);
-    bool removeReservation(const std::string &reservation_id);
-
-    bool listReservations();
+    bool TryReserveResources(const std::string &id, const std::string &filenames, int throughput, int duration_sec);
+    bool RemoveReservation(const std::string &reservation_id);
+    bool ListReservations();
 };
 
 

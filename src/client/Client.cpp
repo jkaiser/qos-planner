@@ -35,7 +35,7 @@ void Client::InitializeZMQSocket() {
 
 }
 
-bool Client::requestResources(const std::string &id, const std::string &filenames, int throughput, int duration_sec) {
+bool Client::TryReserveResources(const std::string &id, const std::string &filenames, int throughput, int duration_sec) {
 
     if(!IsInputValid(id, filenames, duration_sec)) {
         return false;
@@ -135,7 +135,7 @@ void Client::ProcessReply(std::string &reply) {
         spdlog::get("console")->debug("got answer: {}", msg.DebugString());
 }
 
-bool Client::removeReservation(const std::string &reservation_id) {
+bool Client::RemoveReservation(const std::string &reservation_id) {
     std::shared_ptr<rpc::Message> msg (new rpc::Message());
 
     if (reservation_id.empty()) {
@@ -160,7 +160,7 @@ bool Client::removeReservation(const std::string &reservation_id) {
     return true;
 }
 
-bool Client::listReservations() {
+bool Client::ListReservations() {
     std::shared_ptr<rpc::Message> msg (new rpc::Message());
 
     rpc::Request request;
