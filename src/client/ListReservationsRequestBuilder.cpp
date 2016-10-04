@@ -6,7 +6,7 @@
 
 bool ListReservationsRequestBuilder::BuildRequest(rpc::Request &request) const {
 
-    request.set_type(rpc::Request_Type_DELETE);
+    request.set_type(rpc::Request_Type_LISTJOBS);
     request.mutable_listjobsrequest();
 
     return true;
