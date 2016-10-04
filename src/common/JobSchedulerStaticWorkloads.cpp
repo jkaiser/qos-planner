@@ -7,6 +7,8 @@
 
 #include <fstream>
 
+#include <spdlog/spdlog.h>
+
 namespace common {
 
 JobSchedulerStaticWorkloads::JobSchedulerStaticWorkloads(std::shared_ptr<ScheduleState> &schedule,
@@ -92,9 +94,11 @@ void JobSchedulerStaticWorkloads::UpdateLimits(const std::map<std::string, uint3
 
 bool JobSchedulerStaticWorkloads::Init() {
 
+    spdlog::get("console")->info("init scheduler");
     if (!ost_limits_file.empty()) {
         std::ifstream is(ost_limits_file, std::ifstream::in);
         if (!is.is_open()) {
+            spdlog::get("console")->critical("ost limits file \"{}\" doesn't exist!", ost_limits_file);
             return false;
         }
 

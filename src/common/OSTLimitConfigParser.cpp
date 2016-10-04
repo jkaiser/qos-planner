@@ -4,6 +4,7 @@
 
 #include "OSTLimitConfigParser.h"
 
+#include <spdlog/spdlog.h>
 
 namespace common {
 
@@ -38,7 +39,8 @@ void OSTLimitConfigParser::ParseContent(const nlohmann::json &j) {
 bool OSTLimitConfigParser::tryToParse(std::istream &in_stream, nlohmann::json &j) const {
     try {
         j << in_stream;
-    } catch (...) {
+    } catch (const std::exception & ex) {
+        spdlog::get("console")->critical("couldn't parse ost limits file. error: {}", ex.what());
         return false;
     }
     return true;
