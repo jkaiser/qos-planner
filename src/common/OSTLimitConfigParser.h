@@ -21,7 +21,6 @@ private:
 public:
 
     bool Parse(std::istream &in_stream);
-
     std::map<std::string, float> GetLimits();
 };
 }

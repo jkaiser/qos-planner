@@ -123,12 +123,12 @@ bool Client::sendAndReceiveRequest(std::string &raw_msg, std::string &reply) {
 
         while (1) {
             //  Poll socket for a reply, with timeout
-            zmq::pollitem_t items[] = { { (void *) *client, 0, ZMQ_POLLIN, 0 } };
-            zmq::poll (&items[0], 1, request_timeout);
+            zmq::pollitem_t items[] = {{(void *) *client, 0, ZMQ_POLLIN, 0}};
+            zmq::poll(&items[0], 1, request_timeout);
 
             //  If we got a reply, process it
             if (items[0].revents & ZMQ_POLLIN) {
-                reply = s_recv (*client);
+                reply = s_recv(*client);
                 return true;
             } else if (--retries_left == 0) {
                 spdlog::get("console")->error("server seems to be offline, abandoning");
@@ -155,7 +155,7 @@ void Client::ProcessReply(std::string &reply) {
 }
 
 bool Client::RemoveReservation(const std::string &reservation_id) {
-    std::shared_ptr<rpc::Message> msg (new rpc::Message());
+    std::shared_ptr<rpc::Message> msg(new rpc::Message());
 
     if (reservation_id.empty()) {
         return false;
@@ -180,7 +180,7 @@ bool Client::RemoveReservation(const std::string &reservation_id) {
 }
 
 bool Client::ListReservations() {
-    std::shared_ptr<rpc::Message> msg (new rpc::Message());
+    std::shared_ptr<rpc::Message> msg(new rpc::Message());
 
     rpc::Request request;
     ListReservationsRequestBuilder rb;
@@ -193,7 +193,7 @@ bool Client::ListReservations() {
     spdlog::get("console")->debug("will send: {}", msg->DebugString());
 
     std::string reply;
-    if (!trySendRequestAndReceiveReply(msg, reply)){
+    if (!trySendRequestAndReceiveReply(msg, reply)) {
         return false;
     }
 
@@ -202,7 +202,7 @@ bool Client::ListReservations() {
 }
 
 bool Client::ProcessListReply(const std::string &reply) const {
-    std::shared_ptr<rpc::Message> msg (new rpc::Message());
+    std::shared_ptr<rpc::Message> msg(new rpc::Message());
     if (!msg->ParseFromString(reply)) {
         spdlog::get("console")->error("couldn't parse reply from server");
         return false;
@@ -214,7 +214,8 @@ bool Client::ProcessListReply(const std::string &reply) const {
     }
 
     if (msg->reply().rc() != 0) {
-        spdlog::get("console")->error("server returned error: {}", rpc::Error::errorType_Name(msg->reply().error().error()));
+        spdlog::get("console")->error("server returned error: {}",
+                                      rpc::Error::errorType_Name(msg->reply().error().error()));
         return false;
     }
 
