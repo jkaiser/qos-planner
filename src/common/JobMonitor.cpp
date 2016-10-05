@@ -152,7 +152,7 @@ void JobMonitor::Monitor() {
 
 bool JobMonitor::isThereAReadyJob() const {
     return (job_priority_queue.Peek() != nullptr) &&
-           (job_priority_queue.Peek()->time_of_event < std::__1::chrono::system_clock::now());
+           (job_priority_queue.Peek()->time_of_event < std::chrono::system_clock::now());
 }
 
 

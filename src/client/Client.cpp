@@ -100,7 +100,12 @@ bool Client::sendAndReceiveRequest(std::string &raw_msg, std::string &reply) {
     int retries_left = request_retries;
 
     while (retries_left) {
-        s_send (*client, raw_msg);
+
+        zmq::message_t message(raw_msg.size());
+        memcpy (message.data(), raw_msg.data(), raw_msg.size());
+        client->send (message);
+
+//        s_send (*client, raw_msg);
 
         while (1) {
             //  Poll socket for a reply, with timeout
@@ -118,7 +123,12 @@ bool Client::sendAndReceiveRequest(std::string &raw_msg, std::string &reply) {
                 spdlog::get("console")->warn("no response from server, retrying...");
                 //  Old socket will be confused; close it and open a new one
                 InitializeZMQSocket();
-                s_send (*client, raw_msg.data());
+
+                zmq::message_t message(raw_msg.size());
+                memcpy (message.data(), raw_msg.data(), raw_msg.size());
+                client->send (message);
+
+//                s_send (*client, raw_msg.data());
             }
         }
     }
