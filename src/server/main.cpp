@@ -15,7 +15,7 @@ using namespace std;
 
 void setupLogging(bool verbose) {
 
-    auto console = spdlog::stdout_logger_mt("console", false);
+    auto console = spdlog::stdout_logger_mt("console");
     spdlog::set_pattern("[%H:%M:%S] [%l] %v");
 
     if (verbose)
