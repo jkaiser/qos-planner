@@ -5,10 +5,12 @@
 #include "Client.h"
 
 #include <iostream>
+#include <fstream>
 
 #include "ReserveRequestBuilder.h"
 #include "RemoveReservationRequestBuilder.h"
 #include "ListReservationsRequestBuilder.h"
+#include "StorageReqParser.h"
 
 #include <spdlog/spdlog.h>
 
@@ -25,31 +27,48 @@ bool Client::Init() {
 }
 
 void Client::InitializeZMQSocket() {
-    client.reset(new zmq::socket_t (*context, ZMQ_REQ));
+    client.reset(new zmq::socket_t(*context, ZMQ_REQ));
     std::string full_address = "tcp://" + ipPort;
-    client->connect (full_address.data());
+    client->connect(full_address.data());
 
     //  Configure socket to not wait at close time
     int linger = 0;
-    client->setsockopt (ZMQ_LINGER, &linger, sizeof (linger));
+    client->setsockopt(ZMQ_LINGER, &linger, sizeof(linger));
 
 }
 
-bool Client::TryReserveResources(const std::string &id, const std::string &filenames, int throughput, int duration_sec) {
+bool Client::TryReserveResources(const std::string &id, const std::string &filenames, int throughput, int duration_sec,
+                                 const std::string &storage_req_file) {
 
-    if(!IsInputValid(id, filenames, duration_sec)) {
+
+    std::string filenames_to_use = filenames;
+    int throughput_to_use = throughput;
+    int duration_to_use = duration_sec;
+
+    std::shared_ptr<rpc::Message> msg(new rpc::Message());
+    if (!storage_req_file.empty()) {
+        if (!TryParseReqFile(storage_req_file, filenames_to_use, throughput_to_use, duration_to_use)) {
+            return false;
+        }
+
+    }
+
+    spdlog::get("console")->debug("check for valid input");
+    if (!IsInputValid(id, filenames_to_use, duration_to_use)) {
+        spdlog::get("console")->critical("input is invalid {}, {}, {}", id, filenames_to_use, duration_to_use);
         return false;
     }
 
-    std::shared_ptr<rpc::Message> msg (new rpc::Message());
-    if (!TryBuildReserveMessage(id, filenames, throughput, duration_sec, msg)) {
+    spdlog::get("console")->debug("try to build message");
+
+    if (!TryBuildReserveMessage(id, filenames_to_use, throughput_to_use, duration_to_use, msg)) {
         return false;
     };
 
     spdlog::get("console")->debug("will send: {}", msg->DebugString());
 
     std::string reply;
-    if (!trySendRequestAndReceiveReply(msg, reply)){
+    if (!trySendRequestAndReceiveReply(msg, reply)) {
         return false;
     }
 
@@ -163,7 +182,7 @@ bool Client::RemoveReservation(const std::string &reservation_id) {
     spdlog::get("console")->debug("will send: {}", msg->DebugString());
 
     std::string reply;
-    if (!trySendRequestAndReceiveReply(msg, reply)){
+    if (!trySendRequestAndReceiveReply(msg, reply)) {
         return false;
     }
 
@@ -210,6 +229,30 @@ bool Client::ProcessListReply(const std::string &reply) const {
     }
 
     std::cout << msg->reply().return_msg() << std::endl;
+    return true;
+}
+
+bool Client::TryParseReqFile(const std::string &filename, std::string &filenames_to_use, int &throughput_to_use,
+                             int &duration_to_use) {
+
+
+    std::ifstream is(filename, std::ifstream::in);
+    if (!is.is_open()) {
+        spdlog::get("console")->critical("storage req file \"{}\" doesn't exist!", filename);
+        return false;
+    }
+
+    common::StorageReqParser p;
+    if (!p.Parse(is)) {
+        spdlog::get("console")->critical("failed to parse \"{}\"", filename);
+        return false;
+    }
+
+    spdlog::get("console")->info("parsing successful");
+    filenames_to_use = p.getRead_files();
+    throughput_to_use = p.getThroughput_mbs();
+    duration_to_use = p.getDuration();
+
     return true;
 }
 

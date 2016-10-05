@@ -12,6 +12,7 @@ DEFINE_string(id, "", "ID of the job");
 DEFINE_string(filenames, "", "comma seperated list of files");
 DEFINE_int32(throughput, 0, "requested throughput in MB/s");
 DEFINE_int32(duration, 0, "duration of the reservation in seconds");
+DEFINE_string(storage_req_file, "", "file that includes the storage requirements definitions");
 DEFINE_bool(v, false, "verbose");
 
 using namespace std;
@@ -44,7 +45,7 @@ int execute(Client &client, const std::string &cmd) {
 
     bool success = false;
     if (cmd.compare("reserve") == 0) {
-        success = client.TryReserveResources(FLAGS_id, FLAGS_filenames, FLAGS_throughput, FLAGS_duration);
+        success = client.TryReserveResources(FLAGS_id, FLAGS_filenames, FLAGS_throughput, FLAGS_duration, FLAGS_storage_req_file);
     } else if (cmd.compare("remove") == 0) {
         success = client.RemoveReservation(FLAGS_id);
     } else if (cmd.compare("ls") == 0) {
