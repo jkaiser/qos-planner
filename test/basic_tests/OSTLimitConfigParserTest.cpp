@@ -9,12 +9,19 @@
 
 #include <sstream>
 
+#include <spdlog/spdlog.h>
+
 class OSTLimitParserTest : public ::testing::Test {
 
 protected:
     std::unique_ptr<common::OSTLimitConfigParser> oparser;
 
     virtual void SetUp() {
+        if (!spdlog::get("console")) {
+            auto console = spdlog::stdout_logger_mt("console", false);
+            spdlog::set_level(spdlog::level::critical);
+        }
+
         oparser.reset(new common::OSTLimitConfigParser);
     }
 
