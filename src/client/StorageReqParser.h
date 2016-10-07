@@ -24,7 +24,6 @@ private:
     void ParseContent(const nlohmann::json &j);
 public:
     const std::string &getRead_files() const;
-    int getDuration() const;
     int getThroughput_mbs() const;
 
     bool Parse(std::istream &in_stream);

@@ -35,7 +35,7 @@ TEST_F(StorageReqParserTest, MustFailAtInvalidJSON) {
 
 TEST_F(StorageReqParserTest, MustAcceptValidFile) {
 
-    std::string json = "{\"throughput_mbs\" : 10, \"duration_sec\" : 30, \"read_files\" : [\"foo\"]}";
+    std::string json = "{\"throughput_mbs\" : 10, \"read_files\" : [\"foo\"]}";
     ss.str(json);
 
     ASSERT_TRUE(p.Parse(ss));
@@ -43,12 +43,11 @@ TEST_F(StorageReqParserTest, MustAcceptValidFile) {
 
 TEST_F(StorageReqParserTest, MustDeliverValidValues) {
 
-    std::string json = "{\"throughput_mbs\" : 10, \"duration_sec\" : 30, \"read_files\" : [\"foo\"]}";
+    std::string json = "{\"throughput_mbs\" : 10, \"read_files\" : [\"foo\"]}";
     ss.str(json);
 
     p.Parse(ss);
 
     ASSERT_EQ(10, p.getThroughput_mbs());
-    ASSERT_EQ(30, p.getDuration());
     ASSERT_STREQ("foo", p.getRead_files().data());
 }

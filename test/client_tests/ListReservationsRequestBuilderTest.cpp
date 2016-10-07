@@ -13,7 +13,7 @@ TEST(ListReservationsRequestBuilderTest, CreatesMessage) {
     ASSERT_TRUE(rb.BuildRequest(message));
 
     ASSERT_EQ(rpc::Request_Type_LISTJOBS, message.type());
-    ASSERT_TRUE(message.has_listjobsrequest());
+
     ASSERT_FALSE(message.has_deleterequest());
     ASSERT_FALSE(message.has_resourcerequest());
 
