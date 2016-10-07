@@ -30,30 +30,33 @@ void ListJobsFormatter::AddJobs(const std::vector<Job *> &jobs) {
     }
 }
 
-void ListJobsFormatter::AddHeader() { stream << "Reservation ID\tTEnd\tThroughput [MB/s]\tState\n"; }
+void ListJobsFormatter::AddHeader() {
+    stream << std::setw(10) << "Job ID";
+    stream << std::setw(20) << "Reserv. ID";
+    stream << std::setw(20) << "TEnd";
+    stream << std::setw(20) << "Throughput [MB/s]";
+    stream << std::setw(10) << "State";
+    stream << std::endl;
+}
 
 void ListJobsFormatter::AddJob(Job *j) {
     AddJobID(j);
-
-    stream << "\t";
     AddTend(j);
-    stream << "\t";
-
     AddThroughput(j);
     AddJobState(j);
 }
 
-void ListJobsFormatter::AddJobID(const Job *j) { stream << j->getJobid(); }
+void ListJobsFormatter::AddJobID(const Job *j) { stream << std::setw(10) << j->getJobid(); }
 
-void ListJobsFormatter::AddThroughput(const Job *j) { stream << j->getMin_read_throughput_MB(); }
+void ListJobsFormatter::AddThroughput(const Job *j) { stream << std::setw(20) << j->getMin_read_throughput_MB(); }
 
 void ListJobsFormatter::AddTend(const Job *j)  {
     time_t now_c = std::chrono::system_clock::to_time_t(j->GetEndTime());
-    stream << std::put_time(localtime(&now_c), "%b %d %T");
+    stream << std::setw(20) << std::put_time(localtime(&now_c), "%b %d %T");
 }
 
 void ListJobsFormatter::AddJobState(Job *j) {
-    stream << Job::JobStateToString(j->getState());
+    stream << std::setw(10) << Job::JobStateToString(j->getState());
 }
 
 }
