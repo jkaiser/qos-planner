@@ -8,7 +8,6 @@
 #include <Job.h>
 #include <ListJobsFormatter.h>
 
-
 class ListJobsFormatterTest : public ::testing::Test {
 
 protected:
@@ -35,9 +34,9 @@ TEST_F(ListJobsFormatterTest, FormattedStringMustNotBeEmpty) {
     std::string id = "id";
     std::chrono::time_point<std::chrono::system_clock> tstart = std::chrono::system_clock::now();
     std::chrono::time_point<std::chrono::system_clock> tend = tstart;
-    int throuhput_mbs = 10;
+    int throughput_mbs = 10;
 
-    common::Job *job = new common::Job(id, tstart, tend, throuhput_mbs);
+    common::Job *job = new common::Job(id, tstart, tend, throughput_mbs);
     jobs.push_back(job);
 
     auto text = formatter.Format(jobs);
