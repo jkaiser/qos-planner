@@ -25,7 +25,6 @@ std::shared_ptr<std::string> ListJobsFormatter::Format(std::vector<Job *> &jobs)
 }
 
 void ListJobsFormatter::AddJobs(const std::vector<Job *> &jobs) {
-//    std::setfill(' ');
     for(auto &j : jobs) {
         AddJob(j);
     }
@@ -40,13 +39,13 @@ void ListJobsFormatter::AddHeader() {
 }
 
 void ListJobsFormatter::AddJob(Job *j) {
-    AddJobID(j);
+    AddReservationID(j);
     AddThroughput(j);
     AddJobState(j);
     AddTend(j);
 }
 
-void ListJobsFormatter::AddJobID(const Job *j) {
+void ListJobsFormatter::AddReservationID(const Job *j) {
     stream << std::left << std::setw(reservation_shift) << j->getJobid();
 }
 

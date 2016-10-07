@@ -28,7 +28,7 @@ private:
     void AddJobState(Job *j);
     void AddTend(const Job *j);
     void AddThroughput(const Job *j);
-    void AddJobID(const Job *j);
+    void AddReservationID(const Job *j);
     void AddHeader();
     void AddJobs(const std::vector<Job *> &jobs);
 
