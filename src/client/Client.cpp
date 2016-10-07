@@ -55,7 +55,7 @@ bool Client::TryReserveResources(const std::string &id, const std::string &filen
 
     spdlog::get("console")->debug("check for valid input");
     if (!IsInputValid(id, filenames_to_use, duration_to_use)) {
-        spdlog::get("console")->critical("input is invalid {}, {}, {}", id, filenames_to_use, duration_to_use);
+        spdlog::get("console")->critical("input is invalid id:{}, filenames:{}, duration:{}", id, filenames_to_use, duration_to_use);
         return false;
     }
 
