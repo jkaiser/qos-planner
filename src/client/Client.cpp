@@ -68,7 +68,7 @@ bool Client::TryReserveResources(const std::string &id, const std::string &filen
     spdlog::get("console")->debug("will send: {}", msg->DebugString());
 
     std::string reply;
-    if (!trySendRequestAndReceiveReply(msg, reply)) {
+    if (!TrySendRequestAndReceiveReply(msg, reply)) {
         return false;
     }
 
@@ -105,16 +105,16 @@ bool Client::IsInputValid(const std::string &id, const std::string &filenames, i
     return true;
 }
 
-bool Client::trySendRequestAndReceiveReply(std::shared_ptr<rpc::Message> &request, std::string &reply) {
+bool Client::TrySendRequestAndReceiveReply(std::shared_ptr<rpc::Message> &request, std::string &reply) {
     std::string raw_msg = request->SerializeAsString();
-    if (!sendAndReceiveRequest(raw_msg, reply)) {
+    if (!SendAndReceiveRequest(raw_msg, reply)) {
         spdlog::get("console")->error("getting the request the server failed");
         return false;
     }
     return true;
 }
 
-bool Client::sendAndReceiveRequest(std::string &raw_msg, std::string &reply) {
+bool Client::SendAndReceiveRequest(std::string &raw_msg, std::string &reply) {
 
     int retries_left = request_retries;
 
@@ -172,7 +172,7 @@ bool Client::RemoveReservation(const std::string &reservation_id) {
     spdlog::get("console")->debug("will send: {}", msg->DebugString());
 
     std::string reply;
-    if (!trySendRequestAndReceiveReply(msg, reply)) {
+    if (!TrySendRequestAndReceiveReply(msg, reply)) {
         return false;
     }
 
@@ -193,7 +193,7 @@ bool Client::ListReservations() {
     spdlog::get("console")->debug("will send: {}", msg->DebugString());
 
     std::string reply;
-    if (!trySendRequestAndReceiveReply(msg, reply)) {
+    if (!TrySendRequestAndReceiveReply(msg, reply)) {
         return false;
     }
 

@@ -25,13 +25,13 @@ private:
     const int request_timeout = 1000;
     const int request_retries = 3;
 
-    bool sendAndReceiveRequest(std::string &raw_msg, std::string &reply);
+    bool SendAndReceiveRequest(std::string &raw_msg, std::string &reply);
 
     void InitializeZMQSocket();
 
     void ProcessReply(std::string &reply);
 
-    bool trySendRequestAndReceiveReply(std::shared_ptr<rpc::Message> &request, std::string &reply);
+    bool TrySendRequestAndReceiveReply(std::shared_ptr<rpc::Message> &request, std::string &reply);
 
     bool IsInputValid(const std::string &id, const std::string &filenames, int duration) const;
 
