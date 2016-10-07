@@ -19,6 +19,11 @@ class ListJobsFormatter {
 private:
     std::stringstream stream;
 
+    static const int reservation_shift = 15;
+    static const int throughput_shift = 20;
+    static const int jobstate_shift = 15;
+    static const int time_end_shift = 20;
+
     void AddJob(Job *j);
     void AddJobState(Job *j);
     void AddTend(const Job *j);

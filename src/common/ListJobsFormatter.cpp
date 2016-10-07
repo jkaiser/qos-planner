@@ -25,38 +25,42 @@ std::shared_ptr<std::string> ListJobsFormatter::Format(std::vector<Job *> &jobs)
 }
 
 void ListJobsFormatter::AddJobs(const std::vector<Job *> &jobs) {
+//    std::setfill(' ');
     for(auto &j : jobs) {
         AddJob(j);
     }
 }
 
 void ListJobsFormatter::AddHeader() {
-    stream << std::setw(10) << "Job ID";
-    stream << std::setw(20) << "Reserv. ID";
-    stream << std::setw(20) << "TEnd";
-    stream << std::setw(20) << "Throughput [MB/s]";
-    stream << std::setw(10) << "State";
+    stream << std::left << std::setw(reservation_shift) << "Reserv.-ID";
+    stream << std::left << std::setw(throughput_shift) << "Throughput [MB/s]";
+    stream << std::left << std::setw(jobstate_shift) << "State";
+    stream << std::left << std::setw(time_end_shift) << "TEnd";
     stream << std::endl;
 }
 
 void ListJobsFormatter::AddJob(Job *j) {
     AddJobID(j);
-    AddTend(j);
     AddThroughput(j);
     AddJobState(j);
+    AddTend(j);
 }
 
-void ListJobsFormatter::AddJobID(const Job *j) { stream << std::setw(10) << j->getJobid(); }
+void ListJobsFormatter::AddJobID(const Job *j) {
+    stream << std::left << std::setw(reservation_shift) << j->getJobid();
+}
 
-void ListJobsFormatter::AddThroughput(const Job *j) { stream << std::setw(20) << j->getMin_read_throughput_MB(); }
+void ListJobsFormatter::AddThroughput(const Job *j) {
+    stream << std::left << std::setw(throughput_shift) << j->getMin_read_throughput_MB();
+}
 
 void ListJobsFormatter::AddTend(const Job *j)  {
     time_t now_c = std::chrono::system_clock::to_time_t(j->GetEndTime());
-    stream << std::setw(20) << std::put_time(localtime(&now_c), "%b %d %T");
+    stream << std::left << std::setw(time_end_shift) << std::put_time(localtime(&now_c), "%b %d %T");
 }
 
 void ListJobsFormatter::AddJobState(Job *j) {
-    stream << std::setw(10) << Job::JobStateToString(j->getState());
+    stream << std::setw(jobstate_shift) << Job::JobStateToString(j->getState());
 }
 
 }
