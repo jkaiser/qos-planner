@@ -18,7 +18,7 @@ protected:
 
     virtual void SetUp() {
         if (!spdlog::get("console")) {
-            auto console = spdlog::stdout_logger_mt("console", false);
+            auto console = spdlog::stdout_logger_mt("console");
             spdlog::set_level(spdlog::level::critical);
         }
 
