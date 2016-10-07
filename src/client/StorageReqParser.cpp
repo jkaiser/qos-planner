@@ -37,10 +37,6 @@ const std::string &StorageReqParser::getRead_files() const {
     return read_files_;
 }
 
-int StorageReqParser::getDuration() const {
-    return duration_;
-}
-
 int StorageReqParser::getThroughput_mbs() const {
     return throughput_mbs_;
 }
@@ -51,10 +47,6 @@ void StorageReqParser::ParseContent(const nlohmann::json &j) {
     if (throughput != j.end()) {
         throughput_mbs_ = throughput->get<int>();
 
-    }
-    auto duration = j.find("duration_sec");
-    if (duration != j.end()) {
-        duration_ = duration->get<int>();
     }
 
     auto read_files = j.find("read_files");

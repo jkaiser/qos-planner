@@ -40,7 +40,7 @@ private:
 
     bool ProcessListReply(const std::string &reply) const;
 
-    bool TryParseReqFile(const std::string &filename, std::string &filenames_to_use, int &throughput_to_use, int &duration_to_use);
+    bool TryParseReqFile(const std::string &filename, std::string &filenames_to_use, int &throughput_to_use);
 
 public:
 

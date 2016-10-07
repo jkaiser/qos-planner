@@ -47,7 +47,7 @@ bool Client::TryReserveResources(const std::string &id, const std::string &filen
 
     std::shared_ptr<rpc::Message> msg(new rpc::Message());
     if (!storage_req_file.empty()) {
-        if (!TryParseReqFile(storage_req_file, filenames_to_use, throughput_to_use, duration_to_use)) {
+        if (!TryParseReqFile(storage_req_file, filenames_to_use, throughput_to_use)) {
             return false;
         }
 
@@ -98,7 +98,7 @@ bool Client::IsInputValid(const std::string &id, const std::string &filenames, i
     } else if (filenames.empty()) {
         spdlog::get("console")->error("at least one file must be given");
         return false;
-    } else if (duration <= 0) {
+    } else if (duration < 0) {
         spdlog::get("console")->error("an end date must be given");
         return false;
     }
@@ -223,8 +223,7 @@ bool Client::ProcessListReply(const std::string &reply) const {
     return true;
 }
 
-bool Client::TryParseReqFile(const std::string &filename, std::string &filenames_to_use, int &throughput_to_use,
-                             int &duration_to_use) {
+bool Client::TryParseReqFile(const std::string &filename, std::string &filenames_to_use, int &throughput_to_use) {
 
 
     std::ifstream is(filename, std::ifstream::in);
@@ -242,7 +241,6 @@ bool Client::TryParseReqFile(const std::string &filename, std::string &filenames
     spdlog::get("console")->info("parsing successful");
     filenames_to_use = p.getRead_files();
     throughput_to_use = p.getThroughput_mbs();
-    duration_to_use = p.getDuration();
 
     return true;
 }

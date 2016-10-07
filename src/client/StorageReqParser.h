@@ -18,7 +18,6 @@ class StorageReqParser {
 private:
 
     std::string read_files_;
-    int duration_;
     int throughput_mbs_;
 
     bool tryToParse(std::istream &in_stream, nlohmann::json &j) const;
