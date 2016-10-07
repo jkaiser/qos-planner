@@ -72,7 +72,8 @@ bool Planner::ServeJobSubmission(rpc::Message &msg) {
     }
 
     auto tstart = std::chrono::system_clock::now();
-    auto tend = tstart + std::chrono::seconds(request.durationsec());;
+    auto tend = (request.durationsec() == 0) ? std::chrono::time_point::max() : tstart + std::chrono::seconds(
+            request.durationsec());
     auto job = BuildJob(request, tstart, tend, osts_set);
     bool success = scheduler->ScheduleJob(*job);
     msg.mutable_reply()->set_rc((success) ? 0 : -1);
