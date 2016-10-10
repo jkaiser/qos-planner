@@ -4,9 +4,12 @@
 
 #include "Lustre.h"
 
+#include <sys/stat.h>
 #include <regex>
 #include <sstream>
 #include <unordered_set>
+
+#include <spdlog/spdlog.h>
 
 namespace common {
 
@@ -20,7 +23,7 @@ bool LocalLustre::StartJobTbfRule(std::string jobid, std::string rule_name, uint
     std::shared_ptr<std::string> out(new std::string());
 
     if (!exec(cmd.c_str(), out)) {
-        // TODO: add error reporting
+        spdlog::get("console")->error("starting tbf rule failed for reservation '{}'", jobid);
         return false;
     }
     return true;
@@ -32,7 +35,7 @@ bool LocalLustre::ChangeJobTbfRule(std::string jobid, std::string rule_name, uin
     std::shared_ptr<std::string> out(new std::string());
 
     if (!exec(cmd.c_str(), out)) {
-        // TODO: add error reporting
+        spdlog::get("console")->error("changing tbf rule failed for reservation '{}'", jobid);
         return false;
     }
     return true;
@@ -46,7 +49,7 @@ bool LocalLustre::StopJobTbfRule(std::string jobid, std::string rule_name) {
     std::shared_ptr<std::string> out(new std::string());
 
     if (!exec(cmd.c_str(), out)) {
-        // TODO: add error reporting
+        spdlog::get("console")->error("stopping tbf rule failed for reservation '{}'", jobid);
         return false;
     }
 
@@ -71,11 +74,18 @@ bool LocalLustre::Init() {
 }
 
 bool LocalLustre::GetOstsForFile(const std::string &file, std::shared_ptr<std::vector<std::string>> osts) {
+
+    struct stat buffer;
+    if(stat(file.c_str(), &buffer) == 0) {
+        spdlog::get("console")->error("file '{}' doesn't exist!", file);
+        return false;
+    }
+
     std::shared_ptr<std::string> getstripe_out(new std::string());
     std::string cmd = "lfs getstripe " + file;
 
     if (!exec(cmd.c_str(), getstripe_out)) {
-        // TODO: add error reporting
+        spdlog::get("console")->error("lfs getstripe failed for file {}", file);
         return false;
     }
 
@@ -94,7 +104,7 @@ bool LocalLustre::GetOstsForFile(const std::vector<std::string> &files,
     std::string cmd = "lfs getstripe " + oss.str();
 
     if (!exec(cmd.c_str(), getstripe_out)) {
-        // TODO: add error reporting
+        spdlog::get("console")->error("lfs getstripe failed for list of files");
         return false;
     }
 
@@ -118,7 +128,7 @@ bool LocalLustre::GetOstList(const std::string &path, std::shared_ptr<std::vecto
     std::string cmd = "lfs osts " + path;
 
     if (!exec(cmd.c_str(), cmd_out)) {
-        // TODO: add error reporting
+        spdlog::get("console")->error("couldn't get list of osts");
         return false;
     }
 
