@@ -14,7 +14,7 @@ Server::Server(const std::string &ip_port, const std::string &root_path,
 
 
 bool Server::Init() {
-    spdlog::get("console")->info("Init server");
+    spdlog::get("console")->info("init server");
 
     if (!root_path.empty()) {
         return false;   // classes with permanent data structures are not yet implemented
