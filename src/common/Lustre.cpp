@@ -76,7 +76,7 @@ bool LocalLustre::Init() {
 bool LocalLustre::GetOstsForFile(const std::string &file, std::shared_ptr<std::vector<std::string>> osts) {
 
     struct stat buffer;
-    if(stat(file.c_str(), &buffer) == 0) {
+    if(stat(file.c_str(), &buffer) != 0) {
         spdlog::get("console")->error("file '{}' doesn't exist!", file);
         return false;
     }
