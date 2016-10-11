@@ -31,7 +31,7 @@ private:
     void AddReservationID(const Job *j);
     void AddHeader();
     void AddJobs(const std::vector<Job *> &jobs);
-    void AddEndline() const;
+    void AddEndline();
 
 public:
 

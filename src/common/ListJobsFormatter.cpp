@@ -46,7 +46,7 @@ void ListJobsFormatter::AddJob(Job *j) {
     AddEndline();
 }
 
-void ListJobsFormatter::AddEndline() const { stream << std::endl; }
+void ListJobsFormatter::AddEndline() { stream << std::endl; }
 
 void ListJobsFormatter::AddReservationID(const Job *j) {
     stream << std::left << std::setw(reservation_shift) << j->getJobid();
