@@ -43,6 +43,7 @@ void JobMonitor::Handle(const std::string &jobid, Job::JobEvent event) {
             break;
         case Job::JobEvent::JOBSTOP:
             StopJob(jobid);
+            scheduleState->RemoveJob(jobid);
             break;
         default:
             // Error
