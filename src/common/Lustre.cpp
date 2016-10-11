@@ -22,6 +22,7 @@ bool LocalLustre::StartJobTbfRule(std::string jobid, std::string rule_name, uint
                       std::to_string(rpc_rate_limit) + "\"";
     std::shared_ptr<std::string> out(new std::string());
 
+    spdlog::get("console")->debug("lustre: will call '{}'", cmd);
     if (!exec(cmd.c_str(), out)) {
         spdlog::get("console")->error("starting tbf rule failed for reservation '{}'", jobid);
         return false;
@@ -34,7 +35,7 @@ bool LocalLustre::ChangeJobTbfRule(std::string jobid, std::string rule_name, uin
                       std::to_string(new_rpc_rate_limit) + "\"";
     std::shared_ptr<std::string> out(new std::string());
 
-    spdlog::get("console")->error("lustre: will call '{}'", cmd);
+    spdlog::get("console")->debug("lustre: will call '{}'", cmd);
     if (!exec(cmd.c_str(), out)) {
         spdlog::get("console")->error("changing tbf rule failed for reservation '{}'", jobid);
         return false;
@@ -49,7 +50,7 @@ bool LocalLustre::StopJobTbfRule(std::string jobid, std::string rule_name) {
     std::string cmd = "lctl set_param ost.OSS.ost_io.nrs_tbf_rule=\"reg stop " + rule_name + "\"";
     std::shared_ptr<std::string> out(new std::string());
 
-    spdlog::get("console")->error("lustre: will call '{}'", cmd);
+    spdlog::get("console")->debug("lustre: will call '{}'", cmd);
     if (!exec(cmd.c_str(), out)) {
         spdlog::get("console")->error("stopping tbf rule failed for reservation '{}'", jobid);
         return false;
