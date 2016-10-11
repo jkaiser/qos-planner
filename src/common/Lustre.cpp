@@ -18,7 +18,7 @@ bool LocalLustre::StartJobTbfRule(std::string jobid, std::string rule_name, uint
     // $ lctl set_param x.x.x.nrs_tbf_rule="[reg|hp] start rule_name jobid_list) rpc_rate_limit" // NOTE: hp = high priority, reg = regular (?)
     // $ lctl set_param ost.OSS.ost_io.nrs_tbf_rule="[reg|hp] start rule_name jobid_list) rpc_rate_limit"
 
-    std::string cmd = "lctl set_param ost.OSS.ost_io.nrs_tbf_rule=\"reg start " + rule_name + " " + jobid + " " +
+    std::string cmd = "lctl set_param ost.OSS.ost_io.nrs_tbf_rule=\"reg start " + rule_name + " {" + jobid + "} " +
                       std::to_string(rpc_rate_limit) + "\"";
     std::shared_ptr<std::string> out(new std::string());
 
