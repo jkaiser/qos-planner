@@ -208,7 +208,7 @@ bool JobMonitor::StartJob(const std::string &jobid) {
 }
 
 bool JobMonitor::StopJob(const std::string &jobid) {
-    spdlog::get("console")->debug("stop job {}", jobid);
+    spdlog::get("console")->debug("jobmon: stop job {}", jobid);
 
     Job::JobState job_state;
     if (!scheduleState->GetJobStatus(jobid, &job_state)) {   // job was removed in the meantime
