@@ -53,7 +53,7 @@ private:
     std::condition_variable in_flight_jobs_cv;
     std::set<std::string> in_flight_jobs;
 
-    const std::string lustre_tbf_rule_postfix = "_qos_sched_io_rule";
+    const std::string lustre_tbf_rule_postfix = "_qos_sched_io";
     std::shared_ptr<Lustre> lustre;
 
     // function the monitor thread executes
