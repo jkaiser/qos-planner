@@ -33,6 +33,7 @@ bool JobSchedulerStaticWorkloads::ScheduleJob(common::Job &job) {
         }
     }
 
+    job.setState(Job::SCHEDULED);
     if (!schedule->AddJob(job.getJobid(), job, job.getOsts())) {
         return false;
     }
