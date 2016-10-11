@@ -49,7 +49,8 @@ bool JobSchedulerStaticWorkloads::ScheduleJob(common::Job &job) {
 bool JobSchedulerStaticWorkloads::AreEnoughResAvail(const Job &job, const std::string &ost, uint32_t max_ost_mb_sec) {
     std::map<std::string, float>::iterator it = osts_max_mbs_limits_.find(ost);
     if (it == osts_max_mbs_limits_.end()) {
-        return false; // no information about that ost
+        spdlog::get("console")->error("no information about the ost '{}'", ost);
+        return false;
     }
 
     return (max_ost_mb_sec + job.getMin_read_throughput_MB()) <= it->second;
