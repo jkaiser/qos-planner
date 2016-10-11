@@ -34,6 +34,7 @@ bool LocalLustre::ChangeJobTbfRule(std::string jobid, std::string rule_name, uin
                       std::to_string(new_rpc_rate_limit) + "\"";
     std::shared_ptr<std::string> out(new std::string());
 
+    spdlog::get("console")->error("lustre: will call '{}'", cmd);
     if (!exec(cmd.c_str(), out)) {
         spdlog::get("console")->error("changing tbf rule failed for reservation '{}'", jobid);
         return false;

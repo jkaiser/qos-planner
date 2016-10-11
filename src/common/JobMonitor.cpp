@@ -212,8 +212,10 @@ bool JobMonitor::StopJob(const std::string &jobid) {
 
     Job::JobState job_state;
     if (!scheduleState->GetJobStatus(jobid, &job_state)) {   // job was removed in the meantime
+        spdlog::get("console")->error("job was removed in the meantime");
         return false;
     } else if (job_state != Job::ACTIVE) {   // job was unregistered/removed in the meantime
+        spdlog::get("console")->error("job was unregistered in the meantime");
         return false;
     }
 
