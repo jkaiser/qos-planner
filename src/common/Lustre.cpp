@@ -18,7 +18,7 @@ bool LocalLustre::StartJobTbfRule(std::string jobid, std::string rule_name, uint
     // $ lctl set_param x.x.x.nrs_tbf_rule="[reg|hp] start rule_name jobid_list) rpc_rate_limit" // NOTE: hp = high priority, reg = regular (?)
     // $ lctl set_param ost.OSS.ost_io.nrs_tbf_rule="[reg|hp] start rule_name jobid_list) rpc_rate_limit"
 
-    std::string cmd = "lctl set_param ost.OSS.ost_io.nrs_tbf_rule=\"reg start " + rule_name + " {" + jobid + "} " +
+    std::string cmd = "lctl set_param ost.OSS.ost_io.nrs_tbf_rule=\" start " + rule_name + " {" + jobid + "} " +
                       std::to_string(rpc_rate_limit) + "\"";
     std::shared_ptr<std::string> out(new std::string());
 
@@ -31,7 +31,7 @@ bool LocalLustre::StartJobTbfRule(std::string jobid, std::string rule_name, uint
 }
 
 bool LocalLustre::ChangeJobTbfRule(std::string jobid, std::string rule_name, uint32_t new_rpc_rate_limit) {
-    std::string cmd = "lctl set_param ost.OSS.ost_io.nrs_tbf_rule=\"reg change " + rule_name + " " +
+    std::string cmd = "lctl set_param ost.OSS.ost_io.nrs_tbf_rule=\" change " + rule_name + " " +
                       std::to_string(new_rpc_rate_limit) + "\"";
     std::shared_ptr<std::string> out(new std::string());
 
@@ -47,7 +47,7 @@ bool LocalLustre::StopJobTbfRule(std::string jobid, std::string rule_name) {
     // lctl set_param x.x.x.nrs_tbf_rule= "[reg|hp] change rule_name rate"
     // lctl set_param ost.OSS.ost_io.nrs_tbf_rule="stop loginnode"
 
-    std::string cmd = "lctl set_param ost.OSS.ost_io.nrs_tbf_rule=\"reg stop " + rule_name + "\"";
+    std::string cmd = "lctl set_param ost.OSS.ost_io.nrs_tbf_rule=\" stop " + rule_name + "\"";
     std::shared_ptr<std::string> out(new std::string());
 
     spdlog::get("console")->debug("lustre: will call '{}'", cmd);
