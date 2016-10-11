@@ -164,11 +164,14 @@ bool JobMonitor::StartJob(const std::string &jobid) {
 
     Job::JobState job_state;
     if (!scheduleState->GetJobStatus(jobid, &job_state)) {   // job was removed in the meantime
+        spdlog::get("console")->debug("job was removed in the meantime");
         return false;
     } else if (job_state != Job::SCHEDULED) {   // job was unregistered/removed in the meantime
+        spdlog::get("console")->debug("job was removed in the meantime");
         return false;
     }
 
+    spdlog::get("console")->debug("setting up NRS rules");
     // 2) set the NRS settings
     uint32_t requested_throughput;
     if (!scheduleState->GetJobThroughput(jobid, &requested_throughput)) {
@@ -184,6 +187,7 @@ bool JobMonitor::StartJob(const std::string &jobid) {
     }
 
 
+    spdlog::get("console")->debug("update schedule status");
     // 3) update job status to ACTIVE
     if (!scheduleState->UpdateJob(jobid, Job::ACTIVE)) {
         return false;
