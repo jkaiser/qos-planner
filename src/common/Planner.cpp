@@ -116,9 +116,12 @@ bool Planner::ServeJobRemove(rpc::Message &msg) {
 
     bool success = true;
     for (int i = 0; i < request.id_size(); i++) {
+
+        jobMonitor->UnregisterJob(request.id(i));
+
         if (!schedule->RemoveJob(request.id(i))) {
-            spdlog::get("console")->warn("removing of job {} failed", request.id(i));
-            success = false;
+//            spdlog::get("console")->warn("removing of job {} failed", request.id(i));
+//            success = false;
         }
     }
 
