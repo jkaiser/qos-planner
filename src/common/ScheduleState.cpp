@@ -3,6 +3,8 @@
 //
 
 #include "ScheduleState.h"
+#include <spdlog/spdlog.h>
+
 
 namespace common {
 
@@ -50,7 +52,9 @@ void MemoryScheduleState::Reset() {
 bool MemoryScheduleState::AddJob(const std::string &jobid, const Job &job, const std::vector<std::string> &osts) {
     std::lock_guard<std::mutex> lck(schedule_mut);
 
+    spdlog::get("console")->debug("schedule: add job {}", jobid);
     if (jobs.find(jobid) != jobs.end()) {
+        spdlog::get("console")->error("job already exists!");
         return false;
     }
 
@@ -80,7 +84,10 @@ bool MemoryScheduleState::AddJob(const std::string &jobid, const Job &job, const
 bool MemoryScheduleState::RemoveJob(const std::string &jobid) {
     std::lock_guard<std::mutex> lck(schedule_mut);
 
+    spdlog::get("console")->debug("schedule: remove job {}", jobid);
+
     if (jobs.find(jobid) == jobs.end()) {
+        spdlog::get("console")->error("schedule: job doesn't exist");
         return false;
     }
 
@@ -105,6 +112,8 @@ bool MemoryScheduleState::RemoveJob(const std::string &jobid) {
 
 bool MemoryScheduleState::UpdateJob(std::string jobid, Job::JobState new_state) {
     std::lock_guard<std::mutex> lck(schedule_mut);
+
+    spdlog::get("console")->debug("schedule: update job {} to {}", jobid, Job::JobStateToString(new_state));
 
     auto it = jobs.find(jobid);
     if (it == jobs.end()) {
