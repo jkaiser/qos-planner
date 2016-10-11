@@ -68,6 +68,7 @@ bool Planner::ServeJobSubmission(rpc::Message &msg) {
 
     std::unordered_set<std::string> osts_set;
     if (!tryComputeOstSetOfRequest(request, osts_set)) {
+        spdlog::get("console")->error("couldn't get list of OSTs for reservation");
         return false;
     }
 

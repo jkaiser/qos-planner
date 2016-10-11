@@ -23,11 +23,13 @@ bool JobSchedulerStaticWorkloads::ScheduleJob(common::Job &job) {
     for (auto ost : job.getOsts()) {
         uint32_t max_ost_mb_sec;
         if (!GetMaxLoadInTimeInterval(ost, job.GetStartTime(), job.GetEndTime(), &max_ost_mb_sec)) {
-            return false;   // invalid OST? TODO: report an error here
+            spdlog::get("console")->error("couldn't compute max load for ost {}", ost);
+            return false;   // invalid OST?
         }
 
         if (!AreEnoughResAvail(job, ost, max_ost_mb_sec))  {
-            return false;   // not enough resources avail? TODO: report it somewhere
+            spdlog::get("console")->debug("not enough resources for job");
+            return false;   // not enough resources avail?
         }
     }
 
@@ -36,6 +38,7 @@ bool JobSchedulerStaticWorkloads::ScheduleJob(common::Job &job) {
     }
 
     if (!job_monitor->RegisterJob(job)) {
+        spdlog::get("console")->error("failed to register job");
         schedule->RemoveJob(job.getJobid());
         return false;
     }
