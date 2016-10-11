@@ -151,6 +151,7 @@ bool MemoryScheduleState::GetJobStatus(const std::string jobid, Job::JobState *s
     std::lock_guard<std::mutex> lck(schedule_mut);
     auto it = jobs.find(jobid);
     if (it == jobs.end()) {
+        spdlog::get("console")->error("schedule: requested nonexisting job");
         return false;
     }
 

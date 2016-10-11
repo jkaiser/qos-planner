@@ -167,7 +167,7 @@ bool JobMonitor::StartJob(const std::string &jobid) {
         spdlog::get("console")->debug("job was removed in the meantime");
         return false;
     } else if (job_state != Job::SCHEDULED) {   // job was unregistered/removed in the meantime
-        spdlog::get("console")->debug("job was removed in the meantime");
+        spdlog::get("console")->debug("job was unregistered in the meantime");
         return false;
     }
 
