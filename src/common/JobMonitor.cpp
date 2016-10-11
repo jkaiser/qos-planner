@@ -4,6 +4,8 @@
 
 #include "JobMonitor.h"
 
+#include <spdlog/spdlog.h>
+
 namespace common {
 
 JobMonitor::JobMonitor(std::shared_ptr<common::ScheduleState> st, std::shared_ptr<Lustre> lustre) :
@@ -158,6 +160,8 @@ bool JobMonitor::isThereAReadyJob() const {
 
 bool JobMonitor::StartJob(const std::string &jobid) {
 
+    spdlog::get("console")->debug("starting job {}", jobid);
+
     Job::JobState job_state;
     if (!scheduleState->GetJobStatus(jobid, &job_state)) {   // job was removed in the meantime
         return false;
@@ -168,12 +172,14 @@ bool JobMonitor::StartJob(const std::string &jobid) {
     // 2) set the NRS settings
     uint32_t requested_throughput;
     if (!scheduleState->GetJobThroughput(jobid, &requested_throughput)) {
+        spdlog::get("console")->error("schedule doesn't contain job {}!", jobid);
         return false;
     }
 
 
     uint32_t rpc_rate = lustre->MBsToRPCs(requested_throughput);
     if (!lustre->StartJobTbfRule(jobid, jobid + lustre_tbf_rule_postfix, rpc_rate)) {
+        spdlog::get("console")->error("couldn't start TBF rule for job {}!", jobid);
         return false;
     }
 
@@ -198,6 +204,7 @@ bool JobMonitor::StartJob(const std::string &jobid) {
 }
 
 bool JobMonitor::StopJob(const std::string &jobid) {
+    spdlog::get("console")->debug("stop job {}", jobid);
 
     Job::JobState job_state;
     if (!scheduleState->GetJobStatus(jobid, &job_state)) {   // job was removed in the meantime
@@ -208,6 +215,7 @@ bool JobMonitor::StopJob(const std::string &jobid) {
 
     // set the NRS settings
     if (!lustre->StopJobTbfRule(jobid, jobid + lustre_tbf_rule_postfix)) {
+        spdlog::get("console")->warn("couldn't remove TBF rule for job {}", jobid);
         //TODO: give a warning here. This can lead to open permanent open NRS settings in Lustre!
     }
 
@@ -259,6 +267,7 @@ void JobMonitor::UnblockJob(const Job &job) {
 void JobMonitor::RemoveJobFromPrioQueue(const Job &job) {
     std::unique_lock<std::mutex> lk(job_priority_queue_mutex);
     if (!job_priority_queue.Remove(job.getJobid())) {
+        spdlog::get("console")->warn("couldn't remove job from prio. queue {}");
         //TODO: give a warning here. This should not happen but isn't critical here since we remove anyway.
     }
     job_priority_queue_cv.notify_all();
