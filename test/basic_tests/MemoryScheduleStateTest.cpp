@@ -6,16 +6,28 @@
 
 #include <ScheduleState.h>
 
+#include <spdlog/spdlog.h>
 
 
-TEST(MemClusterState, Init) {
+class MemScheduleStateTest : public ::testing::Test {
+protected:
+    virtual void SetUp() {
+        if (!spdlog::get("console")) {
+            auto console = spdlog::stdout_logger_mt("console");
+            spdlog::set_level(spdlog::level::critical);
+        }
+
+    }
+};
+
+TEST_F(MemScheduleStateTest, Init) {
 
     common::MemoryScheduleState mss;
     EXPECT_TRUE(mss.Init());
     EXPECT_TRUE(mss.TearDown());
 }
 
-TEST(MemClusterState, AddJob) {
+TEST_F(MemScheduleStateTest, AddJob) {
     common::MemoryScheduleState mss;
     EXPECT_TRUE(mss.Init());
 
@@ -41,7 +53,7 @@ TEST(MemClusterState, AddJob) {
     EXPECT_TRUE(mss.TearDown());
 };
 
-TEST(MemClusterState, RemoveJob) {
+TEST_F(MemScheduleStateTest, RemoveJob) {
     common::MemoryScheduleState mss;
     EXPECT_TRUE(mss.Init());
 
@@ -53,7 +65,7 @@ TEST(MemClusterState, RemoveJob) {
     EXPECT_FALSE(mss.RemoveJob(j->getJobid()))<< "Remove of nonexisting job must fail";
 }
 
-TEST(MemClusterState, AddJobTwice) {
+TEST_F(MemScheduleStateTest, AddJobTwice) {
     common::MemoryScheduleState mss;
     EXPECT_TRUE(mss.Init());
 
@@ -65,7 +77,7 @@ TEST(MemClusterState, AddJobTwice) {
     EXPECT_TRUE(mss.TearDown());
 };
 
-TEST(MemClusterState, Reset) {
+TEST_F(MemScheduleStateTest, Reset) {
     common::MemoryScheduleState mss;
     EXPECT_TRUE(mss.Init());
 
@@ -80,7 +92,7 @@ TEST(MemClusterState, Reset) {
 };
 
 
-TEST(MemClusterState, UpdateJob) {
+TEST_F(MemScheduleStateTest, UpdateJob) {
     common::MemoryScheduleState mss;
     EXPECT_TRUE(mss.Init());
 
@@ -93,3 +105,31 @@ TEST(MemClusterState, UpdateJob) {
     EXPECT_EQ(common::Job::DONE, job_map->at("foo")->getState());
     EXPECT_TRUE(mss.TearDown());
 }
+
+TEST_F(MemScheduleStateTest, GetJobOsts) {
+    common::MemoryScheduleState mss;
+    EXPECT_TRUE(mss.Init());
+
+    common::Job *j = new common::Job("foo", std::chrono::system_clock::now(), std::chrono::system_clock::now(), 42);
+    std::vector<std::string> osts = {"OST_a", "OST_b", "OST_C"};
+    j->setOsts(osts);
+    mss.AddJob("foo", *j, osts);
+
+    std::vector<std::string> returned_osts;
+    mss.GetJobOstIds("foo", returned_osts);
+
+    std::set<std::string> ost_set;
+    for (auto &ost : osts) {
+        ost_set.insert(ost);
+    }
+
+    for (auto &returned_ost : returned_osts) {
+        auto it = ost_set.find(returned_ost);
+        ASSERT_TRUE(it != ost_set.end()) << "Returned invalid ost id: " << returned_ost;
+        ost_set.erase(it);
+    }
+
+    ASSERT_EQ(ost_set.size(), 0) << "Not all osts were returned";
+
+    EXPECT_TRUE(mss.TearDown());
+};

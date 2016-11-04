@@ -10,10 +10,24 @@
 #include "MockLustre.h"
 #include <JobMonitor.h>
 
+#include <spdlog/spdlog.h>
+
 using ::testing::_;
 
 
-TEST(JobMonitor, InitGetJobs) {
+class JobMonitorTest : public ::testing::Test {
+
+protected:
+
+    virtual void SetUp() {
+        if (!spdlog::get("console")) {
+            auto console = spdlog::stdout_logger_mt("console");
+            spdlog::set_level(spdlog::level::critical);
+        }
+    }
+};
+
+TEST_F(JobMonitorTest, InitGetJobs) {
     common::MockScheduleState *scheduleState = new common::MockScheduleState();
     std::shared_ptr<common::ScheduleState> ss (scheduleState);
     std::shared_ptr<common::LocalLustre> ll (new common::LocalLustre());
@@ -33,7 +47,7 @@ TEST(JobMonitor, InitGetJobs) {
     EXPECT_TRUE(jobMonitor.TearDown());
 }
 
-TEST(JobMonitor, InitTeardown) {
+TEST_F(JobMonitorTest, InitTeardown) {
 
     common::MockScheduleState *scheduleState = new common::MockScheduleState();
     common::LocalLustre *lustre = new common::LocalLustre();
@@ -51,7 +65,7 @@ TEST(JobMonitor, InitTeardown) {
     EXPECT_TRUE(jobMonitor.TearDown());
 }
 
-TEST(JobMonitor, StartStopJob) {
+TEST_F(JobMonitorTest, StartStopJob) {
     // The Start & Stop call are private, so I trigger them by small start-stop times
     common::MockScheduleState *scheduleState = new common::MockScheduleState();
     common::MockLustre *lustre = new common::MockLustre();
@@ -88,7 +102,7 @@ TEST(JobMonitor, StartStopJob) {
     EXPECT_TRUE(jobMonitor.TearDown());
 }
 
-TEST(JobMonitor, RegisterJob) {
+TEST_F(JobMonitorTest, RegisterJob) {
     common::MockScheduleState *scheduleState = new common::MockScheduleState();
     common::MockLustre *lustre = new common::MockLustre();
 
@@ -118,7 +132,7 @@ TEST(JobMonitor, RegisterJob) {
     EXPECT_TRUE(jobMonitor.TearDown());
 }
 
-TEST(JobMonitor, RegisterUnregisterJob) {
+TEST_F(JobMonitorTest, RegisterUnregisterJob) {
 
     common::MockScheduleState *scheduleState = new common::MockScheduleState();
     common::MockLustre *lustre = new common::MockLustre();
