@@ -6,10 +6,10 @@
 #include "gtest/gtest.h"
 #include "JobSchedulerStaticWorkloads.h"
 
-#include "MockScheduleState.h"
-#include "MockClusterState.h"
-#include "MockJobMonitor.h"
-#include "MockLustre.h"
+#include "mock_classes/MockScheduleState.h"
+#include "mock_classes/MockClusterState.h"
+#include "mock_classes/MockJobMonitor.h"
+#include "mock_classes/MockLustre.h"
 
 using ::testing::_;
 

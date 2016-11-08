@@ -6,7 +6,7 @@
 #include "gtest/gtest.h"
 
 #include <ClusterState.h>
-#include "MockLustre.h"
+#include "mock_classes/MockLustre.h"
 
 
 using ::testing::_;

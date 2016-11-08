@@ -5,8 +5,8 @@
 
 #include "gmock/gmock.h"
 
-#include "MockScheduleState.h"
-#include "MockRuleManager.h"
+#include "mock_classes/MockScheduleState.h"
+#include "mock_classes/MockRuleManager.h"
 #include <JobMonitor.h>
 
 #include <spdlog/spdlog.h>

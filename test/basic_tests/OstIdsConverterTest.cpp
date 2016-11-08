@@ -4,7 +4,7 @@
 
 
 #include "gtest/gtest.h"
-#include "MockLustre.h"
+#include "mock_classes/MockLustre.h"
 
 #include <OstIdsConverter.h>
 #include <Lustre.h>
