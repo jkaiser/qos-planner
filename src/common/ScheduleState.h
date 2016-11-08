@@ -51,6 +51,8 @@ public:
 
     virtual bool GetJobThroughput(const std::string jobid, uint32_t *throughput) = 0;
 
+    virtual bool GetJobOstIds(const std::string &jobid, std::vector<std::string> &osts_out) = 0;
+
     virtual bool GetJobStatus(const std::string jobid, Job::JobState *state) = 0;
     virtual bool GetJobEnd(const std::string jobid, std::chrono::system_clock::time_point *tend) = 0;
 
@@ -87,6 +89,7 @@ public:
     virtual bool RemoveJob(const std::string &jobid) override;
     virtual bool UpdateJob(std::string jobid, Job::JobState new_state) override;
     virtual bool GetJobThroughput(const std::string jobid, uint32_t *throughput) override;
+    virtual bool GetJobOstIds(const std::string &jobid, std::vector<std::string> &osts_out) override;
     virtual bool GetJobStatus(const std::string jobid, Job::JobState *state) override;
     virtual bool GetJobEnd(const std::string jobid, std::chrono::system_clock::time_point *tend) override;
     virtual std::map<std::string, Job*> *GetAllJobs() override;

@@ -170,6 +170,16 @@ bool MemoryScheduleState::GetJobEnd(const std::string jobid, std::chrono::system
     return true;
 }
 
+bool MemoryScheduleState::GetJobOstIds(const std::string &jobid, std::vector<std::string> &osts_out) {
+    std::lock_guard<std::mutex> lck(schedule_mut);
+    auto it = jobs.find(jobid);
+    if (it == jobs.end()) {
+        return false;
+    }
+
+    osts_out.insert(osts_out.end(), it->second->getOsts().begin(), it->second->getOsts().end());
+    return true;
+}
 
 
 }

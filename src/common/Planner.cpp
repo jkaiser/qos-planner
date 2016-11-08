@@ -4,19 +4,29 @@
 
 #include "Planner.h"
 #include "JobSchedulerStaticWorkloads.h"
+#include "OstIdsConverter.h"
+#include "OstIpsCache.h"
+#include "SSHRuleSetter.h"
+#include "ListJobsFormatter.h"
 
 #include <spdlog/spdlog.h>
-#include "ListJobsFormatter.h"
 
 namespace common {
 
 
 Planner::Planner(std::string &root_path, std::string &ost_limits_file) : root_path(root_path),
                                                                          ost_limits_file(ost_limits_file) {
-    lustre.reset(new LocalLustre());
-    schedule.reset(new MemoryScheduleState());
-    jobMonitor.reset(new JobMonitor(schedule, lustre, 5));
-    scheduler.reset(new JobSchedulerStaticWorkloads(schedule, jobMonitor, lustre, ost_limits_file));
+    lustre = std::make_shared<LocalLustre>();
+    schedule = std::make_shared<MemoryScheduleState>();
+
+    auto ocache = std::make_shared<OstIpsCache>(lustre);
+    auto id_converter = std::make_shared<OstIdsConverter>(lustre);
+    auto rule_setter = std::make_shared<SSHRuleSetter>();
+    rule_manager = std::make_shared<RuleManager>(rule_setter, ocache, id_converter);
+
+    jobMonitor = std::make_shared<JobMonitor>(schedule, rule_manager, 5);
+
+    scheduler = std::make_shared<JobSchedulerStaticWorkloads>(schedule, jobMonitor, lustre, ost_limits_file);
 }
 
 bool Planner::Init() {

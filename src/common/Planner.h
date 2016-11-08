@@ -14,6 +14,7 @@
 #include "JobMonitor.h"
 #include "ScheduleState.h"
 #include "ClusterState.h"
+#include "RuleManager.h"
 #include "../common/rpc/proto/message.pb.h"
 
 namespace common {
@@ -45,6 +46,7 @@ private:
     std::shared_ptr<Lustre> lustre;
     std::shared_ptr<JobScheduler> scheduler;
     std::shared_ptr<ScheduleState> schedule;
+    std::shared_ptr<RuleManager> rule_manager;
     std::shared_ptr<JobMonitor> jobMonitor;
 
     void AddJobsToReply(std::shared_ptr<rpc::Reply> &reply_msg, const std::map<std::string, Job *> *jobs,

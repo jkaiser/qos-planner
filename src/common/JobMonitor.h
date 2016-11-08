@@ -16,6 +16,7 @@
 #include "ScheduleState.h"
 #include "JobPriorityQueue.h"
 #include "Lustre.h"
+#include "RuleManager.h"
 
 namespace common {
 
@@ -53,8 +54,10 @@ private:
     std::condition_variable in_flight_jobs_cv;
     std::set<std::string> in_flight_jobs;
 
-    const std::string lustre_tbf_rule_postfix = "_qosp";
-    std::shared_ptr<Lustre> lustre;
+    std::shared_ptr<RuleManager> rule_manager_;
+
+//    const std::string lustre_tbf_rule_postfix = "_qosp";
+//    std::shared_ptr<Lustre> lustre;
 
     // function the monitor thread executes
     void Monitor();
@@ -71,12 +74,12 @@ private:
     void UnblockJob(const Job &job);
 public:
     JobMonitor();
-    JobMonitor(std::shared_ptr<ScheduleState> st, std::shared_ptr<Lustre> lustre);
+    JobMonitor(std::shared_ptr<ScheduleState> st, std::shared_ptr<RuleManager> rule_manager);
 
     /**
      * waiting_time_sec: The time the internal threads sleeps before checking for an exit flag (set by a Teardown call)
      */
-    JobMonitor(std::shared_ptr<ScheduleState> st, std::shared_ptr<Lustre> lustre, uint32_t waiting_time_sec);
+    JobMonitor(std::shared_ptr<ScheduleState> st, std::shared_ptr<RuleManager> rule_manager, uint32_t waiting_time_sec);
 
     virtual bool Init();
 
@@ -85,6 +88,8 @@ public:
     virtual bool RegisterJob(const Job &job);
 
     virtual bool UnregisterJob(const Job &job);
+
+    bool SetNrsRules(const std::string &basic_string);
 };
 }
 

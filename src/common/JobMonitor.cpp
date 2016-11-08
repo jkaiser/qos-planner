@@ -8,27 +8,29 @@
 
 namespace common {
 
-JobMonitor::JobMonitor(std::shared_ptr<common::ScheduleState> st, std::shared_ptr<Lustre> lustre) :
+JobMonitor::JobMonitor() {}
+
+JobMonitor::JobMonitor(std::shared_ptr<common::ScheduleState> st, std::shared_ptr<RuleManager> rule_manager) :
         monitor_thread_started(false),
         scheduleState(st),
-        lustre(lustre) {
-    JobMonitor(st, lustre, 5);
+        rule_manager_(rule_manager) {
+    JobMonitor(st, rule_manager, 5);
 }
 
-JobMonitor::JobMonitor(std::shared_ptr<ScheduleState> st, std::shared_ptr<Lustre> lustre, uint32_t waiting_time_sec) :
+JobMonitor::JobMonitor(std::shared_ptr<ScheduleState> st, std::shared_ptr<RuleManager> rule_manager, uint32_t waiting_time_sec) :
         monitor_thread_started(false),
         scheduleState(st),
-        lustre(lustre),
+        rule_manager_(rule_manager),
         waiting_time_sec(waiting_time_sec) {}
+
 
 bool JobMonitor::RegisterJob(const common::Job &job) {
     std::lock_guard<std::mutex> lock(job_priority_queue_mutex);
     JobPriorityQueue::WaitingItem *wt = new JobPriorityQueue::WaitingItem(job.getJobid(), job.GetStartTime(),
-                                                                          Job::JobEvent::JOBSTART);
+    Job::JobEvent::JOBSTART);
     job_priority_queue.Push(wt);
     return true;
 }
-
 void JobMonitor::Handle(const std::string &jobid, Job::JobEvent event) {
     std::unique_lock<std::mutex> lock(in_flight_jobs_mutex);
     while (in_flight_jobs.find(jobid) != in_flight_jobs.end()) {
@@ -58,7 +60,7 @@ void JobMonitor::Handle(const std::string &jobid, Job::JobEvent event) {
 }
 
 bool JobMonitor::Init() {
-    if ((scheduleState == nullptr) || (lustre == nullptr)) {
+    if ((scheduleState == nullptr) || (rule_manager_ == nullptr)) {
         return false;
     }
 
@@ -85,7 +87,7 @@ void JobMonitor::FillWithExistingJobs() {
 
             case Job::SCHEDULED:
                 wt = new JobPriorityQueue::WaitingItem(job.second->getJobid(), job.second->GetStartTime(),
-                                                       Job::JOBSTART);
+                Job::JOBSTART);
                 job_priority_queue.Push(wt);
                 break;
 
@@ -155,7 +157,7 @@ void JobMonitor::Monitor() {
 
 bool JobMonitor::isThereAReadyJob() const {
     return (job_priority_queue.Peek() != nullptr) &&
-           (job_priority_queue.Peek()->time_of_event < std::chrono::system_clock::now());
+    (job_priority_queue.Peek()->time_of_event < std::chrono::system_clock::now());
 }
 
 
@@ -174,18 +176,16 @@ bool JobMonitor::StartJob(const std::string &jobid) {
 
     spdlog::get("console")->debug("setting up NRS rules");
     // 2) set the NRS settings
-    uint32_t requested_throughput;
-    if (!scheduleState->GetJobThroughput(jobid, &requested_throughput)) {
-        spdlog::get("console")->error("schedule doesn't contain job {}!", jobid);
+    if (!SetNrsRules(jobid)) {
+        spdlog::get("console")->error("couldn't set NRS settings for job {}!", jobid);
         return false;
-    }
+    };
 
-
-    uint32_t rpc_rate = lustre->MBsToRPCs(requested_throughput);
-    if (!lustre->StartJobTbfRule(jobid, jobid + lustre_tbf_rule_postfix, rpc_rate)) {
-        spdlog::get("console")->error("couldn't start TBF rule for job {}!", jobid);
-        return false;
-    }
+//    uint32_t rpc_rate = lustre->MBsToRPCs(requested_throughput);
+//    if (!lustre->StartJobTbfRule(jobid, jobid + lustre_tbf_rule_postfix, rpc_rate)) {
+//        spdlog::get("console")->error("couldn't start TBF rule for job {}!", jobid);
+//        return false;
+//    }
 
 
     spdlog::get("console")->debug("update schedule status");
@@ -221,10 +221,15 @@ bool JobMonitor::StopJob(const std::string &jobid) {
     }
 
     // set the NRS settings
-    if (!lustre->StopJobTbfRule(jobid, jobid + lustre_tbf_rule_postfix)) {
+    if (!rule_manager_->RemoveRules(jobid)) {
         spdlog::get("console")->warn("couldn't remove TBF rule for job {}", jobid);
-        //TODO: give a warning here. This can lead to open permanent open NRS settings in Lustre!
     }
+
+
+//    if (!lustre->StopJobTbfRule(jobid, jobid + lustre_tbf_rule_postfix)) {
+//        spdlog::get("console")->warn("couldn't remove TBF rule for job {}", jobid);
+//        TODO: give a warning here. This can lead to open permanent open NRS settings in Lustre!
+//    }
 
     // update job status to DONE
     return scheduleState->UpdateJob(jobid, Job::DONE);
@@ -281,7 +286,23 @@ void JobMonitor::RemoveJobFromPrioQueue(const Job &job) {
     lk.unlock();
 }
 
-JobMonitor::JobMonitor() {}
+bool JobMonitor::SetNrsRules(const std::string &jobid) {
+    uint32_t requested_throughput;
+    if (!scheduleState->GetJobThroughput(jobid, &requested_throughput)) {
+        spdlog::get("console")->error("schedule doesn't contain job {}!", jobid);
+        return false;
+    }
+
+    std::vector<std::string> osts_ids;
+    scheduleState->GetJobOstIds(jobid, osts_ids);
+
+    if (!rule_manager_->SetRules(osts_ids, jobid, requested_throughput)) {
+        spdlog::get("console")->error("failed to set NRS rules for job {}!", jobid);
+        return false;
+    }
+
+    return true;
+}
 
 
 }

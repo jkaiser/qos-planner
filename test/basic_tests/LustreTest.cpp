@@ -84,3 +84,26 @@ INSTANTIATE_TEST_CASE_P(GetOstParsing, ParseOstsFromLfsOstsTest, ::testing::Valu
          std::make_tuple("3", "lustret4-OST0003_UUID", "ACTIVE")}}
 ));
 
+
+struct parseOstIpFromGetParamOscTestset {
+    std::string input;
+    std::string shortened_ost_uuid;
+    std::string expected_output;
+};
+
+class ParseOstIpFromGetParamTest : public ::testing::TestWithParam<parseOstIpFromGetParamOscTestset> {};
+
+TEST_P(ParseOstIpFromGetParamTest, Convert) {
+    auto pt = GetParam();
+
+    std::string out;
+    common::Lustre::ParseOstIpFromGetParamOsc(pt.input, pt.shortened_ost_uuid, out);
+    ASSERT_STREQ(pt.expected_output.c_str(), out.c_str()) << "should parse '" + pt.expected_output + "' out of '" + pt.input + "'";
+}
+
+INSTANTIATE_TEST_CASE_P(OstIDToUUIDConverting, ParseOstIpFromGetParamTest, ::testing::Values(
+        parseOstIpFromGetParamOscTestset{"osc.toto-OST0000-osc-ffff88003b90f800.ost_conn_uuid=192.168.122.241@tcp\n", "toto-OST0000", "192.168.122.241"},
+        parseOstIpFromGetParamOscTestset{"osc.toto-OST0000-osc-ffff88003b90f800.ost_conn_uuid=192.168.122.241@tcp", "toto-OST0000", "192.168.122.241"},
+        parseOstIpFromGetParamOscTestset{"", "toto-OST0000", ""},
+        parseOstIpFromGetParamOscTestset{"osc.toto-OST0000-osc-ffff88003b90f800.ost_conn_uuid=192.168.122.241@tcp\nosc.toto-OST0000-osc-ffff88003b90f800.ost_conn_uuid=192.168.122.242@tcp\n", "toto-OST0000", "192.168.122.241"}
+));

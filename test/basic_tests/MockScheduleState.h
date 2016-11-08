@@ -15,6 +15,7 @@ public:
     MOCK_METHOD2(GetJobEnd, bool(std::string, std::chrono::system_clock::time_point*));
     MOCK_METHOD2(GetJobStatus, bool(std::string, Job::JobState*));
     MOCK_METHOD2(UpdateJob, bool(std::string, Job::JobState));
+    MOCK_METHOD2(GetJobOstIds, bool(const std::string&, std::vector<std::string>&));
     MOCK_METHOD2(GetJobThroughput,bool(std::string, uint32_t*));
     MOCK_METHOD0(GetAllJobs, std::map<std::string, Job*> *());
     MOCK_METHOD1(RemoveJob, bool (const std::string&));

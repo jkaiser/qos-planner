@@ -38,7 +38,7 @@ public:
      * Returns:
      *      true, if successfull
      */
-    virtual bool GetOstList(const std::string &path, std::shared_ptr<std::vector<getOstsResults>> output) = 0;
+    virtual bool GetOstList(const std::string &path, std::shared_ptr<std::vector<getOstsResults>> &output) = 0;
     static void ParseOstsFromLfsOsts(const std::string &lfs_out, std::shared_ptr<std::vector<getOstsResults>> osts);
 
     virtual bool StartJobTbfRule(std::string jobid, std::string rule_name, uint32_t rpc_rate_limit) = 0;
@@ -55,6 +55,14 @@ public:
     virtual bool GetOstsForFile(const std::string &file, std::shared_ptr<std::vector<std::string>> osts) = 0;
 
     /**
+     * Given the uuid of an OST, determines the ip address of the node serving the OST.
+     * @param ost_uuid
+     * @param ip_address Output parameter.
+     * @return True, if successful
+     */
+    virtual bool GetIPOfOst(const std::string &ost_uuid, std::string &ip_address) = 0;
+
+    /**
      * Determines the osts for the given files and appends them to the given vector.
      */
     virtual bool GetOstsForFile(const std::vector<std::string> &files, std::shared_ptr<std::vector<std::string>> osts) = 0;
@@ -64,6 +72,13 @@ public:
      * for a single file and that the call didn't return with an error.
      */
     static void ParseOstsFromGetStripe(std::string lfs_out, std::shared_ptr<std::vector<std::string>> osts);
+
+    /**
+     * Parses the ip address of an "lctl get_param osc.fsname-OSTnumber*.ost_conn_uuid" call.
+     * @param to_parse The stdout output of the command
+     * @param ip_address Output parameter
+     */
+    static void ParseOstIpFromGetParamOsc(const std::string &to_parse, const std::string &ost_id, std::string &ip_address);
 };
 
 
@@ -83,12 +98,13 @@ public:
     virtual uint32_t MBsToRPCs(const uint32_t mb_per_sec) const override;
     virtual uint32_t RPCsToMBs(const uint32_t rpc_per_sec) const override;
 
-    virtual bool GetOstList(const std::string &path, std::shared_ptr<std::vector<getOstsResults>> output) override;
+    virtual bool GetOstList(const std::string &path, std::shared_ptr<std::vector<getOstsResults>> &output) override;
 
     virtual bool StartJobTbfRule(std::string jobid, std::string rule_name, uint32_t rpc_rate_limit) override;
     virtual bool ChangeJobTbfRule(std::string jobid, std::string rule_name, uint32_t new_rpc_rate_limit) override;
     virtual bool StopJobTbfRule(std::string jobid, std::string rule_name) override;
 
+    virtual bool GetIPOfOst(const std::string &ost_uuid, std::string &ip_address) override;
     virtual bool GetOstsForFile(const std::string &file, std::shared_ptr<std::vector<std::string>> osts) override;
     virtual bool GetOstsForFile(const std::vector<std::string> &files, std::shared_ptr<std::vector<std::string>> osts) override;
 };

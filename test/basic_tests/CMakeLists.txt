@@ -2,7 +2,7 @@ include_directories(../../src/common)
 
 file(GLOB SRCS *.cpp)
 
-add_executable(runBasicTests ${SRCS} LustreTest.cpp utilTest.cpp JobSchedulerStaticWorkloadsTest.cpp OSTLimitConfigParserTest.cpp ListJobsFormatterTest.cpp RuleManagerTest.cpp MockRuleSetter.cpp MockRuleSetter.h)
+add_executable(runBasicTests ${SRCS} LustreTest.cpp utilTest.cpp JobSchedulerStaticWorkloadsTest.cpp OSTLimitConfigParserTest.cpp ListJobsFormatterTest.cpp RuleManagerTest.cpp MockRuleSetter.cpp MockRuleSetter.h OstIdsConverterTest.cpp OstIpCacheTest.cpp MockOstIpsCache.cpp MockOstIpsCache.h MockOstIdsConverter.cpp MockOstIdsConverter.h MockRuleManager.cpp MockRuleManager.h)
 target_link_libraries(runBasicTests gtest gmock common)
 
 # small helper to run the test within the CLion IDE...

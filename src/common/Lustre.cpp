@@ -126,7 +126,7 @@ bool LocalLustre::GetOstsForFile(const std::vector<std::string> &files,
     return true;
 }
 
-bool LocalLustre::GetOstList(const std::string &path, std::shared_ptr<std::vector<getOstsResults>> output) {
+bool LocalLustre::GetOstList(const std::string &path, std::shared_ptr<std::vector<getOstsResults>> &output) {
         std::shared_ptr<std::string> cmd_out(new std::string());
     std::string cmd = "lfs osts " + path;
 
@@ -139,6 +139,24 @@ bool LocalLustre::GetOstList(const std::string &path, std::shared_ptr<std::vecto
 
     return true;
 }
+
+bool LocalLustre::GetIPOfOst(const std::string &ost_uuid, std::string &ip_address) {
+
+    auto pos = ost_uuid.find("_UUID");
+    std::string shortened_id = (pos == std::string::npos)? ost_uuid : ost_uuid.substr(0, pos);
+
+    std::shared_ptr<std::string> cmd_out(new std::string());
+    std::string cmd = "lctl get_param osc." + shortened_id + "*.ost_conn_uuid";
+    if (!exec(cmd.c_str(), cmd_out)) {
+        spdlog::get("console")->error("couldn't get ip of osts '{}'", ost_uuid);
+        return false;
+    }
+
+    ParseOstIpFromGetParamOsc(*cmd_out, shortened_id, ip_address);
+
+    return true;
+}
+
 
 void Lustre::ParseOstsFromGetStripe(std::string lfs_out, std::shared_ptr<std::vector<std::string>> osts) {
 
@@ -176,6 +194,23 @@ void Lustre::ParseOstsFromLfsOsts(const std::string &lfs_out,
     }
 }
 
+
+void
+Lustre::ParseOstIpFromGetParamOsc(const std::string &to_parse, const std::string &ost_id, std::string &ip_address) {
+    // example: "osc.toto-OST0000-osc-ffff88003b90f800.ost_conn_uuid=192.168.122.241@tcp\n"
+    std::regex r(".+" + ost_id + ".+ost_conn_uuid=(.+)@tcp$");
+    std::istringstream stream(to_parse);
+    for (std::string line; std::getline(stream, line);) {
+
+        std::smatch base_match;
+        if (std::regex_match(line, base_match, r)) {
+            if (base_match.size() == 2) {
+                ip_address = base_match[1].str();
+                return;
+            }
+        }
+    }
+}
 
 }
 
