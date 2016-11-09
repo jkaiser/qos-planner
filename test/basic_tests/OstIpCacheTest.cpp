@@ -12,7 +12,7 @@ using ::testing::_;
 using ::testing::Return;
 using ::testing::DoAll;
 
-class OstUpsCacheTest : public ::testing::Test {
+class OstIpsCacheTest : public ::testing::Test {
 protected:
 
     std::unique_ptr<common::OstIpsCache> ip_cache;
@@ -28,7 +28,7 @@ protected:
     std::shared_ptr<common::MockLustre> mocked_ll;
 };
 
-TEST_F(OstUpsCacheTest, WhenGivenValidUUIDThenReturnCorrectIp) {
+TEST_F(OstIpsCacheTest, WhenGivenValidUUIDThenReturnCorrectIp) {
 
     std::string expected_ip = "127.0.0.1";
     std::string uuid = "foo_uuid";
@@ -39,7 +39,7 @@ TEST_F(OstUpsCacheTest, WhenGivenValidUUIDThenReturnCorrectIp) {
     ASSERT_STREQ(expected_ip.c_str(), returned_ip.c_str());
 }
 
-TEST_F(OstUpsCacheTest, WhenGivenInValidUUIDThenReturnEmptyString) {
+TEST_F(OstIpsCacheTest, WhenGivenInValidUUIDThenReturnEmptyString) {
 
     std::string expected_ip = "";
     std::string uuid = "foo_uuid";
@@ -50,7 +50,7 @@ TEST_F(OstUpsCacheTest, WhenGivenInValidUUIDThenReturnEmptyString) {
     ASSERT_STREQ(expected_ip.c_str(), returned_ip.c_str());
 }
 
-TEST_F(OstUpsCacheTest, WhenLustreFailsThenReturnEmptyString) {
+TEST_F(OstIpsCacheTest, WhenLustreFailsThenReturnEmptyString) {
 
     std::string expected_ip = "";
     std::string returned_from_lustre = "nonsense";
