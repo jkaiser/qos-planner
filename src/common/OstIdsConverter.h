@@ -13,6 +13,7 @@ class OstIdsConverter {
 
 private:
     std::shared_ptr<Lustre> lustre_;
+    std::mutex cache_mut_;
     std::unordered_map<std::string, std::string> id_to_uuid_;
 
     void UpdateCache();

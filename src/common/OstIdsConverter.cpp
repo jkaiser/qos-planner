@@ -13,6 +13,7 @@ namespace common {
 OstIdsConverter::OstIdsConverter(std::shared_ptr<common::Lustre> lustre) : lustre_(lustre) {}
 
 std::string OstIdsConverter::ToUUID(const std::string &id) {
+    std::lock_guard<std::mutex> lock(cache_mut_);
     auto it = id_to_uuid_.find(id);
     if(it != id_to_uuid_.end()) {
         return it->second;
