@@ -23,7 +23,7 @@ const std::map<std::string, std::list<Job*>> *MemoryScheduleState::GetClusterSta
     std::lock_guard<std::mutex> lck(schedule_mut_);
     auto new_sched = new std::map<std::string, std::list<Job*>>();
 
-    for (auto &&it : schedule) {
+    for (auto &&it : schedule_) {
         (*new_sched)[it.first] = std::list<Job*>(it.second);
     }
 
@@ -32,8 +32,8 @@ const std::map<std::string, std::list<Job*>> *MemoryScheduleState::GetClusterSta
 
 const std::list<Job *> *MemoryScheduleState::GetOSTState(const std::string &ost) {
     std::lock_guard<std::mutex> lck(schedule_mut_);
-    std::map<std::string, std::list<Job*>>::const_iterator it = schedule.find(ost);
-    if (it == schedule.end()) {
+    std::map<std::string, std::list<Job*>>::const_iterator it = schedule_.find(ost);
+    if (it == schedule_.end()) {
         return nullptr;
     }
     return &it->second;
@@ -42,18 +42,18 @@ const std::list<Job *> *MemoryScheduleState::GetOSTState(const std::string &ost)
 void MemoryScheduleState::Reset() {
     std::lock_guard<std::mutex> lck(schedule_mut_);
 
-    for (auto &&job : jobs) {
+    for (auto &&job : jobs_) {
         delete job.second;
     }
-    schedule.clear();
-    jobs.clear();
+    schedule_.clear();
+    jobs_.clear();
 }
 
 bool MemoryScheduleState::AddJob(const std::string &jobid, const Job &job, const std::vector<std::string> &osts) {
     std::lock_guard<std::mutex> lck(schedule_mut_);
 
     spdlog::get("console")->debug("schedule: add job {}", jobid);
-    if (jobs.find(jobid) != jobs.end()) {
+    if (jobs_.find(jobid) != jobs_.end()) {
         spdlog::get("console")->error("job already exists!");
         return false;
     }
@@ -61,11 +61,11 @@ bool MemoryScheduleState::AddJob(const std::string &jobid, const Job &job, const
     auto to_insert_job = new Job(job);
 
     for (auto &&ost : osts) {
-        if (schedule.find(ost) == schedule.end()) {
-            schedule[ost] = std::list<Job*>();
+        if (schedule_.find(ost) == schedule_.end()) {
+            schedule_[ost] = std::list<Job*>();
         }
 
-        std::list<Job*> *ost_sched = &schedule[ost];
+        std::list<Job*> *ost_sched = &schedule_[ost];
         auto it = ost_sched->begin();
         for (; it != ost_sched->end(); it++) {
             if ((*it)->GetStartTime() > job.GetStartTime()) {
@@ -76,7 +76,7 @@ bool MemoryScheduleState::AddJob(const std::string &jobid, const Job &job, const
         ost_sched->insert(it, to_insert_job);
     }
 
-    jobs[jobid] = to_insert_job;
+    jobs_[jobid] = to_insert_job;
     return true;
 }
 
@@ -86,18 +86,18 @@ bool MemoryScheduleState::RemoveJob(const std::string &jobid) {
 
     spdlog::get("console")->debug("schedule: remove job {}", jobid);
 
-    if (jobs.find(jobid) == jobs.end()) {
+    if (jobs_.find(jobid) == jobs_.end()) {
         spdlog::get("console")->error("schedule: job doesn't exist");
         return false;
     }
 
-    Job *job = jobs[jobid];
-    jobs.erase(jobid);
+    Job *job = jobs_[jobid];
+    jobs_.erase(jobid);
 
 
     for (auto ost : job->getOsts()) {
 
-        std::list<Job*> ost_job_list = schedule[ost];
+        std::list<Job*> ost_job_list = schedule_[ost];
         for (std::list<Job*>::iterator it = ost_job_list.begin(); it !=  ost_job_list.end(); it++) {
 
             if ((*it)->getJobid().compare(jobid) == 0) {
@@ -115,8 +115,8 @@ bool MemoryScheduleState::UpdateJob(std::string jobid, Job::JobState new_state) 
 
     spdlog::get("console")->debug("schedule: update job {} to {}", jobid, Job::JobStateToString(new_state));
 
-    auto it = jobs.find(jobid);
-    if (it == jobs.end()) {
+    auto it = jobs_.find(jobid);
+    if (it == jobs_.end()) {
         return false;
     }
 
@@ -129,7 +129,7 @@ std::map<std::string, Job *> *MemoryScheduleState::GetAllJobs() {
 
     auto new_map = new std::map<std::string, Job*>();
 
-    for (auto &&it : jobs){
+    for (auto &&it : jobs_){
         (*new_map)[it.first] = new Job(*it.second);
     }
 
@@ -138,8 +138,8 @@ std::map<std::string, Job *> *MemoryScheduleState::GetAllJobs() {
 
 bool MemoryScheduleState::GetJobThroughput(std::string jobid, uint32_t *throughput) {
     std::lock_guard<std::mutex> lck(schedule_mut_);
-    auto it = jobs.find(jobid);
-    if (it == jobs.end()) {
+    auto it = jobs_.find(jobid);
+    if (it == jobs_.end()) {
         return false;
     }
 
@@ -149,8 +149,8 @@ bool MemoryScheduleState::GetJobThroughput(std::string jobid, uint32_t *throughp
 
 bool MemoryScheduleState::GetJobStatus(const std::string jobid, Job::JobState *state) {
     std::lock_guard<std::mutex> lck(schedule_mut_);
-    auto it = jobs.find(jobid);
-    if (it == jobs.end()) {
+    auto it = jobs_.find(jobid);
+    if (it == jobs_.end()) {
         spdlog::get("console")->error("schedule: requested nonexisting job");
         return false;
     }
@@ -161,8 +161,8 @@ bool MemoryScheduleState::GetJobStatus(const std::string jobid, Job::JobState *s
 
 bool MemoryScheduleState::GetJobEnd(const std::string jobid, std::chrono::system_clock::time_point *tend) {
     std::lock_guard<std::mutex> lck(schedule_mut_);
-    auto it = jobs.find(jobid);
-    if (it == jobs.end()) {
+    auto it = jobs_.find(jobid);
+    if (it == jobs_.end()) {
         return false;
     }
 
@@ -172,8 +172,8 @@ bool MemoryScheduleState::GetJobEnd(const std::string jobid, std::chrono::system
 
 bool MemoryScheduleState::GetJobOstIds(const std::string &jobid, std::vector<std::string> &osts_out) {
     std::lock_guard<std::mutex> lck(schedule_mut_);
-    auto it = jobs.find(jobid);
-    if (it == jobs.end()) {
+    auto it = jobs_.find(jobid);
+    if (it == jobs_.end()) {
         return false;
     }
 

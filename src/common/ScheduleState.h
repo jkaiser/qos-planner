@@ -72,9 +72,9 @@ private:
      * operation is O(n) for the std::list version. Switch to a skiplist if this turns out to be a bottleneck.
      */
     //
-    std::map<std::string, std::list<Job*>> schedule;
+    std::map<std::string, std::list<Job*>> schedule_;
 
-    std::map<std::string, Job*> jobs;
+    std::map<std::string, Job*> jobs_;
 
 public:
 
