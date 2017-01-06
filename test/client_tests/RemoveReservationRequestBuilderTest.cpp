@@ -11,29 +11,29 @@
 class RemReservRequestBuilderTest : public ::testing::Test {
 protected:
     virtual void TearDown() {
-        message.Clear();
+        message_.Clear();
     }
 
-    rpc::Request message;
-    RemoveReservationRequestBuilder rb;
+    rpc::Request message_;
+    RemoveReservationRequestBuilder rb_;
 };
 
 TEST_F(RemReservRequestBuilderTest, ParseValidInputMustSucceed) {
-    ASSERT_TRUE(rb.BuildRequest("id", message));
+    ASSERT_TRUE(rb_.BuildRequest("id", message_));
 }
 
 TEST_F(RemReservRequestBuilderTest, MessageMustIncludeCorrectVals) {
-    rb.BuildRequest("id", message);
+    rb_.BuildRequest("id", message_);
 
-    ASSERT_EQ(rpc::Request_Type_DELETE, message.type());
-    ASSERT_EQ(1, message.deleterequest().id_size());
-    ASSERT_STREQ("id", message.deleterequest().id(0).data());
+    ASSERT_EQ(rpc::Request_Type_DELETE, message_.type());
+    ASSERT_EQ(1, message_.deleterequest().id_size());
+    ASSERT_STREQ("id", message_.deleterequest().id(0).data());
 }
 
 TEST_F(RemReservRequestBuilderTest, MessageOnlyContainsDeleteRequest) {
 
     rpc::Request message;
-    rb.BuildRequest("id", message);
+    rb_.BuildRequest("id", message);
 
     ASSERT_FALSE(message.has_resourcerequest());
     ASSERT_FALSE(message.has_listjobsrequest());

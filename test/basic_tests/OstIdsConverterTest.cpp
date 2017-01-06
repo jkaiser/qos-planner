@@ -17,13 +17,13 @@ class OstIdsConverterTest : public ::testing::Test {
 
 protected:
 
-    std::unique_ptr<common::OstIdsConverter> converter;
+    std::unique_ptr<common::OstIdsConverter> converter_;
 
     virtual void SetUp() {
         mock_lustre = new common::MockLustre();
         mocked_ll.reset(mock_lustre);
 
-        converter.reset(new common::OstIdsConverter(mocked_ll));
+        converter_.reset(new common::OstIdsConverter(mocked_ll));
     }
 
     common::MockLustre *mock_lustre;
@@ -46,7 +46,7 @@ TEST_F(OstIdsConverterTest, WhenGivenValidIdThenReturnUUID) {
 
     ON_CALL(*mocked_ll, GetOstList(_, _)).WillByDefault(DoAll(testing::SetArgReferee<1>(ost_list), Return(true)));
 
-    std::string returned_uuid = converter->ToUUID(id);
+    std::string returned_uuid = converter_->ToUUID(id);
     ASSERT_STREQ(expected_uuid.c_str(), returned_uuid.c_str());
 }
 
@@ -57,7 +57,7 @@ TEST_F(OstIdsConverterTest, WhenGivenInValidIdThenReturnEmptyString) {
     auto ost_list = std::make_shared<std::vector<common::Lustre::getOstsResults>>();
 
     ON_CALL(*mocked_ll, GetOstList(_, _)).WillByDefault(DoAll(testing::SetArgReferee<1>(ost_list), Return(true)));
-    std::string returned_uuid = converter->ToUUID(id);
+    std::string returned_uuid = converter_->ToUUID(id);
 
     ASSERT_STREQ("", returned_uuid.c_str());
 }
@@ -68,5 +68,5 @@ TEST_F(OstIdsConverterTest, WhenLustreCallFailsThenDontCrash) {
     auto ost_list = std::make_shared<std::vector<common::Lustre::getOstsResults>>();
 
     ON_CALL(*mocked_ll, GetOstList(_, _)).WillByDefault(DoAll(testing::SetArgReferee<1>(ost_list), Return(false)));
-    std::string returned_uuid = converter->ToUUID(id);
+    std::string returned_uuid = converter_->ToUUID(id);
 }

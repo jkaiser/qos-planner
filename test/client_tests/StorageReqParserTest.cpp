@@ -11,43 +11,43 @@
 class StorageReqParserTest : public ::testing::Test {
 
 protected:
-    common::StorageReqParser p;
-    std::stringstream ss;
+    common::StorageReqParser sq_parser_;
+    std::stringstream ss_;
 
     virtual void TearDown() {
-        ss.str("");
+        ss_.str("");
     }
 };
 
 TEST_F(StorageReqParserTest, MustFailAtEmptyInput) {
-    ss.str("");
-    ASSERT_FALSE(p.Parse(ss));
+    ss_.str("");
+    ASSERT_FALSE(sq_parser_.Parse(ss_));
 }
 
 TEST_F(StorageReqParserTest, MustFailAtInvalidJSON) {
 
-    ss.str("}{");
-    ASSERT_FALSE(p.Parse(ss));
+    ss_.str("}{");
+    ASSERT_FALSE(sq_parser_.Parse(ss_));
 
-    ss.str("{\"foo\": 42");
-    ASSERT_FALSE(p.Parse(ss));
+    ss_.str("{\"foo\": 42");
+    ASSERT_FALSE(sq_parser_.Parse(ss_));
 }
 
 TEST_F(StorageReqParserTest, MustAcceptValidFile) {
 
     std::string json = "{\"throughput_mbs\" : 10, \"read_files\" : [\"foo\"]}";
-    ss.str(json);
+    ss_.str(json);
 
-    ASSERT_TRUE(p.Parse(ss));
+    ASSERT_TRUE(sq_parser_.Parse(ss_));
 }
 
 TEST_F(StorageReqParserTest, MustDeliverValidValues) {
 
     std::string json = "{\"throughput_mbs\" : 10, \"read_files\" : [\"foo\"]}";
-    ss.str(json);
+    ss_.str(json);
 
-    p.Parse(ss);
+    sq_parser_.Parse(ss_);
 
-    ASSERT_EQ(10, p.getThroughput_mbs());
-    ASSERT_STREQ("foo", p.getRead_files().data());
+    ASSERT_EQ(10, sq_parser_.getThroughput_mbs());
+    ASSERT_STREQ("foo", sq_parser_.getRead_files().data());
 }

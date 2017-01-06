@@ -17,41 +17,41 @@ class JobSchedStaticWL : public ::testing::Test {
 
 protected:
 
-    std::string ost_limits_cfg_file;
-    common::MockScheduleState *mock_scheduler_state;
-    common::MockJobMonitor *mock_job_monitor;
-    common::MockLustre *mock_lustre;
+    std::string ost_limits_cfg_file_;
+    common::MockScheduleState *mock_scheduler_state_;
+    common::MockJobMonitor *mock_job_monitor_;
+    common::MockLustre *mock_lustre_;
 
-    std::shared_ptr<common::ScheduleState> mocked_sstate;
-    std::shared_ptr<common::MockLustre> mocked_ll;
-    std::shared_ptr<common::JobMonitor> mocked_jobmon;
+    std::shared_ptr<common::ScheduleState> mocked_sstate_;
+    std::shared_ptr<common::MockLustre> mocked_ll_;
+    std::shared_ptr<common::JobMonitor> mocked_jobmon_;
 
-    std::map<std::string, uint32_t> limits;
-    std::shared_ptr<common::JobSchedulerStaticWorkloads> scheduler;
+    std::map<std::string, uint32_t> limits_;
+    std::shared_ptr<common::JobSchedulerStaticWorkloads> scheduler_;
 
     virtual void SetUp() {
-        mock_scheduler_state = new common::MockScheduleState();
-        mock_job_monitor = new common::MockJobMonitor();
-        mock_lustre = new common::MockLustre();
+        mock_scheduler_state_ = new common::MockScheduleState();
+        mock_job_monitor_ = new common::MockJobMonitor();
+        mock_lustre_ = new common::MockLustre();
 
-        mocked_sstate.reset(mock_scheduler_state);
-        mocked_ll.reset(mock_lustre);
-        mocked_jobmon.reset(mock_job_monitor);
+        mocked_sstate_.reset(mock_scheduler_state_);
+        mocked_ll_.reset(mock_lustre_);
+        mocked_jobmon_.reset(mock_job_monitor_);
 
-        scheduler.reset(new common::JobSchedulerStaticWorkloads(mocked_sstate, mocked_jobmon, mocked_ll, ost_limits_cfg_file));
-        scheduler->UpdateLimits(limits);
+        scheduler_.reset(new common::JobSchedulerStaticWorkloads(mocked_sstate_, mocked_jobmon_, mocked_ll_, ost_limits_cfg_file_));
+        scheduler_->UpdateLimits(limits_);
     }
 
     virtual void TearDown() {
-        scheduler.reset();
+        scheduler_.reset();
 
-        mocked_sstate.reset();
-        mocked_ll.reset();
-        mocked_jobmon.reset();
+        mocked_sstate_.reset();
+        mocked_ll_.reset();
+        mocked_jobmon_.reset();
 
-        mock_scheduler_state = nullptr;
-        mock_job_monitor = nullptr;
-        mock_lustre = nullptr;
+        mock_scheduler_state_ = nullptr;
+        mock_job_monitor_ = nullptr;
+        mock_lustre_ = nullptr;
     }
 
     std::vector<std::string> CreateSingleOstList() {
@@ -68,7 +68,7 @@ protected:
 
 
 TEST_F(JobSchedStaticWL, CanUpdateOSTLimits) {
-    scheduler->UpdateLimits(limits);
+    scheduler_->UpdateLimits(limits_);
 }
 
 TEST_F(JobSchedStaticWL, ScheduleJobOnEmptyClusterShouldFail) {
@@ -76,7 +76,7 @@ TEST_F(JobSchedStaticWL, ScheduleJobOnEmptyClusterShouldFail) {
     std::vector<std::string> osts_touched_by_job = CreateSingleOstList();
     job->setOsts(osts_touched_by_job);
 
-    EXPECT_FALSE(scheduler->ScheduleJob(*job));
+    EXPECT_FALSE(scheduler_->ScheduleJob(*job));
     delete job;
 }
 
@@ -90,13 +90,13 @@ TEST_F(JobSchedStaticWL, ScheduleJobOnEmptyClusterWithEnoughResShouldPass) {
 
     std::map<std::string, uint32_t> ost_resources;
     ost_resources[osts_touched_by_job[0]] = 100;
-    scheduler->UpdateLimits(ost_resources);
+    scheduler_->UpdateLimits(ost_resources);
 
-    EXPECT_CALL(*mock_scheduler_state, AddJob(_, _, _)).WillRepeatedly(testing::Return(true));
-    EXPECT_CALL(*mock_job_monitor, RegisterJob(_)).WillRepeatedly(testing::Return(true));
+    EXPECT_CALL(*mock_scheduler_state_, AddJob(_, _, _)).WillRepeatedly(testing::Return(true));
+    EXPECT_CALL(*mock_job_monitor_, RegisterJob(_)).WillRepeatedly(testing::Return(true));
 
-    EXPECT_TRUE(scheduler->ScheduleJob(*job));
-    EXPECT_TRUE(scheduler->ScheduleJob(*job2));
+    EXPECT_TRUE(scheduler_->ScheduleJob(*job));
+    EXPECT_TRUE(scheduler_->ScheduleJob(*job2));
     delete job;
     delete job2;
 }
@@ -108,12 +108,12 @@ TEST_F(JobSchedStaticWL, ScheduleJobClusterWithonEdgeResShouldPass) {
 
     std::map<std::string, uint32_t> ost_resources;
     ost_resources[osts_touched_by_job[0]] = 100;
-    scheduler->UpdateLimits(ost_resources);
+    scheduler_->UpdateLimits(ost_resources);
 
-    EXPECT_CALL(*mock_scheduler_state, AddJob(_, _, _)).WillOnce(testing::Return(true));
-    EXPECT_CALL(*mock_job_monitor, RegisterJob(_)).WillOnce(testing::Return(true));
+    EXPECT_CALL(*mock_scheduler_state_, AddJob(_, _, _)).WillOnce(testing::Return(true));
+    EXPECT_CALL(*mock_job_monitor_, RegisterJob(_)).WillOnce(testing::Return(true));
 
-    EXPECT_TRUE(scheduler->ScheduleJob(*job));
+    EXPECT_TRUE(scheduler_->ScheduleJob(*job));
     delete job;
 }
 
@@ -126,17 +126,17 @@ TEST_F(JobSchedStaticWL, RemoveExistingJobShouldSucceed) {
 
     std::map<std::string, uint32_t> ost_resources;
     ost_resources[osts_touched_by_job[0]] = 100;
-    scheduler->UpdateLimits(ost_resources);
+    scheduler_->UpdateLimits(ost_resources);
 
-    ON_CALL(*mock_scheduler_state, AddJob(_, _, _)).WillByDefault(testing::Return(true));
-    ON_CALL(*mock_job_monitor, RegisterJob(_)).WillByDefault(testing::Return(true));
-    ON_CALL(*mock_scheduler_state, GetJobStatus(job->getJobid(), _)).WillByDefault(testing::DoAll(testing::SetArgPointee<1>(common::Job::SCHEDULED),testing::Return(true)));
+    ON_CALL(*mock_scheduler_state_, AddJob(_, _, _)).WillByDefault(testing::Return(true));
+    ON_CALL(*mock_job_monitor_, RegisterJob(_)).WillByDefault(testing::Return(true));
+    ON_CALL(*mock_scheduler_state_, GetJobStatus(job->getJobid(), _)).WillByDefault(testing::DoAll(testing::SetArgPointee<1>(common::Job::SCHEDULED),testing::Return(true)));
 
-    EXPECT_CALL(*mock_scheduler_state, RemoveJob(job->getJobid())).WillOnce(testing::Return(true));
-    EXPECT_CALL(*mock_job_monitor, UnregisterJob(_)).Times(1);
+    EXPECT_CALL(*mock_scheduler_state_, RemoveJob(job->getJobid())).WillOnce(testing::Return(true));
+    EXPECT_CALL(*mock_job_monitor_, UnregisterJob(_)).Times(1);
 
-    scheduler->ScheduleJob(*job);
-    EXPECT_TRUE(scheduler->RemoveJob(job->getJobid())) << "Call should succeed if job exist";
+    scheduler_->ScheduleJob(*job);
+    EXPECT_TRUE(scheduler_->RemoveJob(job->getJobid())) << "Call should succeed if job exist";
     delete job;
 }
 
@@ -146,8 +146,8 @@ TEST_F(JobSchedStaticWL, RemoveNonExistingJobShouldFail) {
     std::vector<std::string> osts_touched_by_job = CreateSingleOstList();
     job->setOsts(osts_touched_by_job);
 
-    EXPECT_CALL(*mock_job_monitor, UnregisterJob(_)).Times(0);
+    EXPECT_CALL(*mock_job_monitor_, UnregisterJob(_)).Times(0);
 
-    EXPECT_FALSE(scheduler->RemoveJob(job->getJobid())) << "Call should fail if job doesn't exist";
+    EXPECT_FALSE(scheduler_->RemoveJob(job->getJobid())) << "Call should fail if job doesn't exist";
     delete job;
 }

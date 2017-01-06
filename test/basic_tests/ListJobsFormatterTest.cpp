@@ -11,20 +11,20 @@
 class ListJobsFormatterTest : public ::testing::Test {
 
 protected:
-    common::ListJobsFormatter formatter;
-    std::vector<common::Job*> jobs;
+    common::ListJobsFormatter formatter_;
+    std::vector<common::Job*> jobs_;
 
     virtual void TearDown() {
-        for (int i = 0; i < jobs.size(); ++i) {
-            delete jobs[i];
+        for (int i = 0; i < jobs_.size(); ++i) {
+            delete jobs_[i];
         }
-        jobs.clear();
+        jobs_.clear();
     }
 
 };
 
 TEST_F(ListJobsFormatterTest, FormatEmptyListShouldShowSpecialText) {
-    std::shared_ptr<std::string> text = formatter.Format(jobs);
+    std::shared_ptr<std::string> text = formatter_.Format(jobs_);
 
     ASSERT_STREQ("", text->data());
 }
@@ -37,8 +37,8 @@ TEST_F(ListJobsFormatterTest, FormattedStringMustNotBeEmpty) {
     int throughput_mbs = 10;
 
     common::Job *job = new common::Job(id, tstart, tend, throughput_mbs);
-    jobs.push_back(job);
+    jobs_.push_back(job);
 
-    auto text = formatter.Format(jobs);
+    auto text = formatter_.Format(jobs_);
     ASSERT_TRUE(text->size() > 0);
 }

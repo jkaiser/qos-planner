@@ -14,7 +14,7 @@
 class OSTLimitParserTest : public ::testing::Test {
 
 protected:
-    std::unique_ptr<common::OSTLimitConfigParser> oparser;
+    std::unique_ptr<common::OSTLimitConfigParser> oparser_;
 
     virtual void SetUp() {
         if (!spdlog::get("console")) {
@@ -22,34 +22,34 @@ protected:
             spdlog::set_level(spdlog::level::critical);
         }
 
-        oparser.reset(new common::OSTLimitConfigParser);
+        oparser_.reset(new common::OSTLimitConfigParser);
     }
 
     virtual void TearDown() {
-        oparser.reset();
+        oparser_.reset();
     }
 };
 
 TEST_F(OSTLimitParserTest, ParseEmptyFileMustFail) {
     std::stringstream ss("");
-    ASSERT_FALSE(oparser->Parse(ss));
+    ASSERT_FALSE(oparser_->Parse(ss));
 }
 
 TEST_F(OSTLimitParserTest, ParseInvalidJsonMustFail) {
     std::stringstream ss("}{");
-    ASSERT_FALSE(oparser->Parse(ss));
+    ASSERT_FALSE(oparser_->Parse(ss));
 }
 
 TEST_F(OSTLimitParserTest, ParsedElementsMustSucceed) {
     std::stringstream ss("[{\"name\" : \"OST_a\", \"max_mbs\" : 100}]");
-    ASSERT_TRUE(oparser->Parse(ss));
+    ASSERT_TRUE(oparser_->Parse(ss));
 }
 
 TEST_F(OSTLimitParserTest, ParsedValuesMustBeCorrect) {
     std::stringstream ss("[{\"name\" : \"OST_a\", \"max_mbs\" : 100}, {\"name\" : \"OST_b\", \"max_mbs\" : 42.0}]");
-    oparser->Parse(ss);
+    oparser_->Parse(ss);
 
-    auto limits = oparser->GetLimits();
+    auto limits = oparser_->GetLimits();
 
     bool has_entry = limits.find("OST_a") != limits.end();
     ASSERT_TRUE(has_entry);
