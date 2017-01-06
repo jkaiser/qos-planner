@@ -181,13 +181,6 @@ bool JobMonitor::StartJob(const std::string &jobid) {
         return false;
     };
 
-//    uint32_t rpc_rate = lustre->MBsToRPCs(requested_throughput);
-//    if (!lustre->StartJobTbfRule(jobid, jobid + lustre_tbf_rule_postfix, rpc_rate)) {
-//        spdlog::get("console")->error("couldn't start TBF rule for job {}!", jobid);
-//        return false;
-//    }
-
-
     spdlog::get("console")->debug("update schedule status");
     // 3) update job status to ACTIVE
     if (!scheduleState_->UpdateJob(jobid, Job::ACTIVE)) {
@@ -224,12 +217,6 @@ bool JobMonitor::StopJob(const std::string &jobid) {
     if (!rule_manager_->RemoveRules(jobid)) {
         spdlog::get("console")->warn("couldn't remove TBF rule for job {}", jobid);
     }
-
-
-//    if (!lustre->StopJobTbfRule(jobid, jobid + lustre_tbf_rule_postfix)) {
-//        spdlog::get("console")->warn("couldn't remove TBF rule for job {}", jobid);
-//        TODO: give a warning here. This can lead to open permanent open NRS settings in Lustre!
-//    }
 
     // update job status to DONE
     return scheduleState_->UpdateJob(jobid, Job::DONE);

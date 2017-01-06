@@ -37,8 +37,6 @@ public:
      */
     virtual const std::list<Job*> *GetOSTState(const std::string &ost) = 0;
 
-//    virtual const std::map<std::string, Workload> *GetClusterWorkload() = 0;
-
     virtual void Reset() = 0;
 
     /**
