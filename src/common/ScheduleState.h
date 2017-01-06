@@ -21,7 +21,7 @@ namespace common {
 class ScheduleState {
 
 protected:
-    std::mutex schedule_mut;
+    std::mutex schedule_mut_;
 public:
 
     virtual bool Init() = 0;

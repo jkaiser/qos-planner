@@ -9,11 +9,11 @@ JobSchedulerDynWorkloads::JobSchedulerDynWorkloads(std::shared_ptr<ScheduleState
                                                    std::shared_ptr<JobMonitor> job_monitor,
                                                    std::shared_ptr<ClusterState> cluster_state,
                                                    std::shared_ptr<Lustre> lustre)
-        : schedule(schedule), job_monitor(job_monitor), cluster_state(cluster_state), lustre(lustre) {}
+        : schedule_(schedule), job_monitor_(job_monitor), cluster_state_(cluster_state), lustre_(lustre) {}
 
 bool JobSchedulerDynWorkloads::ScheduleJob(common::Job &job) {
 
-    std::lock_guard<std::mutex> lck(scheduler_mut);
+    std::lock_guard<std::mutex> lck(scheduler_mut_);
 
     for (auto ost : job.getOsts()) {
         // get the resource utilization for the timeframe of the job
@@ -24,7 +24,7 @@ bool JobSchedulerDynWorkloads::ScheduleJob(common::Job &job) {
         }
 
         OSTWorkload node_state;
-        if (!cluster_state->getOstState(ost, &node_state)) {
+        if (!cluster_state_->getOstState(ost, &node_state)) {
             return false;
         }
 
@@ -33,12 +33,12 @@ bool JobSchedulerDynWorkloads::ScheduleJob(common::Job &job) {
         }
     }
 
-    if (!schedule->AddJob(job.getJobid(), job, job.getOsts())) {
+    if (!schedule_->AddJob(job.getJobid(), job, job.getOsts())) {
         return false;
     }
 
-    if (!job_monitor->RegisterJob(job)) {
-        schedule->RemoveJob(job.getJobid());
+    if (!job_monitor_->RegisterJob(job)) {
+        schedule_->RemoveJob(job.getJobid());
         return false;
     }
 
@@ -47,7 +47,7 @@ bool JobSchedulerDynWorkloads::ScheduleJob(common::Job &job) {
 
 bool JobSchedulerDynWorkloads::AreEnoughResAvail(const Job &job, uint32_t max_ost_mb_sec,
                                                  const OSTWorkload &node_state) const {
-    return ((max_ost_mb_sec + job.getMin_read_throughput_MB()) <= lustre->RPCsToMBs(node_state.maxRpcSec));
+    return ((max_ost_mb_sec + job.getMin_read_throughput_MB()) <= lustre_->RPCsToMBs(node_state.maxRpcSec));
 }
 
 bool JobSchedulerDynWorkloads::RemoveJob(const std::string &jobid) {
@@ -57,14 +57,14 @@ bool JobSchedulerDynWorkloads::RemoveJob(const std::string &jobid) {
         return false;
     }
 
-    if (!job_monitor->UnregisterJob(jobid)) {
+    if (!job_monitor_->UnregisterJob(jobid)) {
         // TODO: give a warning here
     }
-    return schedule->RemoveJob(jobid);
+    return schedule_->RemoveJob(jobid);
 }
 
 bool JobSchedulerDynWorkloads::JobDoesNotExist(const std::string &jobid, Job::JobState &state) const {
-    return !schedule->GetJobStatus(jobid, &state);
+    return !schedule_->GetJobStatus(jobid, &state);
 }
 
 bool JobSchedulerDynWorkloads::GetMaxLoadInTimeInterval(std::string ost, std::chrono::system_clock::time_point start,
@@ -72,11 +72,11 @@ bool JobSchedulerDynWorkloads::GetMaxLoadInTimeInterval(std::string ost, std::ch
                                                         uint32_t *maxLoadMBSec) {
 
     OSTWorkload node_state;
-    if (!cluster_state->getOstState(ost, &node_state)) {
+    if (!cluster_state_->getOstState(ost, &node_state)) {
         return false;
     }
 
-    const std::list<Job *> *job_list = schedule->GetOSTState(ost);
+    const std::list<Job *> *job_list = schedule_->GetOSTState(ost);
     if (job_list == nullptr) {
         *maxLoadMBSec = 0;
         return true;
@@ -96,7 +96,7 @@ bool JobSchedulerDynWorkloads::GetMaxLoadInTimeInterval(std::string ost, std::ch
 }
 
 bool JobSchedulerDynWorkloads::Init() {
-    if ((schedule == nullptr) || (job_monitor == nullptr) || (lustre == nullptr)) {
+    if ((schedule_ == nullptr) || (job_monitor_ == nullptr) || (lustre_ == nullptr)) {
         return false;
     }
 

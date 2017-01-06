@@ -14,43 +14,43 @@
 namespace common {
 
 
-Planner::Planner(std::string &root_path, std::string &ost_limits_file) : root_path(root_path),
-                                                                         ost_limits_file(ost_limits_file) {
-    lustre = std::make_shared<LocalLustre>();
-    schedule = std::make_shared<MemoryScheduleState>();
+Planner::Planner(std::string &root_path, std::string &ost_limits_file) : root_path_(root_path),
+                                                                         ost_limits_file_(ost_limits_file) {
+    lustre_ = std::make_shared<LocalLustre>();
+    schedule_ = std::make_shared<MemoryScheduleState>();
 
-    auto ocache = std::make_shared<OstIpsCache>(lustre);
-    auto id_converter = std::make_shared<OstIdsConverter>(lustre);
+    auto ocache = std::make_shared<OstIpsCache>(lustre_);
+    auto id_converter = std::make_shared<OstIdsConverter>(lustre_);
     auto rule_setter = std::make_shared<SSHRuleSetter>();
-    rule_manager = std::make_shared<RuleManager>(rule_setter, ocache, id_converter);
+    rule_manager_ = std::make_shared<RuleManager>(rule_setter, ocache, id_converter);
 
-    jobMonitor = std::make_shared<JobMonitor>(schedule, rule_manager, 5);
+    job_monitor_ = std::make_shared<JobMonitor>(schedule_, rule_manager_, 5);
 
-    scheduler = std::make_shared<JobSchedulerStaticWorkloads>(schedule, jobMonitor, lustre, ost_limits_file);
+    scheduler_ = std::make_shared<JobSchedulerStaticWorkloads>(schedule_, job_monitor_, lustre_, ost_limits_file);
 }
 
 bool Planner::Init() {
 
-    if (!lustre->Init()) {
+    if (!lustre_->Init()) {
         spdlog::get("console")->critical("Initializing lustre connector failed");
         return false;
     }
 
-    if (!schedule->Init()) {
+    if (!schedule_->Init()) {
         spdlog::get("console")->critical("Initializing schedule failed");
         return false;
     }
 
-    if (!jobMonitor->Init()) {
-        schedule->TearDown();
+    if (!job_monitor_->Init()) {
+        schedule_->TearDown();
         spdlog::get("console")->critical("Initializing job monitor failed");
         return false;
     }
 
-    if (!scheduler->Init()) {
+    if (!scheduler_->Init()) {
         spdlog::get("console")->critical("Initializing scheduler failed");
-        jobMonitor->TearDown();
-        schedule->TearDown();
+        job_monitor_->TearDown();
+        schedule_->TearDown();
         return false;
     }
 
@@ -60,11 +60,11 @@ bool Planner::Init() {
 bool Planner::TearDown() {
     bool ret = true;
 
-    ret &= jobMonitor->TearDown();
-    jobMonitor.reset();
+    ret &= job_monitor_->TearDown();
+    job_monitor_.reset();
 
-    ret &= schedule->TearDown();
-    schedule.reset();
+    ret &= schedule_->TearDown();
+    schedule_.reset();
 
     return ret;
 }
@@ -89,7 +89,7 @@ bool Planner::ServeJobSubmission(rpc::Message &msg) {
     }
 
     auto job = BuildJob(request, tstart, tend, osts_set);
-    bool success = scheduler->ScheduleJob(*job);
+    bool success = scheduler_->ScheduleJob(*job);
     msg.mutable_reply()->set_rc((success) ? 0 : -1);
     return success;
 }
@@ -109,7 +109,7 @@ bool Planner::tryComputeOstSetOfRequest(const rpc::Request_ResourceRequest &requ
                                         std::unordered_set<std::string> &osts_set) const {
     for (auto it = request.files().begin(); it != request.files().end(); it++) {
         std::shared_ptr<std::vector<std::string>> osts(new std::vector<std::string>());
-        if (!lustre->GetOstsForFile(*it, osts)) {
+        if (!lustre_->GetOstsForFile(*it, osts)) {
             return false;
         }
 
@@ -127,9 +127,9 @@ bool Planner::ServeJobRemove(rpc::Message &msg) {
     bool success = true;
     for (int i = 0; i < request.id_size(); i++) {
 
-        jobMonitor->UnregisterJob(request.id(i));
+        job_monitor_->UnregisterJob(request.id(i));
 
-        if (!schedule->RemoveJob(request.id(i))) {
+        if (!schedule_->RemoveJob(request.id(i))) {
 //            spdlog::get("console")->warn("removing of job {} failed", request.id(i));
 //            success = false;
         }
@@ -144,7 +144,7 @@ bool Planner::ServeListJobs(rpc::Message &msg) {
     AddDefaultRegexIfEmpty(msg);
 
     const rpc::Request_ListJobsRequest &request = msg.request().listjobsrequest();
-    auto jobs = schedule->GetAllJobs();
+    auto jobs = schedule_->GetAllJobs();
     std::vector<Job *> job_list = FilterJobs(request, jobs);
 
     std::shared_ptr<rpc::Reply> reply_msg(new (rpc::Reply));

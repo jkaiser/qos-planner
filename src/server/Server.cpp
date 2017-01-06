@@ -9,14 +9,14 @@
 #include <spdlog/spdlog.h>
 
 Server::Server(const std::string &ip_port, const std::string &root_path,
-               std::shared_ptr<common::Planner> planner) : ip_port_(ip_port), context(nullptr), root_path(root_path), planner(planner) {
+               std::shared_ptr<common::Planner> planner) : ip_port_(ip_port), context_(nullptr), root_path_(root_path), planner_(planner) {
 }
 
 
 bool Server::Init() {
     spdlog::get("console")->info("init server");
 
-    if (!root_path.empty()) {
+    if (!root_path_.empty()) {
         return false;   // classes with permanent data structures are not yet implemented
     }
 
@@ -27,10 +27,10 @@ bool Server::Init() {
 }
 
 void Server::initZMQ() {
-    context = new zmq::context_t (1);
-    server.reset(new zmq::socket_t(*context, ZMQ_REP));
+    context_ = new zmq::context_t (1);
+    server_.reset(new zmq::socket_t(*context_, ZMQ_REP));
     spdlog::get("console")->info("will listen on: {}", ip_port_);
-    server->bind("tcp://" + ip_port_);
+    server_->bind("tcp://" + ip_port_);
 }
 
 bool Server::TearDown() {
@@ -43,7 +43,7 @@ void Server::Serve() {
     spdlog::get("console")->info("start serving");
 
     while (1) {
-        std::string request = s_recv(*server);
+        std::string request = s_recv(*server_);
 
         rpc::Message msg;
         if (!msg.ParseFromString(request)) {    // is it a valid parseable msg?
@@ -64,18 +64,18 @@ void Server::Serve() {
 
         msg.release_request();
         msg.set_type(rpc::Message::REPLY);
-        s_send (*server, msg.SerializeAsString());
+        s_send (*server_, msg.SerializeAsString());
     }
 }
 
 bool Server::ProcessMessage(rpc::Message &msg) const {
     switch (msg.request().type()) {
             case rpc::Request::RESERVE:
-                return planner->ServeJobSubmission(msg);
+                return planner_->ServeJobSubmission(msg);
             case rpc::Request::DELETE:
-                return planner->ServeJobRemove(msg);
+                return planner_->ServeJobRemove(msg);
             case rpc::Request::LISTJOBS:
-                return planner->ServeListJobs(msg);
+                return planner_->ServeListJobs(msg);
             default :
                 return false;
         }
@@ -84,5 +84,5 @@ bool Server::ProcessMessage(rpc::Message &msg) const {
 void Server::ProcessUnparsableMsg(rpc::Message &msg) const {
     msg.set_type(rpc::Message::REPLY);
     msg.mutable_reply()->set_rc(1);
-    s_send (*server, msg.SerializeAsString());
+    s_send (*server_, msg.SerializeAsString());
 }

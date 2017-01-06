@@ -7,7 +7,7 @@
 namespace common {
 
 JobPriorityQueue::JobPriorityQueue() {
-    heap.reserve(100);
+    heap_.reserve(100);
 }
 
 void JobPriorityQueue::Up(std::vector<WaitingItem *> &queue, int pos) {
@@ -26,21 +26,21 @@ void JobPriorityQueue::Up(std::vector<WaitingItem *> &queue, int pos) {
 }
 
 void JobPriorityQueue::Push(JobPriorityQueue::WaitingItem *new_item) {
-    heap.push_back(new_item);
-    Up(heap, (uint32_t) (heap.size() - 1));
+    heap_.push_back(new_item);
+    Up(heap_, (uint32_t) (heap_.size() - 1));
 }
 
 JobPriorityQueue::WaitingItem *JobPriorityQueue::Pop() {
-    if (heap.size() == 0) {
+    if (heap_.size() == 0) {
         return nullptr;
     }
 
-    WaitingItem *return_item = heap[0];
-    heap[0] = heap[heap.size() - 1];
-    heap.pop_back();
+    WaitingItem *return_item = heap_[0];
+    heap_[0] = heap_[heap_.size() - 1];
+    heap_.pop_back();
 
-    if (heap.size() != 0) {
-        Down(heap, 0);
+    if (heap_.size() != 0) {
+        Down(heap_, 0);
     }
 
     return return_item;
@@ -74,17 +74,17 @@ void JobPriorityQueue::Down(std::vector<WaitingItem *> &queue, int pos) {
 }
 
 bool JobPriorityQueue::Remove(std::string job) {
-    for (int i = 0; i < heap.size(); i++) {
-        if (heap[i]->jobid == job) {
-            WaitingItem *tmp = heap[i];
-            heap[i] = heap[heap.size() - 1];
+    for (int i = 0; i < heap_.size(); i++) {
+        if (heap_[i]->jobid == job) {
+            WaitingItem *tmp = heap_[i];
+            heap_[i] = heap_[heap_.size() - 1];
 
-            if (i == heap.size() -1) {  // it was the last element
-                heap.pop_back();
+            if (i == heap_.size() -1) {  // it was the last element
+                heap_.pop_back();
                 return true;
             } else {
-                heap.pop_back();
-                Down(heap, i);
+                heap_.pop_back();
+                Down(heap_, i);
                 return true;
             }
         }
@@ -93,10 +93,10 @@ bool JobPriorityQueue::Remove(std::string job) {
 }
 
 const JobPriorityQueue::WaitingItem *JobPriorityQueue::Peek() const {
-    if (heap.size() == 0) {
+    if (heap_.size() == 0) {
         return nullptr;
     }
 
-    return heap[0];
+    return heap_[0];
 }
 }

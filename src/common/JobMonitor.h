@@ -32,27 +32,27 @@ class JobMonitor {
 
 private:
     // The internal thread sleeps for this amount of seconds before checking for a Teardown call
-    uint32_t waiting_time_sec = 5;
+    uint32_t waiting_time_sec_ = 5;
 
-    bool monitor_thread_started = false;
-    std::thread monitor_thread;
-    bool monitor_thread_exit_flag = false;
-    bool monitor_thread_is_active = false;
-    std::condition_variable monitor_thread_finish_cv;
+    bool monitor_thread_started_ = false;
+    std::thread monitor_thread_;
+    bool monitor_thread_exit_flag_ = false;
+    bool monitor_thread_is_active_ = false;
+    std::condition_variable monitor_thread_finish_cv_;
 
-    std::shared_ptr<ScheduleState> scheduleState;
+    std::shared_ptr<ScheduleState> scheduleState_;
 
-    std::mutex job_priority_queue_mutex;
-    std::condition_variable job_priority_queue_cv;
-    JobPriorityQueue job_priority_queue;
+    std::mutex job_priority_queue_mutex_;
+    std::condition_variable job_priority_queue_cv_;
+    JobPriorityQueue job_priority_queue_;
 
     /** in-flight jobs are jobs which currently are processed by the internal thread
      *  This distinction is necessary because UnregisterJob(...) might be called during
      *  the processing of a job event.
      */
-    std::mutex in_flight_jobs_mutex;
-    std::condition_variable in_flight_jobs_cv;
-    std::set<std::string> in_flight_jobs;
+    std::mutex in_flight_jobs_mutex_;
+    std::condition_variable in_flight_jobs_cv_;
+    std::set<std::string> in_flight_jobs_;
 
     std::shared_ptr<RuleManager> rule_manager_;
 

@@ -27,12 +27,12 @@ namespace common {
 class JobSchedulerDynWorkloads : public JobScheduler {
 
 private:
-    std::mutex scheduler_mut;
+    std::mutex scheduler_mut_;
 
-    std::shared_ptr<ClusterState> cluster_state;
-    std::shared_ptr<ScheduleState> schedule;
-    std::shared_ptr<JobMonitor> job_monitor;
-    std::shared_ptr<Lustre> lustre;
+    std::shared_ptr<ClusterState> cluster_state_;
+    std::shared_ptr<ScheduleState> schedule_;
+    std::shared_ptr<JobMonitor> job_monitor_;
+    std::shared_ptr<Lustre> lustre_;
 
 
     bool GetMaxLoadInTimeInterval(std::string ost,

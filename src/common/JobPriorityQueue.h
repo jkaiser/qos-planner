@@ -36,7 +36,7 @@ public:
 
 
 private:
-    std::vector<WaitingItem*> heap;
+    std::vector<WaitingItem*> heap_;
     void Up(std::vector<WaitingItem*> &queue, int pos);
     void Down(std::vector<WaitingItem*> &queue, int pos);
 

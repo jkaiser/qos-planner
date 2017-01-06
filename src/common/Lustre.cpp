@@ -60,11 +60,11 @@ bool LocalLustre::StopJobTbfRule(std::string jobid, std::string rule_name) {
 }
 
 uint32_t LocalLustre::MBsToRPCs(const uint32_t mb_per_sec) const {
-    return mb_per_sec / max_rpc_size;   // TODO:
+    return mb_per_sec / max_rpc_size_;   // TODO:
 }
 
 uint32_t LocalLustre::RPCsToMBs(const uint32_t rpc_per_sec) const {
-    return rpc_per_sec * max_rpc_size;   // TODO:
+    return rpc_per_sec * max_rpc_size_;   // TODO:
 }
 
 bool LocalLustre::Init() {

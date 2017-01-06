@@ -88,12 +88,12 @@ public:
 class LocalLustre : public Lustre {
 
 private:
-    uint32_t max_rpc_size;  //in MB
+    uint32_t max_rpc_size_;  //in MB
 
 public:
     virtual bool Init() override;
 
-    LocalLustre() : max_rpc_size(1) { }
+    LocalLustre() : max_rpc_size_(1) { }
 
     virtual uint32_t MBsToRPCs(const uint32_t mb_per_sec) const override;
     virtual uint32_t RPCsToMBs(const uint32_t rpc_per_sec) const override;

@@ -15,10 +15,10 @@ JobSchedulerStaticWorkloads::JobSchedulerStaticWorkloads(std::shared_ptr<Schedul
                                                    std::shared_ptr<JobMonitor> job_monitor,
                                                    std::shared_ptr<Lustre> lustre,
                                                    std::string &ost_limits_file)
-        : schedule(schedule), job_monitor(job_monitor), lustre(lustre), ost_limits_file(ost_limits_file) {}
+        : schedule_(schedule), job_monitor_(job_monitor), lustre_(lustre), ost_limits_file_(ost_limits_file) {}
 
 bool JobSchedulerStaticWorkloads::ScheduleJob(common::Job &job) {
-    std::lock_guard<std::mutex> lck(scheduler_mut);
+    std::lock_guard<std::mutex> lck(scheduler_mut_);
 
     for (auto ost : job.getOsts()) {
         uint32_t max_ost_mb_sec;
@@ -34,13 +34,13 @@ bool JobSchedulerStaticWorkloads::ScheduleJob(common::Job &job) {
     }
 
     job.setState(Job::SCHEDULED);
-    if (!schedule->AddJob(job.getJobid(), job, job.getOsts())) {
+    if (!schedule_->AddJob(job.getJobid(), job, job.getOsts())) {
         return false;
     }
 
-    if (!job_monitor->RegisterJob(job)) {
+    if (!job_monitor_->RegisterJob(job)) {
         spdlog::get("console")->error("failed to register job");
-        schedule->RemoveJob(job.getJobid());
+        schedule_->RemoveJob(job.getJobid());
         return false;
     }
 
@@ -60,7 +60,7 @@ bool JobSchedulerStaticWorkloads::AreEnoughResAvail(const Job &job, const std::s
 bool JobSchedulerStaticWorkloads::GetMaxLoadInTimeInterval(std::string ost, std::chrono::system_clock::time_point start,
                                                         std::chrono::system_clock::time_point end, uint32_t *maxLoadMBSec) {
 
-    const std::list<Job *> *job_list = schedule->GetOSTState(ost);
+    const std::list<Job *> *job_list = schedule_->GetOSTState(ost);
     if (job_list == nullptr) {
         *maxLoadMBSec = 0;
         return true;
@@ -84,13 +84,13 @@ bool JobSchedulerStaticWorkloads::RemoveJob(const std::string &jobid) {
         return false;
     }
 
-    if (!job_monitor->UnregisterJob(jobid)) {
+    if (!job_monitor_->UnregisterJob(jobid)) {
         // TODO: give a warning here
     }
-    return schedule->RemoveJob(jobid);
+    return schedule_->RemoveJob(jobid);
 }
 
-bool JobSchedulerStaticWorkloads::JobDoesNotExist(const std::string &jobid, Job::JobState &state) const { return !schedule->GetJobStatus(jobid, &state); }
+bool JobSchedulerStaticWorkloads::JobDoesNotExist(const std::string &jobid, Job::JobState &state) const { return !schedule_->GetJobStatus(jobid, &state); }
 
 void JobSchedulerStaticWorkloads::UpdateLimits(const std::map<std::string, uint32_t> &new_limits) {
     osts_max_mbs_limits_.clear();
@@ -100,10 +100,10 @@ void JobSchedulerStaticWorkloads::UpdateLimits(const std::map<std::string, uint3
 bool JobSchedulerStaticWorkloads::Init() {
 
     spdlog::get("console")->info("init scheduler");
-    if (!ost_limits_file.empty()) {
-        std::ifstream is(ost_limits_file, std::ifstream::in);
+    if (!ost_limits_file_.empty()) {
+        std::ifstream is(ost_limits_file_, std::ifstream::in);
         if (!is.is_open()) {
-            spdlog::get("console")->critical("ost limits file \"{}\" doesn't exist!", ost_limits_file);
+            spdlog::get("console")->critical("ost limits file \"{}\" doesn't exist!", ost_limits_file_);
             return false;
         }
 

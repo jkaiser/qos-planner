@@ -17,12 +17,12 @@ namespace common {
 class ListJobsFormatter {
 
 private:
-    std::stringstream stream;
+    std::stringstream stream_;
 
-    static const int reservation_shift = 15;
-    static const int throughput_shift = 20;
-    static const int jobstate_shift = 15;
-    static const int time_end_shift = 20;
+    static const int kReservationShift = 15;
+    static const int kThroughputShift = 20;
+    static const int kJobstateShift = 15;
+    static const int kTimeEndShift = 20;
 
     void AddJob(Job *j);
     void AddJobState(Job *j);

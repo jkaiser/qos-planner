@@ -20,14 +20,14 @@ namespace common {
 class JobSchedulerStaticWorkloads : public JobScheduler {
 
 private:
-    std::string ost_limits_file;
-    std::mutex scheduler_mut;
+    std::string ost_limits_file_;
+    std::mutex scheduler_mut_;
 
     std::map<std::string, float> osts_max_mbs_limits_;
 
-    std::shared_ptr<ScheduleState> schedule;
-    std::shared_ptr<JobMonitor> job_monitor;
-    std::shared_ptr<Lustre> lustre;
+    std::shared_ptr<ScheduleState> schedule_;
+    std::shared_ptr<JobMonitor> job_monitor_;
+    std::shared_ptr<Lustre> lustre_;
 
 
     bool GetMaxLoadInTimeInterval(std::string ost,

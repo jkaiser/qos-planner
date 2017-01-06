@@ -25,12 +25,12 @@
 class Server {
 
 private:
-    std::string root_path;
+    std::string root_path_;
     std::string ip_port_;
-    std::shared_ptr<common::Planner> planner;
-    std::shared_ptr<zmq::socket_t> server;
+    std::shared_ptr<common::Planner> planner_;
+    std::shared_ptr<zmq::socket_t> server_;
 
-    zmq::context_t *context;
+    zmq::context_t *context_;
     void initZMQ();
 
 public:

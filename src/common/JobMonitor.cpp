@@ -11,32 +11,32 @@ namespace common {
 JobMonitor::JobMonitor() {}
 
 JobMonitor::JobMonitor(std::shared_ptr<common::ScheduleState> st, std::shared_ptr<RuleManager> rule_manager) :
-        monitor_thread_started(false),
-        scheduleState(st),
+        monitor_thread_started_(false),
+        scheduleState_(st),
         rule_manager_(rule_manager) {
     JobMonitor(st, rule_manager, 5);
 }
 
 JobMonitor::JobMonitor(std::shared_ptr<ScheduleState> st, std::shared_ptr<RuleManager> rule_manager, uint32_t waiting_time_sec) :
-        monitor_thread_started(false),
-        scheduleState(st),
+        monitor_thread_started_(false),
+        scheduleState_(st),
         rule_manager_(rule_manager),
-        waiting_time_sec(waiting_time_sec) {}
+        waiting_time_sec_(waiting_time_sec) {}
 
 
 bool JobMonitor::RegisterJob(const common::Job &job) {
-    std::lock_guard<std::mutex> lock(job_priority_queue_mutex);
+    std::lock_guard<std::mutex> lock(job_priority_queue_mutex_);
     JobPriorityQueue::WaitingItem *wt = new JobPriorityQueue::WaitingItem(job.getJobid(), job.GetStartTime(),
     Job::JobEvent::JOBSTART);
-    job_priority_queue.Push(wt);
+    job_priority_queue_.Push(wt);
     return true;
 }
 void JobMonitor::Handle(const std::string &jobid, Job::JobEvent event) {
-    std::unique_lock<std::mutex> lock(in_flight_jobs_mutex);
-    while (in_flight_jobs.find(jobid) != in_flight_jobs.end()) {
-        in_flight_jobs_cv.wait(lock);
+    std::unique_lock<std::mutex> lock(in_flight_jobs_mutex_);
+    while (in_flight_jobs_.find(jobid) != in_flight_jobs_.end()) {
+        in_flight_jobs_cv_.wait(lock);
     }
-    in_flight_jobs.insert(jobid);
+    in_flight_jobs_.insert(jobid);
     lock.unlock();
 
     switch (event) {
@@ -45,7 +45,7 @@ void JobMonitor::Handle(const std::string &jobid, Job::JobEvent event) {
             break;
         case Job::JobEvent::JOBSTOP:
             StopJob(jobid);
-            scheduleState->RemoveJob(jobid);
+            scheduleState_->RemoveJob(jobid);
             break;
         default:
             // Error
@@ -54,21 +54,21 @@ void JobMonitor::Handle(const std::string &jobid, Job::JobEvent event) {
     }
 
     lock.lock();
-    in_flight_jobs.erase(jobid);
-    in_flight_jobs_cv.notify_all();
+    in_flight_jobs_.erase(jobid);
+    in_flight_jobs_cv_.notify_all();
     lock.unlock();
 }
 
 bool JobMonitor::Init() {
-    if ((scheduleState == nullptr) || (rule_manager_ == nullptr)) {
+    if ((scheduleState_ == nullptr) || (rule_manager_ == nullptr)) {
         return false;
     }
 
     FillWithExistingJobs();
 
-    if (not monitor_thread_started) {
-        monitor_thread = std::thread(&JobMonitor::Monitor, this);
-        monitor_thread_started = true;
+    if (not monitor_thread_started_) {
+        monitor_thread_ = std::thread(&JobMonitor::Monitor, this);
+        monitor_thread_started_ = true;
     } else { // something's wrong. Was it initialized before?
         return false;
     }
@@ -78,9 +78,9 @@ bool JobMonitor::Init() {
 
 void JobMonitor::FillWithExistingJobs() {
     // We only consider jobs that were touched by the monitor itself -> state == SCHEDULED or state == ACTIVE
-    std::map<std::string, Job *> *existing_jobs = scheduleState->GetAllJobs();
+    std::map<std::string, Job *> *existing_jobs = scheduleState_->GetAllJobs();
 
-    std::unique_lock<std::mutex> lock(job_priority_queue_mutex);
+    std::unique_lock<std::mutex> lock(job_priority_queue_mutex_);
     for (auto job : *existing_jobs) {
         JobPriorityQueue::WaitingItem *wt;
         switch (job.second->getState()) {
@@ -88,12 +88,12 @@ void JobMonitor::FillWithExistingJobs() {
             case Job::SCHEDULED:
                 wt = new JobPriorityQueue::WaitingItem(job.second->getJobid(), job.second->GetStartTime(),
                 Job::JOBSTART);
-                job_priority_queue.Push(wt);
+                job_priority_queue_.Push(wt);
                 break;
 
             case Job::ACTIVE:
                 wt = new JobPriorityQueue::WaitingItem(job.second->getJobid(), job.second->GetEndTime(), Job::JOBSTOP);
-                job_priority_queue.Push(wt);
+                job_priority_queue_.Push(wt);
                 break;
 
             case Job::INITIALIZED:
@@ -111,16 +111,16 @@ void JobMonitor::FillWithExistingJobs() {
 
 bool JobMonitor::TearDown() {
 
-    std::unique_lock<std::mutex> lock(job_priority_queue_mutex);
-    monitor_thread_exit_flag = true;
-    while (monitor_thread_is_active) {
-        monitor_thread_finish_cv.wait(lock);
+    std::unique_lock<std::mutex> lock(job_priority_queue_mutex_);
+    monitor_thread_exit_flag_ = true;
+    while (monitor_thread_is_active_) {
+        monitor_thread_finish_cv_.wait(lock);
     }
     lock.unlock();
 
 
-    if (monitor_thread.joinable()) {
-        monitor_thread.join();
+    if (monitor_thread_.joinable()) {
+        monitor_thread_.join();
     }
 
     return true;
@@ -128,15 +128,15 @@ bool JobMonitor::TearDown() {
 
 void JobMonitor::Monitor() {
 
-    std::unique_lock<std::mutex> lk(job_priority_queue_mutex);
-    monitor_thread_is_active = true;
-    monitor_thread_finish_cv.notify_all();
+    std::unique_lock<std::mutex> lk(job_priority_queue_mutex_);
+    monitor_thread_is_active_ = true;
+    monitor_thread_finish_cv_.notify_all();
     lk.unlock();
 
-    while (!monitor_thread_exit_flag) {
+    while (!monitor_thread_exit_flag_) {
         lk.lock();
         while (isThereAReadyJob()) {
-            JobPriorityQueue::WaitingItem *wt = job_priority_queue.Pop();
+            JobPriorityQueue::WaitingItem *wt = job_priority_queue_.Pop();
             lk.unlock();
 
             Handle(wt->jobid, wt->eventType);
@@ -144,20 +144,20 @@ void JobMonitor::Monitor() {
             lk.lock();
         }
 
-        job_priority_queue_cv.wait_for(lk, std::chrono::seconds(waiting_time_sec));
+        job_priority_queue_cv_.wait_for(lk, std::chrono::seconds(waiting_time_sec_));
         lk.unlock();
     }
 
     lk.lock();
-    monitor_thread_is_active = false;
-    monitor_thread_finish_cv.notify_all();
+    monitor_thread_is_active_ = false;
+    monitor_thread_finish_cv_.notify_all();
     lk.unlock();
 
 }
 
 bool JobMonitor::isThereAReadyJob() const {
-    return (job_priority_queue.Peek() != nullptr) &&
-    (job_priority_queue.Peek()->time_of_event < std::chrono::system_clock::now());
+    return (job_priority_queue_.Peek() != nullptr) &&
+    (job_priority_queue_.Peek()->time_of_event < std::chrono::system_clock::now());
 }
 
 
@@ -166,7 +166,7 @@ bool JobMonitor::StartJob(const std::string &jobid) {
     spdlog::get("console")->debug("starting job {}", jobid);
 
     Job::JobState job_state;
-    if (!scheduleState->GetJobStatus(jobid, &job_state)) {   // job was removed in the meantime
+    if (!scheduleState_->GetJobStatus(jobid, &job_state)) {   // job was removed in the meantime
         spdlog::get("console")->debug("job was removed in the meantime");
         return false;
     } else if (job_state != Job::SCHEDULED) {   // job was unregistered/removed in the meantime
@@ -190,19 +190,19 @@ bool JobMonitor::StartJob(const std::string &jobid) {
 
     spdlog::get("console")->debug("update schedule status");
     // 3) update job status to ACTIVE
-    if (!scheduleState->UpdateJob(jobid, Job::ACTIVE)) {
+    if (!scheduleState_->UpdateJob(jobid, Job::ACTIVE)) {
         return false;
     }
 
     // 4) setup new waiting mechanism
     std::chrono::system_clock::time_point tend;
-    if (!scheduleState->GetJobEnd(jobid, &tend)) {
+    if (!scheduleState_->GetJobEnd(jobid, &tend)) {
         return false;
     }
-    std::unique_lock<std::mutex> lock(job_priority_queue_mutex);
+    std::unique_lock<std::mutex> lock(job_priority_queue_mutex_);
     JobPriorityQueue::WaitingItem *wt = new JobPriorityQueue::WaitingItem(jobid, tend, Job::JobEvent::JOBSTOP);
-    job_priority_queue.Push(wt);
-    job_priority_queue_cv.notify_all();
+    job_priority_queue_.Push(wt);
+    job_priority_queue_cv_.notify_all();
     lock.unlock();
 
     return true;
@@ -212,7 +212,7 @@ bool JobMonitor::StopJob(const std::string &jobid) {
     spdlog::get("console")->debug("jobmon: stop job {}", jobid);
 
     Job::JobState job_state;
-    if (!scheduleState->GetJobStatus(jobid, &job_state)) {   // job was removed in the meantime
+    if (!scheduleState_->GetJobStatus(jobid, &job_state)) {   // job was removed in the meantime
         spdlog::get("console")->error("job was removed in the meantime");
         return false;
     } else if (job_state != Job::ACTIVE) {   // job was unregistered/removed in the meantime
@@ -232,7 +232,7 @@ bool JobMonitor::StopJob(const std::string &jobid) {
 //    }
 
     // update job status to DONE
-    return scheduleState->UpdateJob(jobid, Job::DONE);
+    return scheduleState_->UpdateJob(jobid, Job::DONE);
 
 }
 
@@ -242,7 +242,7 @@ bool JobMonitor::UnregisterJob(const Job &job) {
     RemoveJobFromPrioQueue(job);
 
     Job::JobState job_state;
-    if (!scheduleState->GetJobStatus(job.getJobid(), &job_state)) {   // job was removed in the meantime
+    if (!scheduleState_->GetJobStatus(job.getJobid(), &job_state)) {   // job was removed in the meantime
         UnblockJob(job);
         return true;
     }
@@ -261,40 +261,40 @@ bool JobMonitor::UnregisterJob(const Job &job) {
 }
 
 void JobMonitor::BlockJob(const Job &job) {
-    std::unique_lock<std::mutex> lock(in_flight_jobs_mutex);
-    while (in_flight_jobs.find(job.getJobid()) != in_flight_jobs.end()) {
-        in_flight_jobs_cv.wait(lock);
+    std::unique_lock<std::mutex> lock(in_flight_jobs_mutex_);
+    while (in_flight_jobs_.find(job.getJobid()) != in_flight_jobs_.end()) {
+        in_flight_jobs_cv_.wait(lock);
     }
-    in_flight_jobs.insert(job.getJobid());
+    in_flight_jobs_.insert(job.getJobid());
     lock.unlock();
 }
 
 void JobMonitor::UnblockJob(const Job &job) {
-    std::unique_lock<std::mutex> lock(in_flight_jobs_mutex);
-    in_flight_jobs.erase(job.getJobid());
-    in_flight_jobs_cv.notify_all();
+    std::unique_lock<std::mutex> lock(in_flight_jobs_mutex_);
+    in_flight_jobs_.erase(job.getJobid());
+    in_flight_jobs_cv_.notify_all();
     lock.unlock();
 }
 
 void JobMonitor::RemoveJobFromPrioQueue(const Job &job) {
-    std::unique_lock<std::mutex> lk(job_priority_queue_mutex);
-    if (!job_priority_queue.Remove(job.getJobid())) {
+    std::unique_lock<std::mutex> lk(job_priority_queue_mutex_);
+    if (!job_priority_queue_.Remove(job.getJobid())) {
         spdlog::get("console")->warn("couldn't remove job from prio. queue {}");
         //TODO: give a warning here. This should not happen but isn't critical here since we remove anyway.
     }
-    job_priority_queue_cv.notify_all();
+    job_priority_queue_cv_.notify_all();
     lk.unlock();
 }
 
 bool JobMonitor::SetNrsRules(const std::string &jobid) {
     uint32_t requested_throughput;
-    if (!scheduleState->GetJobThroughput(jobid, &requested_throughput)) {
+    if (!scheduleState_->GetJobThroughput(jobid, &requested_throughput)) {
         spdlog::get("console")->error("schedule doesn't contain job {}!", jobid);
         return false;
     }
 
     std::vector<std::string> osts_ids;
-    scheduleState->GetJobOstIds(jobid, osts_ids);
+    scheduleState_->GetJobOstIds(jobid, osts_ids);
 
     if (!rule_manager_->SetRules(osts_ids, jobid, requested_throughput)) {
         spdlog::get("console")->error("failed to set NRS rules for job {}!", jobid);

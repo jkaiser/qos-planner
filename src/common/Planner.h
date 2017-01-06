@@ -41,13 +41,13 @@ public:
     bool ServeListJobs(rpc::Message &msg);
 
 private:
-    const std::string root_path;
-    const std::string ost_limits_file;
-    std::shared_ptr<Lustre> lustre;
-    std::shared_ptr<JobScheduler> scheduler;
-    std::shared_ptr<ScheduleState> schedule;
-    std::shared_ptr<RuleManager> rule_manager;
-    std::shared_ptr<JobMonitor> jobMonitor;
+    const std::string root_path_;
+    const std::string ost_limits_file_;
+    std::shared_ptr<Lustre> lustre_;
+    std::shared_ptr<JobScheduler> scheduler_;
+    std::shared_ptr<ScheduleState> schedule_;
+    std::shared_ptr<RuleManager> rule_manager_;
+    std::shared_ptr<JobMonitor> job_monitor_;
 
     void AddJobsToReply(std::shared_ptr<rpc::Reply> &reply_msg, const std::map<std::string, Job *> *jobs,
                         std::vector<Job *> &job_list) const;

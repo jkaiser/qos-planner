@@ -19,11 +19,11 @@
 class Client {
 
 private:
-    std::string ipPort;
-    std::shared_ptr<zmq::socket_t> client;
-    zmq::context_t *context;
-    const int request_timeout = 1000;
-    const int request_retries = 3;
+    std::string ipPort_;
+    std::shared_ptr<zmq::socket_t> client_;
+    zmq::context_t *context_;
+    const int kRequestTimeout = 1000;
+    const int kRequestRetries = 3;
 
     bool SendAndReceiveRequest(std::string &raw_msg, std::string &reply);
 

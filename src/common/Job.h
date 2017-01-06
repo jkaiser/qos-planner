@@ -47,50 +47,50 @@ public:
         std::chrono::time_point<std::chrono::system_clock> tstart,
         std::chrono::time_point<std::chrono::system_clock> tend,
         uint32_t min_read_throughput_MB)
-            : state(INITIALIZED), jobid(jobid), tstart(tstart), tend(tend), min_read_throughput_MB(min_read_throughput_MB) { }
+            : state_(INITIALIZED), jobid_(jobid), tstart_(tstart), tend_(tend), min_read_throughput_MB_(min_read_throughput_MB) { }
 
-    Job(const std::string &jobid) : jobid(jobid), state(INITIALIZED), min_read_throughput_MB(0) {}
+    Job(const std::string &jobid) : jobid_(jobid), state_(INITIALIZED), min_read_throughput_MB_(0) {}
 
 private:
-    JobState state;
-    std::string jobid;
-    std::chrono::time_point<std::chrono::system_clock> tstart;
-    std::chrono::time_point<std::chrono::system_clock> tend;
-    std::vector<std::string> osts;  // relevant osts for this. A OST becomes relevant if one (part) of the input files reside on it.
-    uint32_t min_read_throughput_MB;
+    JobState state_;
+    std::string jobid_;
+    std::chrono::time_point<std::chrono::system_clock> tstart_;
+    std::chrono::time_point<std::chrono::system_clock> tend_;
+    std::vector<std::string> osts_;  // relevant osts for this. A OST becomes relevant if one (part) of the input files reside on it.
+    uint32_t min_read_throughput_MB_;
 
 public:
 
     void setState(const JobState &state) {
-        Job::state = state;
+        Job::state_ = state;
     }
 
     const JobState &getState() const {
-        return state;
+        return state_;
     }
 
     const std::string &getJobid() const {
-        return jobid;
+        return jobid_;
     }
 
     const std::chrono::time_point<std::chrono::system_clock> &GetStartTime() const {
-        return tstart;
+        return tstart_;
     }
 
     const std::chrono::time_point<std::chrono::system_clock> &GetEndTime() const {
-        return tend;
+        return tend_;
     }
 
     const std::vector<std::string> &getOsts() const {
-        return osts;
+        return osts_;
     }
 
     void setOsts(const std::vector<std::string> &osts) {
-        Job::osts = osts;
+        Job::osts_ = osts;
     }
 
     uint32_t getMin_read_throughput_MB() const {
-        return min_read_throughput_MB;
+        return min_read_throughput_MB_;
     }
 };
 

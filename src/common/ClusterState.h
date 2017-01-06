@@ -59,16 +59,16 @@ class MemoryClusterState : public ClusterState {
 
 private:
     static const uint32_t default_rpc_rate_ = 500;
-    std::map<std::string, OSTWorkload> ost_state_map;
-    std::shared_ptr<common::Lustre> lustre;
+    std::map<std::string, OSTWorkload> ost_state_map_;
+    std::shared_ptr<common::Lustre> lustre_;
 
-    bool update_thread_started;
-    std::thread update_thread;
-    bool update_thread_exit_flag = false;
-    bool update_thread_is_active = false;
-    std::condition_variable update_thread_finish_cv;
+    bool update_thread_started_;
+    std::thread update_thread_;
+    bool update_thread_exit_flag_ = false;
+    bool update_thread_is_active_ = false;
+    std::condition_variable update_thread_finish_cv_;
 
-    std::mutex state_mut;
+    std::mutex state_mut_;
 
     void updateRepeatedly();
 

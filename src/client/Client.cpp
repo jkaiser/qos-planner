@@ -15,11 +15,11 @@
 #include <spdlog/spdlog.h>
 
 Client::Client(std::string ipPort) {
-    this->ipPort = ipPort;
+    this->ipPort_ = ipPort;
 }
 
 bool Client::Init() {
-    context = new zmq::context_t(1);
+    context_ = new zmq::context_t(1);
     spdlog::get("console")->debug("connecting to server...");
 
     InitializeZMQSocket();
@@ -27,13 +27,13 @@ bool Client::Init() {
 }
 
 void Client::InitializeZMQSocket() {
-    client.reset(new zmq::socket_t(*context, ZMQ_REQ));
-    std::string full_address = "tcp://" + ipPort;
-    client->connect(full_address.data());
+    client_.reset(new zmq::socket_t(*context_, ZMQ_REQ));
+    std::string full_address = "tcp://" + ipPort_;
+    client_->connect(full_address.data());
 
     //  Configure socket to not wait at close time
     int linger = 0;
-    client->setsockopt(ZMQ_LINGER, &linger, sizeof(linger));
+    client_->setsockopt(ZMQ_LINGER, &linger, sizeof(linger));
 
 }
 
@@ -116,19 +116,19 @@ bool Client::TrySendRequestAndReceiveReply(std::shared_ptr<rpc::Message> &reques
 
 bool Client::SendAndReceiveRequest(std::string &raw_msg, std::string &reply) {
 
-    int retries_left = request_retries;
+    int retries_left = kRequestRetries;
 
     while (retries_left) {
-        s_send(*client, raw_msg);
+        s_send(*client_, raw_msg);
 
         while (1) {
             //  Poll socket for a reply, with timeout
-            zmq::pollitem_t items[] = {{(void *) *client, 0, ZMQ_POLLIN, 0}};
-            zmq::poll(&items[0], 1, request_timeout);
+            zmq::pollitem_t items[] = {{(void *) *client_, 0, ZMQ_POLLIN, 0}};
+            zmq::poll(&items[0], 1, kRequestTimeout);
 
             //  If we got a reply, process it
             if (items[0].revents & ZMQ_POLLIN) {
-                reply = s_recv(*client);
+                reply = s_recv(*client_);
                 return true;
             } else if (--retries_left == 0) {
                 spdlog::get("console")->error("server seems to be offline, abandoning");
@@ -137,7 +137,7 @@ bool Client::SendAndReceiveRequest(std::string &raw_msg, std::string &reply) {
                 spdlog::get("console")->warn("no response from server, retrying...");
                 //  Old socket will be confused; close it and open a new one
                 InitializeZMQSocket();
-                s_send(*client, raw_msg.data());
+                s_send(*client_, raw_msg.data());
             }
         }
     }
