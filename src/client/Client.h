@@ -22,7 +22,7 @@ private:
     std::string ipPort_;
     std::shared_ptr<zmq::socket_t> client_;
     zmq::context_t *context_;
-    const int kRequestTimeout = 1000;
+    const int kRequestTimeoutUs = 1000;
     const int kRequestRetries = 3;
 
     bool SendAndReceiveRequest(std::string &raw_msg, std::string &reply);

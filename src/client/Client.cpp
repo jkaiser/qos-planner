@@ -124,7 +124,7 @@ bool Client::SendAndReceiveRequest(std::string &raw_msg, std::string &reply) {
         while (1) {
             //  Poll socket for a reply, with timeout
             zmq::pollitem_t items[] = {{(void *) *client_, 0, ZMQ_POLLIN, 0}};
-            zmq::poll(&items[0], 1, kRequestTimeout);
+            zmq::poll(&items[0], 1, kRequestTimeoutUs);
 
             //  If we got a reply, process it
             if (items[0].revents & ZMQ_POLLIN) {
