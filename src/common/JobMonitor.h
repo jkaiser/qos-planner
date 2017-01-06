@@ -13,7 +13,7 @@
 #include <memory>
 #include <condition_variable>
 #include "Job.h"
-#include "ScheduleState.h"
+#include "MemoryScheduleState.h"
 #include "JobPriorityQueue.h"
 #include "Lustre.h"
 #include "RuleManager.h"

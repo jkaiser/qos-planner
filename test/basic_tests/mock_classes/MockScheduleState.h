@@ -7,7 +7,7 @@
 
 #include "gmock/gmock.h"
 
-#include <ScheduleState.h>
+#include <MemoryScheduleState.h>
 
 namespace common {
 class MockScheduleState : public MemoryScheduleState {

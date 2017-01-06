@@ -4,7 +4,7 @@
 
 #include "gtest/gtest.h"
 
-#include <ScheduleState.h>
+#include <MemoryScheduleState.h>
 
 #include <spdlog/spdlog.h>
 
