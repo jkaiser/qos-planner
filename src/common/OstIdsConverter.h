@@ -6,6 +6,7 @@
 #define QOS_PLANNER_OSTIDSCONVERTER_H
 
 #include <unordered_map>
+#include <mutex>
 #include "Lustre.h"
 
 namespace common {
