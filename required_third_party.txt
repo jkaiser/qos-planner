@@ -1,3 +1,32 @@
-gflags
-glog
-nlohmann/json from https://nlohmann.github.io/json/
+Required third party libraries are:
+- cmake
+- gflags
+- protobuf >= 3.10
+- spdlog from https://github.com/gabime/spdlog
+- nlohmann/json from https://nlohmann.github.io/json/
+
+
+Example installation script for an ubuntu:
+
+#/bin/sh
+sudo aptitude install cmake
+sudo aptitude install libgflags2v5 libgflags-dev
+
+# install spdlog
+sudo aptitude install libspdlog-dev
+
+#istall protobuf >=3.0
+wget https://github.com/google/protobuf/releases/download/v3.1.0/protobuf-cpp-3.1.0.tar.gz
+tar xf protobuf-cpp-3.1.0.tar.gz
+cd protobuf-3.1.0
+./configure && make -j8
+sudo make install
+
+cd ..
+
+# install nlohman/json
+git clone https://github.com/nlohmann/json.git
+mkdir json_build
+cd json_build
+cmake ../json && make -j8
+sudo make install
