@@ -139,174 +139,103 @@ Secure Shell (or SSH) is used to allow remote login and other network services b
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%% Interface %%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Interface}
+%\section{Interface}
 
-As mentioned in Section \ref{sect:general_design}, besides the new \textbf{QoS Planner}, we see interface changes both in the Slurm/LSF and in the Lustre file system.
-The following subsections describe the minimal set of functions/changes.
-We are going to extend the APIs gradually as we implement new features.
+%As mentioned in Section \ref{sect:general_design}, besides the new \textbf{QoS Planner}, we see interface changes both in the Slurm/LSF and in the Lustre file system.
+%The following subsections describe the minimal set of functions/changes.
+%We are going to extend the APIs gradually as we implement new features.
 
-\subsection{HPC cluster side tool}
-On the HPC cluster side, the job scheduling system (e.g. Slurm/LSF) must communicate with the QoS Planner to implement the resource reservation function.
-It does so calling a cmdline tool by RPC, which can be a newly created tool or an extended version of \emph{lctl}.
-The HPC cluster side tool only acts as a frontend for the QoS Planner.
-It directly forwards each request to the QoS Planner.
+%\subsection{HPC cluster side tool}
+%On the HPC cluster side, the job scheduling system (e.g. Slurm/LSF) must communicate with the QoS Planner to implement the resource reservation function.
+%It does so calling a cmdline tool by RPC, which can be a newly created tool or an extended version of \emph{lctl}.
+%The HPC cluster side tool only acts as a frontend for the QoS Planner.
+%It directly forwards each request to the QoS Planner.
 
-We identify the following basic operations.
-Note that names etc.\ are preliminary and are open for discussion.
+%We identify the following basic operations.
+%Note that names etc.\ are preliminary and are open for discussion.
 
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%% RPC calls %%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%\begin{lstlisting}[language=bash,caption={Example lctl calls}]
+%#!/bin/bash
+%# reserve resources for a job with the ID "job1".
+%# The same identifier will be used to setup the NRS.
+%lctl qosp reserve <jobid> <resource constraints>
+%lctl qosp reserve -i job1  -f /foo/bar1 \
+    %-tstart 2016-05-19T12:00            \
+    %-tend 2016-05-19T13:00              \
+    %-mbs 10240
+
+%# reserve with a given job definition file. This 
+%# becomes necessary if the computation job reads 
+%# many files.
+%lctl qosp reserve -d <job definition file>
+
+%# Remove the resource reservation for the given job.
+%lctl qosp free <jobid>
+%lctl qosp free job1
+%lctl qosp free -a
+
+%# List all existing job reservations
+%lctl qosp ls
+%\end{lstlisting}
+
+%\paragraph{Resource Constraints Definition}
+%The constraint for each file is given in the tuple $\langle file, Tp, T_{start}, T_{end}\rangle$.
+%In the beginning, we focus on read intensive workloads, therefore this parameter should only be given for main input files for computations.
+%This excludes small files such as shared libraries, for example.
+
+%Note that the constraints for write throughput skip the $file$ parameter because the output files usually are created during the computation.
+%%Note that the constraints also include timestamps and durations per file.
+%While it might not be necessary for read-only files, specifying an interval $[T_{start}, T_{end}]$ becomes necessary when the QoS Planner also considers write throughput.
+%It is hard to specify exact times for normal output files, but it is easy for checkpoints as they be triggered at scheduled times in some cases.
+%Therefore, the HPC job only requires a short reservation of write throughput at different times.
+
+%\subsection{QoS Planner -- relating to MDS}
+%In the third step in Figure \ref{subfig:qos_comm_flow}, the QoS Planner requests location information for a given file of the MDS.
+%This can be done by a call of \emph{lfs} and a parsing of the cmd-line output. 
+
+%However, if the QoS Planner processes many job requests, this mechanism could state a performance bottlneck. 
+%In the long run, we, therefore, plan to perform an direct rpc call to the MDS.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%% RPC calls %%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%% Open Issues %%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-\begin{lstlisting}[language=bash,caption={Example lctl calls}]
-#!/bin/bash
-# reserve resources for a job with the ID "job1".
-# The same identifier will be used to setup the NRS.
-lctl qosp reserve <jobid> <resource constraints>
-lctl qosp reserve -i job1  -f /foo/bar1 \
-    -tstart 2016-05-19T12:00            \
-    -tend 2016-05-19T13:00              \
-    -mbs 10240
-
-# reserve with a given job definition file. This 
-# becomes necessary if the computation job reads 
-# many files.
-lctl qosp reserve -d <job definition file>
-
-# Remove the resource reservation for the given job.
-lctl qosp free <jobid>
-lctl qosp free job1
-lctl qosp free -a
-
-# List all existing job reservations
-lctl qosp ls
-\end{lstlisting}
-
-\paragraph{Resource Constraints Definition}
-The constraint for each file is given in the tuple $\langle file, Tp, T_{start}, T_{end}\rangle$.
-In the beginning, we focus on read intensive workloads, therefore this parameter should only be given for main input files for computations.
-This excludes small files such as shared libraries, for example.
-
-Note that the constraints for write throughput skip the $file$ parameter because the output files usually are created during the computation.
-%Note that the constraints also include timestamps and durations per file.
-While it might not be necessary for read-only files, specifying an interval $[T_{start}, T_{end}]$ becomes necessary when the QoS Planner also considers write throughput.
-It is hard to specify exact times for normal output files, but it is easy for checkpoints as they be triggered at scheduled times in some cases.
-Therefore, the HPC job only requires a short reservation of write throughput at different times.
-
-
+%\section{Open Issues}
 
 %\begin{description}
+ %\item[Allow alternative schedules?] To reduce try-and-error cycles of LSF/Slurm, the QoS Planner could schedule requests at alternative times if wished and the original request cannot be met.
 
-%\item[(1) reserve\_resources(JOBID, resource\_constraints, T$_{end})$]~\\ Asks the QoS Planner to reserve the given resources at the given time.
-%\begin{description}
-    %\item[Parameters]~\\
-        %\begin{description}
-            %\item[JOBID] Same job identifier as provided by LSF/Slurm.
-            %\item[resource\_constraints] list of resource constraints.
-            %The constraint for each file is given in the tuple $\langle file, Tp, T_{start}, T_{end}\rangle$.
-            %In the beginning, we focus on read intensive workloads, therefore this parameter should only be given for main input files for computations.
-            %This excludes small files such as shared libraries, for example.
+ %\item[QoS Planner vs. normal NRS settings] QoS also can be configured via the \emph{lctl} tool.
+ %This can overwrite rules set by the QoS Planner, thus destroying the schedule.
+ %Currently, the QoS Planner is designed with the assumption that he alone has control over the QoS configuration.
+ %How to solve this conflict?
 
-            %Note that the constraints for write throughput skip the $file$ parameter because the output files usually are created during the computation.
-            %%Note that the constraints also include timestamps and durations per file.
-            %While it might not be necessary for read-only files, specifying an interval $[T_{start}, T_{end}]$ becomes necessary when the QoS Planner also considers write throughput.
-            %It is hard to specify exact times for normal output files, but it is easy for checkpoints as they be triggered at scheduled times in some cases.
-            %Therefore, the HPC job only requires a short reservation of write throughput at different times.
-            %\item[$T_{end}$] The scheduled stop date of the job.
-        %\end{description}
-    %\item[Returns]~\\
-        %\begin{description}
-            %\item[0] OK
-            %\item[-1] not enough resources
-            %\item[-2] invalid args
-        %\end{description}
-  %\end{description}
-
-
-%\item[(2) free(JOBID)]~\\ Removes the reservation of resources for the given job.
-  %\begin{description}
-    %\item[Parameters]~\\
-        %\begin{description}
-            %\item[JOBID] Same identifier as giving when reserving resources. %LSF/Slurm
-        %\end{description}
-    %\item[Returns]~\\
-        %\begin{description}
-            %\item[0] OK
-            %\item[-1] error
-        %\end{description}
-  %\end{description}
-
-
-%\item[(3) ls\_jobs()]~\\ Convenience function. Lists all active resource reservations.
-  %\begin{description}
-    %\item[Parameters] no input necessary
-    %\item[Returns] list of active resource reservations
-  %\end{description}
+ %\item[QoS Planner as optional instance?] Is the planner an optional instance or a mandatory one?
+ %If the former: how can a modified lcltl discover it?
+ %Add an entry to the MGS and let LSF/Lustre request the MGS regularly?
+ %Or make the ``discovery'' part of the configuration?
+%% TODO: clients müssen den QoS planer auch _entdecken_
+%% -> Eintrag in MGS?
+%% --> das hieße ein (initialer) zusätzlicher Kommunikationsschritt mit dem MGS. Das Wissen über den QoSPlanner kann dann in den clients vorgehalten werden.
+%% --> wie den QoSPlanner entdecken? Entweder direkt beim client-init oder später. "Später": a) per direkten announcment an alle clients b) per piggyback c) ???
+%% --> das Problem ist, dass es in Lustre noch nicht das Konzept von _optionalen_ Instanzen gibt, die dann nachträglich zugeschaltet werden können. Zugeschaltet werden können weitere OSS/OSTs, aber die werden implizit beim I/O entdeckt und sind nicht optional per Definition. Vielleicht wäre eine Lösung, den QoS als mandantory anzusehen und erst zu startetn, wenn der auch online ist?
 %\end{description}
-
-
-%\subsection{QoS Planner -- relating to OSS/NRS}        
-%So far, users and administrators can set NRS rules only OSS-wide, i.e.\ the same NRS rules are applied to all OSTs belonging to the same OSS.  % CAUTION: not sure if this is true!
-%However, the QoS Planner needs to set NRS rule per OST.
-%Therefore, the existing API of NRS and \emph{lctl} must be extended.
-
-\subsection{QoS Planner -- relating to MDS}
-In the third step in Figure \ref{subfig:qos_comm_flow}, the QoS Planner requests location information for a given file of the MDS.
-This can be done by a call of \emph{lfs} and a parsing of the cmd-line output. 
-
-However, if the QoS Planner processes many job requests, this mechanism could state a performance bottlneck. 
-In the long run, we, therefore, plan to perform an direct rpc call to the MDS.
-
-
-%\begin{description}
-%\item[(1) get\_file\_locations(file)]~\\ Lists the OSTs which hold objects of the given file.
-  %\begin{description}
-    %\item[Parameters]~\\
-        %\begin{description}
-            %\item[file] The file identifier.
-        %\end{description}
-    %\item[Returns] lists the OSTs which hold objects of the given file.
-  %\end{description}
-%\end{description}
-
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%% Open Issues %%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Open Issues}
+%\section{Future Work}
 
-\begin{description}
- \item[Allow alternative schedules?] To reduce try-and-error cycles of LSF/Slurm, the QoS Planner could schedule requests at alternative times if wished and the original request cannot be met.
-
- \item[QoS Planner vs. normal NRS settings] QoS also can be configured via the \emph{lctl} tool.
- This can overwrite rules set by the QoS Planner, thus destroying the schedule.
- Currently, the QoS Planner is designed with the assumption that he alone has control over the QoS configuration.
- How to solve this conflict?
-
- \item[QoS Planner as optional instance?] Is the planner an optional instance or a mandatory one?
- If the former: how can a modified lcltl discover it?
- Add an entry to the MGS and let LSF/Lustre request the MGS regularly?
- Or make the ``discovery'' part of the configuration?
-% TODO: clients müssen den QoS planer auch _entdecken_
-% -> Eintrag in MGS?
-% --> das hieße ein (initialer) zusätzlicher Kommunikationsschritt mit dem MGS. Das Wissen über den QoSPlanner kann dann in den clients vorgehalten werden.
-% --> wie den QoSPlanner entdecken? Entweder direkt beim client-init oder später. "Später": a) per direkten announcment an alle clients b) per piggyback c) ???
-% --> das Problem ist, dass es in Lustre noch nicht das Konzept von _optionalen_ Instanzen gibt, die dann nachträglich zugeschaltet werden können. Zugeschaltet werden können weitere OSS/OSTs, aber die werden implizit beim I/O entdeckt und sind nicht optional per Definition. Vielleicht wäre eine Lösung, den QoS als mandantory anzusehen und erst zu startetn, wenn der auch online ist?
-\end{description}
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%% Open Issues %%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Future Work}
-
-\begin{description}
- \item[Consider write throughput] So far, only read throughput is considered. As first extension, the QoS Planner also could consider write throughput.
- \item[Add real monitoring data] So far, static resource usage is assumed. In a later stage, it might be interesting to consider real workload data in the scheduling process.
-\end{description}
+%\begin{description}
+ %\item[Consider write throughput] So far, only read throughput is considered. As first extension, the QoS Planner also could consider write throughput.
+ %\item[Add real monitoring data] So far, static resource usage is assumed. In a later stage, it might be interesting to consider real workload data in the scheduling process.
+%\end{description}
 
 \end{document}
