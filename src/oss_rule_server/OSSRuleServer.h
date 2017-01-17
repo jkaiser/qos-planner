@@ -22,54 +22,49 @@
  * GPL HEADER END
  */
 
-#ifndef QOS_PLANNER_SERVER_H
-#define QOS_PLANNER_SERVER_H
+#ifndef QOS_PLANNER_OSSRULESERVER_H
+#define QOS_PLANNER_OSSRULESERVER_H
 
-#include <memory>
 #include <string>
 
-#include <Planner.h>
-
 #include <zhelpers.hpp>
-#include "../common/rpc/proto/message.pb.h"
+#include <rpc/proto/oss_server_message.pb.h>
+
+namespace oss_rule_server {
 
 /**
- * Server s(...);
- * s.Init();
- * s.Serve(); // blocking call
- *
- * // in an interrupt handler;
- * <<Interrupt (SigTerm)>>
- * s.Teardown();    // stops all future requests.
+ * The OSSRuleServer is a small instance that runs on a node running a Lustre OSS instance. The purpose is to execute
+ * remote commands cheaper than via ssh.
  */
-class Server {
+class OSSRuleServer {
 
 private:
-    std::string root_path_;
     std::string ip_port_;
-    std::shared_ptr<common::Planner> planner_;
     std::shared_ptr<zmq::socket_t> server_;
 
     zmq::context_t *context_;
+
     void initZMQ();
 
+    void ProcessUnparseableMsg(rpc::OSSCommandMessage &msg) const;
+
+    bool ProcessMessage(rpc::OSSCommandMessage &msg) const;
+
+    bool ServeReply(rpc::OSSCommandMessage &message) const;
+
+    bool ServeCommand(rpc::OSSCommandMessage &message) const;
+
 public:
-    /**
-     * Constructor
-     *
-     * root_path:   The path where the server will store permanent data structures. If empty, it will only
-     *              uses in-memory data structures.
-     */
-    Server(const std::string &ip_port, const std::string &root_path, std::shared_ptr<common::Planner> planner);
+    OSSRuleServer(const std::string &ip_port);
+
     bool Init();
 
     bool TearDown();
 
     void Serve();
 
-    void ProcessUnparsableMsg(rpc::Message &msg) const;
-
-    bool ProcessMessage(rpc::Message &msg) const;
 };
 
-#endif //QOS_PLANNER_SERVER_H
+}
+
+#endif //QOS_PLANNER_OSSRULESERVER_H

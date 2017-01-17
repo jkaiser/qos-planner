@@ -90,15 +90,15 @@ void Server::Serve() {
 
 bool Server::ProcessMessage(rpc::Message &msg) const {
     switch (msg.request().type()) {
-            case rpc::Request::RESERVE:
-                return planner_->ServeJobSubmission(msg);
-            case rpc::Request::DELETE:
-                return planner_->ServeJobRemove(msg);
-            case rpc::Request::LISTJOBS:
-                return planner_->ServeListJobs(msg);
-            default :
-                return false;
-        }
+        case rpc::Request::RESERVE:
+            return planner_->ServeJobSubmission(msg);
+        case rpc::Request::DELETE:
+            return planner_->ServeJobRemove(msg);
+        case rpc::Request::LISTJOBS:
+            return planner_->ServeListJobs(msg);
+        default:
+            return false;
+    }
 }
 
 void Server::ProcessUnparsableMsg(rpc::Message &msg) const {

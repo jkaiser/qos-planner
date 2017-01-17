@@ -35,8 +35,7 @@ bool SSHRuleSetter::SetRule(const std::string &ip, const std::string &job_id, co
         return false;
     }
 
-    std::string cmd = "ssh " + ip + " lctl set_param ost.OSS.ost_io.nrs_tbf_rule=\"start " + rule_name + " {" + job_id + "} " +
-                      std::to_string(rpc_rate_limit) + "\"";
+    std::string cmd = "ssh " + ip + " " + BuildLocalSetRuleCommand(job_id, rule_name, rpc_rate_limit);
     std::shared_ptr<std::string> out(new std::string());
 
     spdlog::get("console")->debug("sshRuleSetter: will call '{}'", cmd);
@@ -49,7 +48,7 @@ bool SSHRuleSetter::SetRule(const std::string &ip, const std::string &job_id, co
 
 bool SSHRuleSetter::RemoveRule(const std::string &ip, const std::string &rule_name, const std::string &job_id) {
 
-    std::string cmd = "ssh " + ip + "lctl set_param ost.OSS.ost_io.nrs_tbf_rule=\"stop " + rule_name + "\"";
+    std::string cmd = "ssh " + ip + " " + BuildLocalRemoveRuleCommand(job_id, rule_name);
     std::shared_ptr<std::string> out(new std::string());
 
     spdlog::get("console")->debug("lustre: will call '{}'", cmd);

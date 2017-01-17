@@ -26,16 +26,26 @@
 #define QOS_PLANNER_RULESETTER_H
 
 #include <string>
-#include <vector>
 
 namespace common {
 
-
 class RuleSetter {
+
+protected:
+    std::string BuildLocalSetRuleCommand(const std::string &job_id, const std::string &rule_name,
+                                         uint32_t rpc_rate_limit) const {
+        return "lctl set_param ost.OSS.ost_io.nrs_tbf_rule=\"start " + rule_name + " {" + job_id + "} " +
+               std::to_string(rpc_rate_limit) + "\"";
+    };
+
+    std::string BuildLocalRemoveRuleCommand(const std::string &job_id, const std::string &rule_name) const {
+        return "lctl set_param ost.OSS.ost_io.nrs_tbf_rule=\"stop " + rule_name + "\"";
+    };
 
 public:
     virtual bool SetRule(const std::string &ip, const std::string &job_id, const std::string &rule_name,
                          uint32_t rpc_rate_limit) = 0;
+
     virtual bool RemoveRule(const std::string &ost_ip, const std::string &rule_name, const std::string &job_id) = 0;
 
 };

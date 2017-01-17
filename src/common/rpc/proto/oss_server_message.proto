@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package rpc;
+
+
+message OSSCommandRequest {
+    string command = 1;
+}
+
+message OSSCommandReply {
+    int32 rc = 1;
+    string return_msg = 2;
+}
+
+message OSSCommandMessage {
+
+    enum Type {
+        REQUEST = 0;
+        REPLY = 1;
+    }
+
+    Type type = 1;
+    oneof rq {
+            OSSCommandRequest request = 2;
+            OSSCommandReply   reply = 3;
+    }
+}
